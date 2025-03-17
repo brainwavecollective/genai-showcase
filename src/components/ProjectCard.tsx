@@ -1,11 +1,12 @@
 
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Project } from '@/types';
+import { Project, Tag } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Lock } from 'lucide-react';
+import { Calendar, Lock, Tag as TagIcon } from 'lucide-react';
+import { getProjectTags } from '@/data/mockData';
 
 interface ProjectCardProps {
   project: Project;
@@ -15,6 +16,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const { isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
   const isPrivate = project.isPrivate;
+  const projectTags = getProjectTags(project);
   
   // Format date
   const formattedDate = new Date(project.dateUpdated).toLocaleDateString('en-US', {
@@ -80,6 +82,16 @@ export function ProjectCard({ project }: ProjectCardProps) {
               <Lock className="h-3 w-3" />
               <span>Sign in to view details</span>
             </p>
+          )}
+
+          {(isAuthenticated || !isPrivate) && projectTags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1">
+              {projectTags.map(tag => (
+                <Badge key={tag.id} variant="secondary" className="text-xs">
+                  {tag.name}
+                </Badge>
+              ))}
+            </div>
           )}
         </CardContent>
         

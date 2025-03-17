@@ -1,5 +1,4 @@
-
-import { User, Project, MediaItem, Comment, Theme } from '../types';
+import { User, Project, MediaItem, Comment, Theme, Tag } from '../types';
 
 // Mock Users
 export const users: User[] = [
@@ -30,6 +29,46 @@ export const users: User[] = [
     email: 'jordan@example.com',
     role: 'creator',
     avatar: 'https://i.pravatar.cc/150?img=4',
+  },
+];
+
+// Mock Tags
+export const tags: Tag[] = [
+  {
+    id: 't1',
+    name: 'UI/UX Design',
+    description: 'User interface and experience design projects',
+    createdBy: '1'
+  },
+  {
+    id: 't2',
+    name: 'Web Development',
+    description: 'Web-based projects and applications',
+    createdBy: '1'
+  },
+  {
+    id: 't3',
+    name: 'Mobile Apps',
+    description: 'Mobile application design and development',
+    createdBy: '1'
+  },
+  {
+    id: 't4',
+    name: 'Custom GPTs',
+    description: 'Projects involving custom GPT models',
+    createdBy: '1'
+  },
+  {
+    id: 't5',
+    name: 'Podcast',
+    description: 'Podcast and audio content projects',
+    createdBy: '1'
+  },
+  {
+    id: 't6',
+    name: 'Architecture',
+    description: 'Architectural design projects',
+    createdBy: '1'
   },
 ];
 
@@ -132,6 +171,7 @@ export const projects: Project[] = [
     mediaItems: alexMediaItems,
     dateCreated: '2023-08-01T00:00:00Z',
     dateUpdated: '2023-11-15T00:00:00Z',
+    tags: ['t1', 't2'],
   },
   {
     id: '2',
@@ -144,6 +184,7 @@ export const projects: Project[] = [
     mediaItems: mayaMediaItems,
     dateCreated: '2023-07-15T00:00:00Z',
     dateUpdated: '2023-10-10T00:00:00Z',
+    tags: ['t1', 't3'],
   },
   {
     id: '3',
@@ -156,6 +197,7 @@ export const projects: Project[] = [
     mediaItems: jordanMediaItems,
     dateCreated: '2023-06-20T00:00:00Z',
     dateUpdated: '2023-10-25T00:00:00Z',
+    tags: ['t6'],
   },
 ];
 
@@ -238,6 +280,16 @@ export const getUserById = (id: string): User | undefined => {
   return users.find(user => user.id === id);
 };
 
+// Function to get tag by ID
+export const getTagById = (id: string): Tag | undefined => {
+  return tags.find(tag => tag.id === id);
+};
+
+// Function to get all tags for a project
+export const getProjectTags = (project: Project): Tag[] => {
+  return project.tags.map(tagId => tags.find(t => t.id === tagId)).filter(Boolean) as Tag[];
+};
+
 // Current logged in user (for mock purposes)
 export const currentUser: User | null = null;
 
@@ -250,4 +302,9 @@ export const isAdmin = (user: User | null): boolean => {
 export const canEditProject = (user: User | null, project: Project): boolean => {
   if (!user) return false;
   return user.role === 'admin' || user.id === project.creatorId;
+};
+
+// Check if user can create tags (only admins)
+export const canCreateTags = (user: User | null): boolean => {
+  return user?.role === 'admin';
 };

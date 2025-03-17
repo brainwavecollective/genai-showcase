@@ -8,18 +8,19 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/context/AuthContext';
-import { projects } from '@/data/mockData';
-import { Project } from '@/types';
-import { Search } from 'lucide-react';
+import { projects, tags } from '@/data/mockData';
+import { Project, Tag } from '@/types';
+import { Search, Tag as TagIcon, X } from 'lucide-react';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState<'all' | 'public' | 'private'>('all');
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Filter projects based on authentication state, selected tab, and search query
+  // Filter projects based on authentication state, selected tab, search query, and tags
   useEffect(() => {
     setIsLoading(true);
     
@@ -49,10 +50,25 @@ const Index = () => {
         );
       }
       
+      // Filter by selected tags
+      if (selectedTags.length > 0) {
+        filtered = filtered.filter(project => 
+          selectedTags.some(tagId => project.tags.includes(tagId))
+        );
+      }
+      
       setVisibleProjects(filtered);
       setIsLoading(false);
     }, 500);
-  }, [searchQuery, selectedTab, isAuthenticated]);
+  }, [searchQuery, selectedTab, isAuthenticated, selectedTags]);
+
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId) 
+        : [...prev, tagId]
+    );
+  };
 
   // Animation variants
   const container = {
@@ -119,6 +135,41 @@ const Index = () => {
                 )}
               </TabsList>
             </Tabs>
+
+            {/* Tags Filter */}
+            <div className="mt-4">
+              <div className="flex flex-wrap gap-2 items-center">
+                <TagIcon className="h-4 w-4 text-muted-foreground mr-1" />
+                <span className="text-sm text-muted-foreground">Filter by tags:</span>
+                
+                {tags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant={selectedTags.includes(tag.id) ? "default" : "outline"}
+                    className={`cursor-pointer transition-colors ${
+                      selectedTags.includes(tag.id) ? 'bg-primary' : 'hover:bg-secondary/50'
+                    }`}
+                    onClick={() => handleTagToggle(tag.id)}
+                  >
+                    {tag.name}
+                    {selectedTags.includes(tag.id) && (
+                      <X className="ml-1 h-3 w-3" />
+                    )}
+                  </Badge>
+                ))}
+                
+                {selectedTags.length > 0 && (
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer hover:bg-destructive/10 transition-colors"
+                    onClick={() => setSelectedTags([])}
+                  >
+                    Clear All
+                    <X className="ml-1 h-3 w-3" />
+                  </Badge>
+                )}
+              </div>
+            </div>
           </div>
           
           {/* Project Grid */}
@@ -146,8 +197,8 @@ const Index = () => {
               <div className="text-center py-16">
                 <h3 className="text-xl font-medium mb-2">No projects found</h3>
                 <p className="text-muted-foreground">
-                  {searchQuery 
-                    ? "Try a different search term" 
+                  {searchQuery || selectedTags.length > 0
+                    ? "Try different search terms or tag filters" 
                     : isAuthenticated 
                       ? "No projects match the current filter" 
                       : "Sign in to see private projects"}

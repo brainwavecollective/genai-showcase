@@ -20,6 +20,13 @@ export interface MediaItem {
   creatorId: string;
 }
 
+export interface Tag {
+  id: string;
+  name: string;
+  description?: string;
+  createdBy: string;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -31,6 +38,7 @@ export interface Project {
   mediaItems: MediaItem[];
   dateCreated: string;
   dateUpdated: string;
+  tags: string[]; // Array of tag IDs
 }
 
 export interface Comment {
