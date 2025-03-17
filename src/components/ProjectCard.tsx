@@ -87,9 +87,21 @@ export function ProjectCard({ project }: ProjectCardProps) {
           {(isAuthenticated || !isPrivate) && projectTags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1">
               {projectTags.map(tag => (
-                <Badge key={tag.id} variant="secondary" className="text-xs">
-                  {tag.name}
-                </Badge>
+                <div key={tag.id} className="group relative">
+                  <Badge variant="secondary" className="text-xs flex items-center gap-1">
+                    <TagIcon className="h-3 w-3" />
+                    {tag.name}
+                  </Badge>
+                  
+                  {tag.description && (
+                    <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                      <div className="bg-popover text-popover-foreground shadow-md rounded-md px-3 py-2 text-xs max-w-[200px]">
+                        {tag.description}
+                        <div className="absolute w-2 h-2 bg-popover rotate-45 left-1/2 transform -translate-x-1/2 top-full -mt-1"></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           )}

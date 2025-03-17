@@ -13,15 +13,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
-import { getProjectById, getUserById, getCommentsForMediaItem, canEditProject } from '@/data/mockData';
-import { MediaItem, Project, Comment } from '@/types';
-import { ArrowLeft, Calendar, User, Link as LinkIcon, File, Image, Video, FileText } from 'lucide-react';
+import { getProjectById, getUserById, getCommentsForMediaItem, canEditProject, getProjectTags } from '@/data/mockData';
+import { MediaItem, Project, Comment, Tag } from '@/types';
+import { ArrowLeft, Calendar, User, Link as LinkIcon, File, Image, Video, FileText, Tag as TagIcon } from 'lucide-react';
 
 const ShowcasePage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const [project, setProject] = useState<Project | null>(null);
+  const [projectTags, setProjectTags] = useState<Tag[]>([]);
   const [creator, setCreator] = useState<any>(null);
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -58,6 +59,7 @@ const ShowcasePage = () => {
       }
       
       setProject(foundProject);
+      setProjectTags(getProjectTags(foundProject));
       
       // Set the first media item as selected by default if available
       if (foundProject.mediaItems.length > 0) {
@@ -263,46 +265,58 @@ const ShowcasePage = () => {
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-7xl mx-auto px-4 md:px-8">
-          {/* Back button and project info */}
-          <div className="mb-8">
+          {/* Back button */}
+          <div className="mb-6">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={() => navigate('/')}
-              className="mb-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Projects
             </Button>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-              className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6"
-            >
-              <div>
-                <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight">{project.title}</h1>
-                <div className="flex items-center mt-2 text-sm text-muted-foreground">
-                  <Calendar className="h-4 w-4 mr-1" />
-                  <span>Last updated {formatDate(project.dateUpdated)}</span>
-                </div>
-              </div>
-              
-              {canEdit && (
-                <PrivacyToggle 
-                  isPrivate={project.isPrivate} 
-                  projectId={project.id}
-                  onToggle={handlePrivacyToggle}
-                />
-              )}
-            </motion.div>
+          </div>
+          
+          {/* Project header - centered */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            <h1 className="text-3xl md:text-4xl font-display font-bold tracking-tight mb-4">{project.title}</h1>
             
             {project.description && (
-              <p className="text-muted-foreground max-w-3xl mb-6">{project.description}</p>
+              <p className="text-muted-foreground max-w-2xl mx-auto mb-6">{project.description}</p>
             )}
             
-            <div className="flex items-center space-x-2 mb-8">
+            {/* Display project tags with descriptions */}
+            {projectTags.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2 mb-6">
+                {projectTags.map(tag => (
+                  <div key={tag.id} className="group relative">
+                    <Badge 
+                      variant="secondary" 
+                      className="flex items-center gap-1 px-3 py-1"
+                    >
+                      <TagIcon className="h-3 w-3" />
+                      {tag.name}
+                    </Badge>
+                    
+                    {tag.description && (
+                      <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
+                        <div className="bg-popover text-popover-foreground shadow-md rounded-md px-3 py-2 text-sm max-w-[200px]">
+                          {tag.description}
+                          <div className="absolute w-2 h-2 bg-popover rotate-45 left-1/2 transform -translate-x-1/2 top-full -mt-1"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            <div className="flex items-center justify-center space-x-3 mb-6">
               <Avatar>
                 {creator?.avatar && <AvatarImage src={creator.avatar} />}
                 <AvatarFallback>
@@ -313,8 +327,16 @@ const ShowcasePage = () => {
                 <p className="text-sm font-medium">{creator?.name || project.creatorName}</p>
                 <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
               </div>
+              
+              {canEdit && (
+                <PrivacyToggle 
+                  isPrivate={project.isPrivate} 
+                  projectId={project.id}
+                  onToggle={handlePrivacyToggle}
+                />
+              )}
             </div>
-          </div>
+          </motion.div>
           
           {/* Project content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -417,6 +439,12 @@ const ShowcasePage = () => {
                 </div>
               )}
             </div>
+          </div>
+          
+          {/* Last updated date at the bottom */}
+          <div className="text-center mt-16 text-sm text-muted-foreground flex items-center justify-center">
+            <Calendar className="h-4 w-4 mr-1" />
+            <span>Last updated {formatDate(project.dateUpdated)}</span>
           </div>
         </div>
       </main>
