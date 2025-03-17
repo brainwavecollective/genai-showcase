@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { PrivacyToggle } from '@/components/PrivacyToggle';
 import { User, TagIcon } from 'lucide-react';
 import { Project, Tag } from '@/types';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useState } from 'react';
 
 interface ProjectHeaderProps {
   project: Project;
@@ -21,6 +23,16 @@ export function ProjectHeader({
   projectTags,
   onTogglePrivacy
 }: ProjectHeaderProps) {
+  const [openTags, setOpenTags] = useState<string[]>([]);
+
+  const toggleTag = (tagId: string) => {
+    setOpenTags(prev => 
+      prev.includes(tagId)
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -36,25 +48,32 @@ export function ProjectHeader({
       
       {/* Display project tags with descriptions */}
       {projectTags.length > 0 && (
-        <div className="flex flex-wrap justify-center gap-2 mb-6">
+        <div className="flex flex-wrap justify-center gap-3 mb-6">
           {projectTags.map(tag => (
-            <div key={tag.id} className="group relative">
-              <Badge 
-                variant="secondary" 
-                className="flex items-center gap-1 px-3 py-1"
+            <div key={tag.id} className="w-auto max-w-56">
+              <Collapsible 
+                open={openTags.includes(tag.id)}
+                onOpenChange={() => toggleTag(tag.id)}
+                className="w-full bg-secondary rounded-md overflow-hidden"
               >
-                <TagIcon className="h-3 w-3" />
-                {tag.name}
-              </Badge>
-              
-              {tag.description && (
-                <div className="absolute z-50 invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-opacity duration-300 bottom-full mb-2 left-1/2 transform -translate-x-1/2">
-                  <div className="bg-popover text-popover-foreground shadow-md rounded-md px-3 py-2 text-sm max-w-[200px]">
-                    {tag.description}
-                    <div className="absolute w-2 h-2 bg-popover rotate-45 left-1/2 transform -translate-x-1/2 top-full -mt-1"></div>
-                  </div>
-                </div>
-              )}
+                <CollapsibleTrigger className="w-full">
+                  <Badge 
+                    variant="secondary" 
+                    className="flex items-center gap-1 px-3 py-1.5 w-full justify-center cursor-pointer"
+                  >
+                    <TagIcon className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{tag.name}</span>
+                  </Badge>
+                </CollapsibleTrigger>
+                
+                {tag.description && (
+                  <CollapsibleContent>
+                    <div className="p-3 text-sm text-left text-muted-foreground">
+                      {tag.description}
+                    </div>
+                  </CollapsibleContent>
+                )}
+              </Collapsible>
             </div>
           ))}
         </div>
