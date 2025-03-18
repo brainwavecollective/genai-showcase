@@ -3,56 +3,72 @@ export type UserRole = 'admin' | 'creator' | 'visitor';
 
 export interface User {
   id: string;
-  name: string;
   email: string;
+  name: string;
   role: UserRole;
-  avatar?: string;
+  avatar_url?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface MediaItem {
   id: string;
+  project_id: string;
   title: string;
   description?: string;
-  mediaType: 'image' | 'video' | 'link' | 'document' | 'text';
-  mediaUrl: string;
-  thumbnailUrl?: string;
-  dateCreated: string;
-  creatorId: string;
+  media_type: 'image' | 'video' | 'link' | 'document' | 'text';
+  media_url: string;
+  thumbnail_url?: string;
+  creator_id: string;
+  creator_name?: string;
+  creator_avatar?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Tag {
   id: string;
   name: string;
   description?: string;
-  createdBy: string;
+  created_by: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Project {
   id: string;
   title: string;
   description?: string;
-  creatorId: string;
-  creatorName: string;
-  isPrivate: boolean;
-  coverImage?: string;
-  mediaItems: MediaItem[];
-  dateCreated: string;
-  dateUpdated: string;
-  tags: string[]; // Array of tag IDs
+  creator_id: string;
+  creator_name?: string;
+  is_private: boolean;
+  cover_image_url?: string;
+  created_at?: string;
+  updated_at?: string;
+  tag_ids?: string[];
+  tag_names?: string[];
 }
 
 export interface Comment {
   id: string;
-  mediaItemId: string;
-  userId: string;
-  userName: string;
-  userAvatar?: string;
+  media_item_id: string;
+  user_id: string;
   content: string;
-  dateCreated: string;
+  created_at?: string;
+  updated_at?: string;
+  // These fields might come from joined queries
+  user_name?: string;
+  user_avatar?: string;
 }
 
 export interface Theme {
   id: string;
   name: string;
   class: string;
+}
+
+export interface ProjectTag {
+  project_id: string;
+  tag_id: string;
+  created_at?: string;
 }

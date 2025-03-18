@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { MessageSquare } from 'lucide-react';
@@ -34,12 +34,12 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
       // Create new comment with mock data
       const comment: Comment = {
         id: `comment-${Date.now()}`,
-        mediaItemId,
-        userId: user?.id || '1',
-        userName: user?.name || 'Anonymous',
-        userAvatar: user?.avatar,
+        media_item_id: mediaItemId,
+        user_id: user?.id || '1',
         content: newComment,
-        dateCreated: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        user_name: user?.name || 'Anonymous',
+        user_avatar: user?.avatar_url,
       };
       
       onAddComment(comment);
@@ -106,17 +106,17 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
             <div key={comment.id} className="animate-fade-in">
               <div className="flex items-start gap-3">
                 <Avatar className="h-8 w-8">
-                  {comment.userAvatar && (
-                    <AvatarImage src={comment.userAvatar} alt={comment.userName} />
+                  {comment.user_avatar && (
+                    <AvatarImage src={comment.user_avatar} alt={comment.user_name || ''} />
                   )}
-                  <AvatarFallback>{comment.userName.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{comment.user_name?.charAt(0) || 'U'}</AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium">{comment.userName}</h4>
+                    <h4 className="text-sm font-medium">{comment.user_name || 'Unknown User'}</h4>
                     <span className="text-xs text-muted-foreground">
-                      {formatDate(comment.dateCreated)}
+                      {formatDate(comment.created_at || '')}
                     </span>
                   </div>
                   

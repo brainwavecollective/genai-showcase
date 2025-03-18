@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Upload, Plus } from 'lucide-react';
 import { MediaItem } from '@/types';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/context/AuthContext';
 
 interface MediaUploadProps {
   projectId: string;
@@ -24,6 +25,7 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
   const [mediaContent, setMediaContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const resetForm = () => {
     setTitle('');
@@ -45,12 +47,15 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       // Create new media item with mock ID and creator data
       const newMedia: MediaItem = {
         id: `new-${Date.now()}`,
+        project_id: projectId,
         title,
         description,
-        mediaType,
-        mediaUrl: finalMediaUrl,
-        dateCreated: new Date().toISOString(),
-        creatorId: '1', // Using admin ID for mock purposes
+        media_type: mediaType,
+        media_url: finalMediaUrl,
+        creator_id: user?.id || '',
+        creator_name: user?.name,
+        creator_avatar: user?.avatar_url,
+        created_at: new Date().toISOString(),
       };
       
       onMediaAdded(newMedia);

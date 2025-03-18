@@ -6,21 +6,20 @@ import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Lock, Tag as TagIcon } from 'lucide-react';
-import { getProjectTags } from '@/data/mockData';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 interface ProjectCardProps {
   project: Project;
+  tags?: Tag[];
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, tags }: ProjectCardProps) {
   const { isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
-  const isPrivate = project.isPrivate;
-  const projectTags = getProjectTags(project);
+  const isPrivate = project.is_private;
   
   // Format date
-  const formattedDate = new Date(project.dateUpdated).toLocaleDateString('en-US', {
+  const formattedDate = new Date(project.updated_at || '').toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -28,26 +27,26 @@ export function ProjectCard({ project }: ProjectCardProps) {
   
   // Handle image loading
   useEffect(() => {
-    if (project.coverImage) {
+    if (project.cover_image_url) {
       const img = new Image();
-      img.src = project.coverImage;
+      img.src = project.cover_image_url;
       img.onload = () => setImageLoaded(true);
     } else {
       setImageLoaded(true);
     }
-  }, [project.coverImage]);
+  }, [project.cover_image_url]);
 
   return (
     <Link to={`/project/${project.id}`}>
       <Card className="overflow-hidden hover-lift group h-full">
         <div className="relative aspect-video overflow-hidden bg-muted">
-          {project.coverImage ? (
+          {project.cover_image_url ? (
             <>
               <div 
                 className={`absolute inset-0 bg-muted ${imageLoaded ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
               />
               <img
-                src={project.coverImage}
+                src={project.cover_image_url}
                 alt={project.title}
                 className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
                   imageLoaded ? 'opacity-100' : 'opacity-0'
@@ -85,9 +84,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
             </p>
           )}
 
-          {(isAuthenticated || !isPrivate) && projectTags.length > 0 && (
+          {(isAuthenticated || !isPrivate) && tags && tags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1">
-              {projectTags.map(tag => (
+              {tags.map(tag => (
                 <TooltipProvider key={tag.id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -110,7 +109,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         
         <CardFooter className="pt-0 pb-4 flex justify-between">
           <div className="text-sm text-muted-foreground">
-            By <span className="font-medium">{project.creatorName}</span>
+            By <span className="font-medium">{project.creator_name}</span>
           </div>
           
           <div className="text-xs text-muted-foreground flex items-center">

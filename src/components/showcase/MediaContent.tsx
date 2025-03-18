@@ -45,8 +45,8 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-2xl font-medium">{selectedMedia.title}</h2>
           <Badge variant="outline" className="flex items-center gap-1">
-            {getMediaTypeIcon(selectedMedia.mediaType)}
-            <span className="capitalize">{selectedMedia.mediaType}</span>
+            {getMediaTypeIcon(selectedMedia.media_type)}
+            <span className="capitalize">{selectedMedia.media_type}</span>
           </Badge>
         </div>
         

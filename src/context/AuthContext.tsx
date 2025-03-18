@@ -1,8 +1,39 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '../types';
-import { users } from '../data/mockData';
 import { useToast } from '@/hooks/use-toast';
+
+// Mock users for demonstration
+const mockUsers: User[] = [
+  {
+    id: '1',
+    name: 'Larissa Thompson',
+    email: 'larissa@example.com',
+    role: 'admin',
+    avatar_url: 'https://i.pravatar.cc/150?img=1',
+  },
+  {
+    id: '2',
+    name: 'Alex Rodriguez',
+    email: 'alex@example.com',
+    role: 'creator',
+    avatar_url: 'https://i.pravatar.cc/150?img=2',
+  },
+  {
+    id: '3',
+    name: 'Maya Patel',
+    email: 'maya@example.com',
+    role: 'creator',
+    avatar_url: 'https://i.pravatar.cc/150?img=3',
+  },
+  {
+    id: '4',
+    name: 'Jordan Lee',
+    email: 'jordan@example.com',
+    role: 'creator',
+    avatar_url: 'https://i.pravatar.cc/150?img=4',
+  },
+];
 
 interface AuthContextType {
   user: User | null;
@@ -43,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // For demo, just check if email exists in our mock data
     // Password is ignored in this mock implementation
     
-    const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (foundUser) {
       setUser(foundUser);
@@ -68,12 +99,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // New function to request a magic link
+  // Function to request a magic link
   const requestMagicLink = async (email: string): Promise<boolean> => {
     // In a real app, this would send an email with a magic link
     // For this mock implementation, we'll just check if the email exists
     
-    const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
     
     if (foundUser) {
       // In a real app, generate a token and send an email
@@ -98,7 +129,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  // New function to confirm a magic link token
+  // Function to confirm a magic link token
   const confirmMagicLink = async (token: string): Promise<boolean> => {
     // In a real app, validate the token
     // For this mock, we'll just check if there's a pending email
@@ -106,7 +137,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const email = localStorage.getItem('pendingMagicLinkEmail');
     
     if (email) {
-      const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+      const foundUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
       
       if (foundUser) {
         setUser(foundUser);

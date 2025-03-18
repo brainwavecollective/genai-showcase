@@ -7,12 +7,12 @@ interface MediaDisplayProps {
 }
 
 export function MediaDisplay({ media }: MediaDisplayProps) {
-  switch (media.mediaType) {
+  switch (media.media_type) {
     case 'image':
       return (
         <div className="flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden max-h-[500px]">
           <img 
-            src={media.mediaUrl} 
+            src={media.media_url} 
             alt={media.title} 
             className="max-w-full max-h-[500px] object-contain"
           />
@@ -24,7 +24,7 @@ export function MediaDisplay({ media }: MediaDisplayProps) {
           <Video className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
           <p>Video content would be displayed here</p>
           <a 
-            href={media.mediaUrl} 
+            href={media.media_url} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline mt-2 inline-block"
@@ -39,7 +39,7 @@ export function MediaDisplay({ media }: MediaDisplayProps) {
           <LinkIcon className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
           <p>External link content</p>
           <a 
-            href={media.mediaUrl} 
+            href={media.media_url} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline mt-2 inline-block"
@@ -54,7 +54,7 @@ export function MediaDisplay({ media }: MediaDisplayProps) {
           <File className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
           <p>Document would be displayed here</p>
           <a 
-            href={media.mediaUrl} 
+            href={media.media_url} 
             target="_blank" 
             rel="noopener noreferrer"
             className="text-sm text-primary hover:underline mt-2 inline-block"
@@ -66,7 +66,7 @@ export function MediaDisplay({ media }: MediaDisplayProps) {
     case 'text':
       return (
         <div className="bg-muted/10 rounded-lg p-6 text-foreground">
-          <p className="whitespace-pre-line">{media.mediaUrl}</p>
+          <p className="whitespace-pre-line">{media.media_url}</p>
         </div>
       );
     default:

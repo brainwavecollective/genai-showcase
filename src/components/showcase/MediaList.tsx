@@ -70,12 +70,12 @@ export function MediaList({
                 <CardContent className="p-3">
                   <div className="flex items-start gap-2">
                     <div className="mt-1 text-muted-foreground">
-                      {getMediaTypeIcon(media.mediaType)}
+                      {getMediaTypeIcon(media.media_type)}
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium leading-tight">{media.title}</h3>
                       <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(media.dateCreated).toLocaleDateString()}
+                        {new Date(media.created_at || '').toLocaleDateString()}
                       </p>
                     </div>
                   </div>
