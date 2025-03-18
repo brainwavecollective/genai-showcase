@@ -30,14 +30,14 @@ const Index = () => {
       
       // Filter by tab
       if (selectedTab === 'public') {
-        filtered = filtered.filter(project => !project.isPrivate);
+        filtered = filtered.filter(project => !project.is_private);
       } else if (selectedTab === 'private') {
-        filtered = filtered.filter(project => project.isPrivate);
+        filtered = filtered.filter(project => project.is_private);
       }
       
       // If not authenticated, only show non-private projects
       if (!isAuthenticated) {
-        filtered = filtered.filter(project => !project.isPrivate);
+        filtered = filtered.filter(project => !project.is_private);
       }
       
       // Filter by search query
@@ -46,14 +46,14 @@ const Index = () => {
         filtered = filtered.filter(project =>
           project.title.toLowerCase().includes(query) ||
           (project.description && project.description.toLowerCase().includes(query)) ||
-          project.creatorName.toLowerCase().includes(query)
+          project.creator_name?.toLowerCase().includes(query)
         );
       }
       
       // Filter by selected tags
       if (selectedTags.length > 0) {
         filtered = filtered.filter(project => 
-          selectedTags.some(tagId => project.tags.includes(tagId))
+          selectedTags.some(tagId => project.tag_ids?.includes(tagId))
         );
       }
       

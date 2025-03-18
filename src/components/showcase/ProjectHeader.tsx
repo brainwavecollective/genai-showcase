@@ -81,19 +81,19 @@ export function ProjectHeader({
       
       <div className="flex items-center justify-center space-x-3 mb-6">
         <Avatar>
-          {creator?.avatar && <AvatarImage src={creator.avatar} />}
+          {creator?.avatar_url && <AvatarImage src={creator.avatar_url} />}
           <AvatarFallback>
             <User className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
         <div>
-          <p className="text-sm font-medium">{creator?.name || project.creatorName}</p>
+          <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
           <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
         </div>
         
         {canEdit && (
           <PrivacyToggle 
-            isPrivate={project.isPrivate} 
+            isPrivate={project.is_private} 
             projectId={project.id}
             onToggle={onTogglePrivacy}
           />

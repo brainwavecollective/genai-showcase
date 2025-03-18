@@ -50,7 +50,7 @@ const ShowcasePage = () => {
       }
       
       // If project is private and user is not authenticated, show error
-      if (foundProject.isPrivate && !isAuthenticated) {
+      if (foundProject.is_private && !isAuthenticated) {
         setError('This project is private. Please sign in to view it.');
         setIsLoading(false);
         return;
@@ -60,13 +60,13 @@ const ShowcasePage = () => {
       setProjectTags(getProjectTags(foundProject));
       
       // Set the first media item as selected by default if available
-      if (foundProject.mediaItems.length > 0) {
+      if (foundProject.mediaItems && foundProject.mediaItems.length > 0) {
         setSelectedMedia(foundProject.mediaItems[0]);
         setComments(getCommentsForMediaItem(foundProject.mediaItems[0].id));
       }
       
       // Get creator info
-      const projectCreator = getUserById(foundProject.creatorId);
+      const projectCreator = getUserById(foundProject.creator_id);
       setCreator(projectCreator);
       
       // Check if user can edit
@@ -94,7 +94,7 @@ const ShowcasePage = () => {
     if (project) {
       const updatedProject = {
         ...project,
-        mediaItems: [media, ...project.mediaItems],
+        mediaItems: [media, ...(project.mediaItems || [])],
       };
       setProject(updatedProject);
       setSelectedMedia(media);
@@ -107,7 +107,7 @@ const ShowcasePage = () => {
     if (project) {
       setProject({
         ...project,
-        isPrivate,
+        is_private: isPrivate,
       });
     }
   };
@@ -165,7 +165,7 @@ const ShowcasePage = () => {
             {/* Sidebar with media items list */}
             <div className="lg:col-span-1 order-2 lg:order-1">
               <MediaList 
-                mediaItems={project.mediaItems}
+                mediaItems={project.mediaItems || []}
                 selectedMedia={selectedMedia}
                 onMediaSelect={handleMediaSelect}
                 canEdit={canEdit}
@@ -187,7 +187,7 @@ const ShowcasePage = () => {
           {/* Last updated date at the bottom */}
           <div className="text-center mt-16 text-sm text-muted-foreground flex items-center justify-center">
             <Calendar className="h-4 w-4 mr-1" />
-            <span>Last updated {formatDate(project.dateUpdated)}</span>
+            <span>Last updated {formatDate(project.updated_at || '')}</span>
           </div>
         </div>
       </main>

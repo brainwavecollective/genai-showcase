@@ -47,6 +47,8 @@ export interface Project {
   updated_at?: string;
   tag_ids?: string[];
   tag_names?: string[];
+  // Add mediaItems for compatibility with existing code
+  mediaItems?: MediaItem[];
 }
 
 export interface Comment {
