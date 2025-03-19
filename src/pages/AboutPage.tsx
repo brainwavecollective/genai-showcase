@@ -1,26 +1,27 @@
-
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-
 const AboutPage = () => {
-  return (
-    <div className="min-h-screen flex flex-col">
+  return <div className="min-h-screen flex flex-col">
       <Header />
       
       <main className="flex-1 pt-24 pb-16">
         <div className="container max-w-4xl mx-auto px-4 md:px-8">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-8">About the Showcase</h1>
+          <motion.div initial={{
+          opacity: 0,
+          y: 20
+        }} animate={{
+          opacity: 1,
+          y: 0
+        }} transition={{
+          duration: 0.5
+        }}>
+            <h1 className="w-1/2 text-4xl md:text-5xl font-display font-bold mb-8 bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text p-2 border-b-4 border-indigo-500 transform hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-xl">About the Showcase</h1>
             
             <section className="mb-10">
               <h2 className="text-2xl font-semibold mb-4">Project Origin</h2>
-              <p className="text-muted-foreground leading-relaxed mb-4">
+              <p className="w-1/2 text-4xl md:text-5xl font-display font-bold mb-8 bg-gradient-to-r from-purple-600 to-blue-500 text-transparent bg-clip-text p-2 border-b-4 border-indigo-500 transform hover:scale-105 transition-transform duration-300 shadow-lg hover:shadow-xl">
                 This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
                 Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
                 both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
@@ -93,12 +94,8 @@ const AboutPage = () => {
             </p>
             
             <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
-              <AspectRatio ratio={16/9}>
-                <img 
-                  src="/lovable-uploads/270d895b-0c75-453f-a328-6157826d68ab.png" 
-                  alt="View of University of Colorado Boulder with the Flatirons in the background" 
-                  className="object-cover w-full h-full" 
-                />
+              <AspectRatio ratio={16 / 9}>
+                <img src="/lovable-uploads/270d895b-0c75-453f-a328-6157826d68ab.png" alt="View of University of Colorado Boulder with the Flatirons in the background" className="object-cover w-full h-full" />
               </AspectRatio>
               <p className="text-sm text-muted-foreground italic p-2 bg-card">
                 University of Colorado Boulder campus with the iconic Flatirons in the background
@@ -109,8 +106,6 @@ const AboutPage = () => {
       </main>
       
       <Footer />
-    </div>
-  );
+    </div>;
 };
-
 export default AboutPage;
