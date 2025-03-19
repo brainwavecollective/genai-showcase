@@ -14,7 +14,7 @@ export function ChatWithProjectButton({ projectId }: ChatWithProjectButtonProps)
     <Button
       onClick={() => navigate(`/project/${projectId}/chat`)}
       variant="outline"
-      className="gap-2"
+      className="gap-2 hover:bg-primary/10 transition-colors"
     >
       <Bot size={16} />
       Chat with AI about this project

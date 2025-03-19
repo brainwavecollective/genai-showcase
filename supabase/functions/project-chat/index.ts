@@ -19,6 +19,7 @@ serve(async (req) => {
     const { message, projectContext } = await req.json();
 
     if (!openAIApiKey) {
+      console.error('OpenAI API key is not configured');
       throw new Error('OpenAI API key is not configured');
     }
 
@@ -63,6 +64,7 @@ Keep your responses concise, informative, and student-friendly.
     }
 
     const aiResponse = data.choices[0].message.content;
+    console.log('Sending AI response:', aiResponse.substring(0, 100) + '...');
 
     return new Response(JSON.stringify({ response: aiResponse }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
