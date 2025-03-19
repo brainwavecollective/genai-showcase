@@ -1,46 +1,29 @@
 
-import { Link } from 'react-router-dom';
-import { 
-  NavigationMenu, 
-  NavigationMenuList, 
-  NavigationMenuItem, 
-  NavigationMenuLink, 
-  navigationMenuTriggerStyle 
-} from '@/components/ui/navigation-menu';
+import { NavLink } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { MountainSnow, Bot } from 'lucide-react';
 
 export function DesktopNav() {
   return (
-    <NavigationMenu className="hidden md:flex mx-4">
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <Link to="/">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Home
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link to="/about">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              About
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <a href="https://brainwavecollective.ai/?utm_source=atlass25showcase" target="_blank" rel="noopener noreferrer">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Brain Wave Collective
-            </NavigationMenuLink>
-          </a>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link to="/resources">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Resources
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+    <nav className="hidden md:flex items-center space-x-4">
+      <NavLink to="/" className="text-foreground/90 hover:text-foreground flex items-center gap-2 transition-colors">
+        <Button variant="ghost" className="text-base">Home</Button>
+      </NavLink>
+      <NavLink to="/chat" className="text-foreground/90 hover:text-foreground flex items-center gap-2 transition-colors">
+        <Button variant="ghost" className="text-base gap-2">
+          <Bot size={16} />
+          Chat
+        </Button>
+      </NavLink>
+      <NavLink to="/about" className="text-foreground/90 hover:text-foreground">
+        <Button variant="ghost" className="text-base">About</Button>
+      </NavLink>
+      <a href="https://brainwavecollective.ai" target="_blank" rel="noopener noreferrer">
+        <Button variant="ghost" className="text-base gap-2">
+          <MountainSnow size={16} />
+          BWC
+        </Button>
+      </a>
+    </nav>
   );
 }
