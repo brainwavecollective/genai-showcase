@@ -13,7 +13,7 @@ export function Footer() {
               Showcase
             </Link>
             <p className="mt-2 text-sm text-muted-foreground">
-              A platform for creators to showcase their work and inspire others through thoughtful design and innovation.
+              A showcase for student work from the ATLAS Institute's Generative AI course at CU Boulder.
             </p>
           </div>
           
