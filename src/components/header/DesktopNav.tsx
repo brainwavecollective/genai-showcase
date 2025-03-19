@@ -20,18 +20,18 @@ export function DesktopNav() {
           </Link>
         </NavigationMenuItem>
         <NavigationMenuItem>
-          <Link to="/projects">
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              Projects
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
           <Link to="/about">
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               About
             </NavigationMenuLink>
           </Link>
+        </NavigationMenuItem>
+        <NavigationMenuItem>
+          <a href="https://brainwavecollective.ai/?utm_source=atlass25showcase" target="_blank" rel="noopener noreferrer">
+            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              Brain Wave Collective
+            </NavigationMenuLink>
+          </a>
         </NavigationMenuItem>
         <NavigationMenuItem>
           <Link to="/resources">

@@ -29,12 +29,12 @@ export function MobileNav() {
           <Link to="/" className="text-foreground hover:text-primary transition-colors">
             Home
           </Link>
-          <Link to="/projects" className="text-foreground hover:text-primary transition-colors">
-            Projects
-          </Link>
           <Link to="/about" className="text-foreground hover:text-primary transition-colors">
             About
           </Link>
+          <a href="https://brainwavecollective.ai/?utm_source=atlass25showcase" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-primary transition-colors">
+            Brain Wave Collective
+          </a>
           <Link to="/resources" className="text-foreground hover:text-primary transition-colors">
             Resources
           </Link>
