@@ -2,6 +2,7 @@
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { motion } from 'framer-motion';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 const AboutPage = () => {
   return (
@@ -16,6 +17,19 @@ const AboutPage = () => {
             transition={{ duration: 0.5 }}
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-8">About the Showcase</h1>
+            
+            <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
+              <AspectRatio ratio={16/9}>
+                <img 
+                  src="/lovable-uploads/270d895b-0c75-453f-a328-6157826d68ab.png" 
+                  alt="View of University of Colorado Boulder with the Flatirons in the background" 
+                  className="object-cover w-full h-full" 
+                />
+              </AspectRatio>
+              <p className="text-sm text-muted-foreground italic p-2 bg-card">
+                University of Colorado Boulder campus with the iconic Flatirons in the background
+              </p>
+            </div>
             
             <section className="mb-10">
               <h2 className="text-2xl font-semibold mb-4">Project Origin</h2>
