@@ -26,12 +26,12 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/projects" className="text-muted-foreground hover:text-foreground transition-colors">
                   Projects
                 </Link>
               </li>
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
                   About
                 </Link>
               </li>
@@ -42,12 +42,17 @@ export function Footer() {
             <h3 className="text-sm font-semibold mb-3">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <a 
+                  href="https://brainwavecollective.ai/#privacy" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
                   Privacy Policy
-                </Link>
+                </a>
               </li>
               <li>
-                <Link to="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
                   Terms of Service
                 </Link>
               </li>
@@ -56,9 +61,9 @@ export function Footer() {
         </div>
         
         <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center text-sm text-muted-foreground">
-          <p>© {currentYear} Showcase. All rights reserved.</p>
+          <p>© {currentYear} Brain Wave Collective. All rights reserved.</p>
           <p className="mt-2 md:mt-0">
-            Designed with precision. Built with purpose.
+            We create the future.
           </p>
         </div>
       </div>

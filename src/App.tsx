@@ -10,6 +10,8 @@ import ShowcasePage from "./pages/ShowcasePage";
 import NotFound from "./pages/NotFound";
 import ManageUsersPage from "./pages/ManageUsersPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import AboutPage from "./pages/AboutPage";
+import TermsPage from "./pages/TermsPage";
 import { AnimatePresence } from "framer-motion";
 
 const queryClient = new QueryClient();
@@ -27,6 +29,8 @@ const App = () => (
               <Route path="/project/:id" element={<ShowcasePage />} />
               <Route path="/manage-users" element={<ManageUsersPage />} />
               <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/terms" element={<TermsPage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>
