@@ -1,11 +1,18 @@
 
 export type UserRole = 'admin' | 'creator' | 'visitor';
+export type UserStatus = 'pending_review' | 'approved' | 'denied';
 
 export interface User {
   id: string;
   email: string;
   name: string;
   role: UserRole;
+  first_name?: string;
+  last_name?: string;
+  course?: string;
+  semester?: string;
+  notes?: string;
+  status?: UserStatus;
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;
