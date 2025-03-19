@@ -27,11 +27,13 @@ export function SearchAndFilterBar({
   isAuthenticated
 }: SearchAndFilterBarProps) {
   const handleTagToggle = (tagId: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tagId) 
-        ? prev.filter(id => id !== tagId) 
-        : [...prev, tagId]
-    );
+    // Fix: Instead of using a function form that returns a new array,
+    // we compute the new array first and then pass it to setSelectedTags
+    const newSelectedTags = selectedTags.includes(tagId)
+      ? selectedTags.filter(id => id !== tagId)
+      : [...selectedTags, tagId];
+    
+    setSelectedTags(newSelectedTags);
   };
 
   return (
