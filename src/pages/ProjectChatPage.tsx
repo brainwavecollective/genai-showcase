@@ -70,15 +70,20 @@ const ProjectChatPage = () => {
           ).join('\n');
       }
 
-      // Send to OpenAI via edge function
+      // Send to OpenAI via edge function with explicit headers
       const response = await supabase.functions.invoke("project-chat", {
         body: { 
           message: content, 
           projectContext 
         },
+        headers: {
+          apikey: supabase.supabaseKey, // Add the API key explicitly
+          'Content-Type': 'application/json'
+        }
       });
 
       if (response.error) {
+        console.error('Edge function error:', response.error);
         throw new Error(response.error.message);
       }
 
@@ -118,7 +123,7 @@ const ProjectChatPage = () => {
       );
       toast({
         title: "Error",
-        description: "Failed to get response",
+        description: "Failed to get response: " + (error instanceof Error ? error.message : "Unknown error"),
         variant: "destructive",
       });
     } finally {

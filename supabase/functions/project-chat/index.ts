@@ -16,14 +16,21 @@ serve(async (req) => {
   }
 
   try {
+    // Check for API key in request
+    const apiKey = req.headers.get('apikey');
+    if (!apiKey) {
+      console.error('No API key provided in request headers');
+      throw new Error('Authentication required: No API key provided');
+    }
+
     const { message, projectContext } = await req.json();
 
     if (!openAIApiKey) {
-      console.error('OpenAI API key is not configured');
-      throw new Error('OpenAI API key is not configured');
+      console.error('OpenAI API key is not configured in environment');
+      throw new Error('OpenAI API key is not configured in environment');
     }
 
-    console.log('Received request for project chat:', { message, projectContext });
+    console.log('Received request for project chat:', { message, projectContext: projectContext ? 'provided' : 'not provided' });
 
     const systemPrompt = `
 You are a helpful AI assistant that provides information about student projects in the ATLAS Institute's Generative AI course at CU Boulder.
