@@ -12,6 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { NavigationMenu, NavigationMenuList, NavigationMenuItem, NavigationMenuLink, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 
 export function Header() {
   const { isAuthenticated, user, login, logout, requestMagicLink, confirmMagicLink, magicLinkRequested, isAdmin } = useAuth();
@@ -79,8 +80,41 @@ export function Header() {
           to="/"
           className="text-xl md:text-2xl font-display font-bold tracking-tight hover:opacity-90 transition-opacity"
         >
-          Showcase
+          ATLAS GenAI Showcase
         </Link>
+
+        <NavigationMenu className="hidden md:flex mx-4">
+          <NavigationMenuList>
+            <NavigationMenuItem>
+              <Link to="/">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Home
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link to="/projects">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Projects
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link to="/about">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  About
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link to="/resources">
+                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                  Resources
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
 
         <nav className="flex items-center space-x-1 md:space-x-2">
           {isAuthenticated ? (
@@ -104,6 +138,13 @@ export function Header() {
                   >
                     <UserCircle className="mr-2 h-4 w-4" />
                     Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    className="cursor-pointer"
+                    onClick={() => navigate('/my-projects')}
+                  >
+                    <User className="mr-2 h-4 w-4" />
+                    My Projects
                   </DropdownMenuItem>
                   {isAdmin && (
                     <DropdownMenuItem 
@@ -133,7 +174,7 @@ export function Header() {
               className="flex items-center gap-1"
             >
               <User className="h-4 w-4" />
-              <span className="hidden md:inline">Log in</span>
+              <span className="hidden md:inline">Sign in</span>
             </Button>
           )}
           

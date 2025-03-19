@@ -7,10 +7,11 @@ import { Footer } from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { projects, tags } from '@/data/mockData';
 import { Project, Tag } from '@/types';
-import { Search, Tag as TagIcon, X } from 'lucide-react';
+import { ArrowRight, Search, Tag as TagIcon, X } from 'lucide-react';
 
 const Index = () => {
   const { isAuthenticated } = useAuth();
@@ -92,34 +93,45 @@ const Index = () => {
       <Header />
       
       <main className="flex-1 pt-24 pb-16">
-        <section className="container max-w-7xl mx-auto px-4 md:px-8">
-          {/* Hero Section */}
-          <div className="text-center mb-12 md:mb-16">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-background to-secondary/20 py-16 md:py-24">
+          <div className="container max-w-7xl mx-auto px-4 md:px-8">
             <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="text-center max-w-4xl mx-auto"
             >
-              <Badge variant="outline" className="mb-4">Showcase Platform</Badge>
+              <Badge variant="outline" className="mb-4">Student Showcase Platform</Badge>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-4">
-                Discover Creative Excellence
+                Generative AI Innovation at ATLAS
               </h1>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Explore a curated collection of exceptional projects from talented creators around the world.
+              <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
+                Exploring the frontier of AI creativity at CU Boulder. Showcasing student projects from the ATLAS Institute's Generative AI program.
               </p>
+              <Button size="lg" className="rounded-full" asChild>
+                <a href="#projects">
+                  Explore Projects <ArrowRight className="ml-2" />
+                </a>
+              </Button>
             </motion.div>
           </div>
-          
-          {/* Filters and Search */}
+        </section>
+        
+        {/* Project Gallery */}
+        <section id="projects" className="container max-w-7xl mx-auto px-4 md:px-8 py-16">
           <div className="mb-8 space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search projects..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <h2 className="text-3xl font-bold">Featured Projects</h2>
+              <div className="relative w-full md:w-64">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                <Input
+                  placeholder="Search projects..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
             </div>
             
             <Tabs 
@@ -189,7 +201,10 @@ const Index = () => {
               >
                 {visibleProjects.map((project) => (
                   <motion.div key={project.id} variants={item}>
-                    <ProjectCard project={project} />
+                    <ProjectCard 
+                      project={project} 
+                      tags={tags.filter(tag => project.tag_ids?.includes(tag.id))}
+                    />
                   </motion.div>
                 ))}
               </motion.div>
@@ -206,6 +221,14 @@ const Index = () => {
               </div>
             )}
           </AnimatePresence>
+          
+          {visibleProjects.length > 0 && (
+            <div className="mt-12 text-center">
+              <Button variant="outline" size="lg">
+                Load More Projects
+              </Button>
+            </div>
+          )}
         </section>
       </main>
       
