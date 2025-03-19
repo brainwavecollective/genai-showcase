@@ -16,13 +16,9 @@ serve(async (req) => {
   }
 
   try {
-    // Check for API key in request
-    const apiKey = req.headers.get('apikey');
-    if (!apiKey) {
-      console.error('No API key provided in request headers');
-      throw new Error('Authentication required: No API key provided');
-    }
-
+    // We don't need to explicitly check for API key anymore as Supabase
+    // functions automatically validate the request before it reaches our handler
+    
     const { message, projectContext } = await req.json();
 
     if (!openAIApiKey) {

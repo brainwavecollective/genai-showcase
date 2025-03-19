@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -70,16 +69,13 @@ const ProjectChatPage = () => {
           ).join('\n');
       }
 
-      // Send to OpenAI via edge function with explicit headers
+      // Send to OpenAI via edge function with correctly passed API key
       const response = await supabase.functions.invoke("project-chat", {
         body: { 
           message: content, 
           projectContext 
         },
-        headers: {
-          apikey: supabase.supabaseKey, // Add the API key explicitly
-          'Content-Type': 'application/json'
-        }
+        // The API key is automatically included in the request by the Supabase client
       });
 
       if (response.error) {
