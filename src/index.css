@@ -1,10 +1,10 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
+    /* Light mode colors incorporating CU Boulder theme */
     --background: 210 40% 98%;
     --foreground: 222 47% 11%;
 
@@ -14,8 +14,9 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 222 47% 11%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary now uses CU Gold */
+    --primary: 43 45% 65%;
+    --primary-foreground: 0 0% 0%;
 
     --secondary: 210 40% 96%;
     --secondary-foreground: 222 47% 11%;
@@ -23,7 +24,7 @@
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 210 40% 96%;
+    --accent: 43 45% 90%;
     --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
@@ -37,6 +38,7 @@
   }
 
   .dark {
+    /* Dark mode colors with CU Boulder theme */
     --background: 222 47% 6%;
     --foreground: 210 40% 98%;
 
@@ -46,8 +48,9 @@
     --popover: 222 47% 6%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 47% 11%;
+    /* Gold for dark mode primary */
+    --primary: 43 45% 65%;
+    --primary-foreground: 0 0% 0%;
 
     --secondary: 217 33% 17%;
     --secondary-foreground: 210 40% 98%;
@@ -55,7 +58,7 @@
     --muted: 217 33% 17%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 217 33% 17%;
+    --accent: 43 45% 40%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 63% 31%;
@@ -115,6 +118,19 @@
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;  
     overflow: hidden;
+  }
+  
+  /* CU Boulder Theme Utilities */
+  .cu-gradient-gold {
+    @apply bg-gradient-to-r from-cu-gold to-cu-light-gold;
+  }
+  
+  .cu-gradient-dark {
+    @apply bg-gradient-to-r from-cu-black to-cu-carbon;
+  }
+  
+  .cu-gradient-earth {
+    @apply bg-gradient-to-r from-cu-bronze to-cu-sandstone;
   }
 }
 

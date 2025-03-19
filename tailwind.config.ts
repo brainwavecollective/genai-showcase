@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,6 +23,26 @@ export default {
 				display: ['SF Pro Display', 'Inter', 'system-ui', 'sans-serif'],
 			},
 			colors: {
+				// CU Boulder Primary Colors
+				'cu-black': '#000000',
+				'cu-gold': '#CFB87C',
+				
+				// CU Boulder Secondary Colors
+				'cu-light-gold': '#E8D8B8',
+				'cu-silver': '#A7A9AC',
+				
+				// Additional CU Boulder Colors
+				'cu-bronze': '#B08D57',
+				'cu-sandstone': '#D2B48C',
+				'cu-brown': '#5D4037',
+				'cu-maroon': '#7B3F00',
+				'cu-navy': '#1E3A5F',
+				'cu-green': '#2F4F4F',
+				'cu-matte-gold': '#C9A941',
+				'cu-carbon': '#4B4B4B',
+				'cu-yellow': '#FFD700',
+				
+				// UI Theme Colors (keep original theme colors)
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',
