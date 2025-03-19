@@ -81,7 +81,7 @@ const AboutPage = () => {
                 For questions about the Generative AI course at ATLAS Institute, please contact:
               </p>
               <ul className="list-disc pl-6 mb-4 text-muted-foreground space-y-1">
-                <li>Larissa Schwartz</li>
+                <li>Larissa Schwartz: <a href="mailto:Larissa.Schwartz@colorado.edu" className="text-cu-gold hover:underline">Larissa.Schwartz@colorado.edu</a></li>
               </ul>
             </section>
             
