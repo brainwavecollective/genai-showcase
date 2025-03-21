@@ -11,7 +11,7 @@ import { ChatInput } from "@/components/chat/ChatInput";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/use-toast";
 import { Project, User } from "@/types";
-import { ArrowLeft, Bot, Loader2 } from "lucide-react";
+import { ArrowLeft, Bot, Loader2, AlertCircle } from "lucide-react";
 
 type Message = {
   id: string;
@@ -29,13 +29,14 @@ const ChatPage = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingProject, setIsLoadingProject] = useState(true);
+  const [limitReached, setLimitReached] = useState(false);
 
   // Initial welcome message
   useEffect(() => {
     setMessages([
       {
         id: "welcome",
-        content: "Hello! I'm your project assistant. Ask me anything about this project or what you'd like to know.",
+        content: "Hello! I'm your project assistant. Ask me anything about this project or the ATLAS Institute Generative AI Showcase.",
         isUser: false,
       },
     ]);
@@ -72,7 +73,7 @@ const ChatPage = () => {
   }, [projectId, toast]);
 
   const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || isLoading || limitReached) return;
 
     // Add user message
     const userMessage = {
@@ -112,6 +113,11 @@ const ChatPage = () => {
 
       if (response.error) {
         throw new Error(response.error.message);
+      }
+
+      // Check if we've hit the daily limit
+      if (response.data.response.includes("number of available free chats for today has been exhausted")) {
+        setLimitReached(true);
       }
 
       // Replace loading message with AI response
@@ -188,6 +194,21 @@ const ChatPage = () => {
                 </Card>
               )}
 
+              {limitReached && (
+                <Card className="mb-6 p-4 bg-yellow-50 border-yellow-200">
+                  <div className="flex items-start space-x-2">
+                    <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
+                    <div>
+                      <h3 className="font-medium text-yellow-800">Daily Chat Limit Reached</h3>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        The number of available free chats for today has been exhausted. 
+                        Please try again tomorrow or contact daniel@brainwavecollective.ai for assistance.
+                      </p>
+                    </div>
+                  </div>
+                </Card>
+              )}
+
               <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
                 <div className="max-h-[500px] overflow-y-auto">
                   {messages.map((message) => (
@@ -200,7 +221,7 @@ const ChatPage = () => {
                     />
                   ))}
                 </div>
-                <ChatInput onSend={sendMessage} isLoading={isLoading} />
+                <ChatInput onSend={sendMessage} isLoading={isLoading} disabled={limitReached} />
               </div>
             </>
           )}

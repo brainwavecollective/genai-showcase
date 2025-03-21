@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
@@ -11,7 +11,7 @@ import { ProjectList } from './ProjectList';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Home, Bot, Search } from 'lucide-react';
+import { Home, Bot, Search, AlertCircle } from 'lucide-react';
 
 type Message = {
   id: string;
@@ -27,16 +27,22 @@ export function ProjectChatContainer() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Welcome to the Project Assistant! I can help you discover and understand projects in the showcase. What would you like to know?",
+      content: "Welcome to the Project Assistant! I can help you discover and understand projects in the ATLAS Institute Generative AI Showcase. What would you like to know?",
       isUser: false,
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [projects, setProjects] = useState<Project[]>([]);
   const [showProjects, setShowProjects] = useState(false);
+  const [limitReached, setLimitReached] = useState(false);
+
+  // Fetch projects on initial load
+  useEffect(() => {
+    fetchProjects();
+  }, []);
 
   const sendMessage = async (content: string) => {
-    if (!content.trim()) return;
+    if (!content.trim() || isLoading || limitReached) return;
 
     // Add user message
     const userMessage = {
@@ -83,14 +89,21 @@ export function ProjectChatContainer() {
         throw new Error(response.error.message);
       }
 
-      // Check if we need to fetch projects
+      // Check if we've hit the daily limit
+      if (response.data.response.includes("number of available free chats for today has been exhausted")) {
+        setLimitReached(true);
+      }
+
+      // Check if we need to fetch/show projects
       if (
         (content.toLowerCase().includes("show") && content.toLowerCase().includes("project")) ||
         (content.toLowerCase().includes("list") && content.toLowerCase().includes("project")) ||
         content.toLowerCase().includes("what projects") ||
         (messages.length === 1 && !projects.length)
       ) {
-        fetchProjects();
+        if (!showProjects) {
+          setShowProjects(true);
+        }
       }
 
       // Replace loading message with AI response
@@ -132,12 +145,11 @@ export function ProjectChatContainer() {
       const { data, error } = await supabase
         .from("project_details")
         .select("*")
-        .order("created_at", { ascending: false })
-        .limit(10);
+        .eq("is_private", false)
+        .order("created_at", { ascending: false });
 
       if (error) throw error;
       setProjects(data as unknown as Project[]);
-      setShowProjects(true);
     } catch (error) {
       console.error("Error fetching projects:", error);
       toast({
@@ -169,7 +181,22 @@ export function ProjectChatContainer() {
         </div>
       </div>
 
-      <QuickPromptCard sendMessage={sendMessage} />
+      {limitReached && (
+        <Card className="mb-6 p-4 bg-yellow-50 border-yellow-200">
+          <div className="flex items-start space-x-2">
+            <AlertCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
+            <div>
+              <h3 className="font-medium text-yellow-800">Daily Chat Limit Reached</h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                The number of available free chats for today has been exhausted. 
+                Please try again tomorrow or contact daniel@brainwavecollective.ai for assistance.
+              </p>
+            </div>
+          </div>
+        </Card>
+      )}
+
+      <QuickPromptCard sendMessage={sendMessage} disabled={limitReached} />
 
       <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
         <MessageList 
@@ -177,7 +204,7 @@ export function ProjectChatContainer() {
           isLoading={isLoading} 
           user={user} 
         />
-        <ChatInput onSend={sendMessage} isLoading={isLoading} />
+        <ChatInput onSend={sendMessage} isLoading={isLoading} disabled={limitReached} />
       </div>
 
       {showProjects && projects.length > 0 && (
@@ -192,7 +219,7 @@ export function ProjectChatContainer() {
   );
 }
 
-function QuickPromptCard({ sendMessage }: { sendMessage: (message: string) => void }) {
+function QuickPromptCard({ sendMessage, disabled = false }: { sendMessage: (message: string) => void, disabled?: boolean }) {
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
@@ -208,6 +235,7 @@ function QuickPromptCard({ sendMessage }: { sendMessage: (message: string) => vo
             size="sm" 
             className="gap-2"
             onClick={() => sendMessage("What kinds of projects are in the showcase?")}
+            disabled={disabled}
           >
             <Search size={14} />
             Discover projects
@@ -216,6 +244,7 @@ function QuickPromptCard({ sendMessage }: { sendMessage: (message: string) => vo
             variant="outline" 
             size="sm"
             onClick={() => sendMessage("Show me projects related to machine learning")}
+            disabled={disabled}
           >
             ML projects
           </Button>
@@ -223,6 +252,7 @@ function QuickPromptCard({ sendMessage }: { sendMessage: (message: string) => vo
             variant="outline" 
             size="sm"
             onClick={() => sendMessage("Which projects use generative AI?")}
+            disabled={disabled}
           >
             Generative AI
           </Button>
