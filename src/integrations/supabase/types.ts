@@ -200,6 +200,21 @@ export type Database = {
           },
         ]
       }
+      storage: {
+        Row: {
+          key: string
+          value: Json
+        }
+        Insert: {
+          key: string
+          value: Json
+        }
+        Update: {
+          key?: string
+          value?: Json
+        }
+        Relationships: []
+      }
       tags: {
         Row: {
           created_at: string | null
