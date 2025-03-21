@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, X, Home, Bot, Info, MountainSnow } from 'lucide-react';
+import { Menu, X, Home, Bot, Mountain, Brain } from 'lucide-react';
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -55,22 +55,22 @@ export function MobileNav() {
               </li>
               <li>
                 <Link
+                  to="/about"
+                  className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
+                  onClick={handleLinkClick}
+                >
+                  <Mountain size={20} />
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/chat"
                   className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
                   onClick={handleLinkClick}
                 >
                   <Bot size={20} />
                   Chat with AI
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/about"
-                  className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
-                  onClick={handleLinkClick}
-                >
-                  <Info size={20} />
-                  About
                 </Link>
               </li>
               <li>
@@ -81,7 +81,7 @@ export function MobileNav() {
                   className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
                   onClick={handleLinkClick}
                 >
-                  <MountainSnow size={20} />
+                  <Brain size={20} />
                   Brain Wave Collective
                 </a>
               </li>
