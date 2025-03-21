@@ -31,7 +31,7 @@ serve(async (req) => {
       .from('storage')
       .select('value')
       .eq('key', `${CHAT_COUNTER_KEY}_${today}`)
-      .single();
+      .maybeSingle();
     
     const currentCount = counterData?.value || 0;
     
@@ -51,13 +51,17 @@ serve(async (req) => {
       throw new Error('OpenAI API key is not configured in environment');
     }
 
-    console.log('Received request for project chat:', { message, projectContext: projectContext ? 'provided' : 'not provided' });
+    console.log('Received request for project chat:', { message, projectContext });
 
-    // Fetch public projects for context
-    const { data: publicProjects } = await supabase
+    // Fetch public projects for context - ALWAYS do this regardless of whether projectContext is provided
+    const { data: publicProjects, error: projectsError } = await supabase
       .from('project_details')
       .select('*')
       .eq('is_private', false);
+    
+    if (projectsError) {
+      console.error('Error fetching public projects:', projectsError);
+    }
     
     // Format public projects for the system prompt
     const projectsInfo = publicProjects?.map(project => {
@@ -65,8 +69,12 @@ serve(async (req) => {
         Project: ${project.title}
         Description: ${project.description || 'No description provided'}
         Tags: ${project.tag_names?.join(', ') || 'No tags'}
+        Creator: ${project.creator_name || 'Unknown'}
+        Created: ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
       `;
     }).join('\n') || 'No public projects available';
+    
+    console.log(`Found ${publicProjects?.length || 0} public projects for context`);
     
     // About page information for context
     const aboutPageInfo = `
@@ -95,7 +103,7 @@ serve(async (req) => {
       Here is information about the public projects in the showcase:
       ${projectsInfo}
       
-      ${projectContext ? `Additional information about the current project: ${projectContext}` : ''}
+      ${projectContext && projectContext !== "not provided" ? `Additional information about the current project: ${projectContext}` : ''}
       
       Your role is to:
       1. Help users understand the showcase platform and its projects
@@ -109,6 +117,8 @@ serve(async (req) => {
       Keep your responses concise, informative, and student-friendly.
       Base your responses on the information provided. If you don't have enough information, suggest what might be relevant.
     `;
+
+    console.log('System prompt created with project information');
 
     // Make the API request to OpenAI
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
