@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, UserCircle } from 'lucide-react';
+import { User, LogOut, UserCircle, LayoutDashboard } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -61,10 +61,10 @@ export function UserMenu() {
         </DropdownMenuItem>
         <DropdownMenuItem 
           className="cursor-pointer"
-          onClick={() => navigate('/my-projects')}
+          onClick={() => navigate('/dashboard')}
         >
-          <User className="mr-2 h-4 w-4" />
-          My Projects
+          <LayoutDashboard className="mr-2 h-4 w-4" />
+          Dashboard
         </DropdownMenuItem>
         {isAdmin && (
           <DropdownMenuItem 
