@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { Project, Tag } from '@/types';
 import { SearchAndFilterBar } from './SearchAndFilterBar';
 import { ProjectGrid } from './ProjectGrid';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ProjectSectionProps {
   projects: Project[];
@@ -17,6 +18,26 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [adminTagIds, setAdminTagIds] = useState<string[]>([]);
+
+  // Get admin tag IDs for filtering
+  useEffect(() => {
+    const fetchAdminTagIds = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tags')
+          .select('id')
+          .eq('description', 'Admin created tag');
+          
+        if (error) throw error;
+        setAdminTagIds((data || []).map(tag => tag.id));
+      } catch (error) {
+        console.error('Error fetching admin tag IDs:', error);
+      }
+    };
+    
+    fetchAdminTagIds();
+  }, []);
 
   // Filter projects based on authentication state, selected tab, search query, and tags
   useEffect(() => {
@@ -48,7 +69,7 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
         );
       }
       
-      // Filter by selected tags
+      // Filter by selected tags (only admin tags are selectable in the UI)
       if (selectedTags.length > 0) {
         filtered = filtered.filter(project => 
           selectedTags.some(tagId => project.tag_ids?.includes(tagId))
@@ -69,7 +90,7 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
         setSelectedTab={setSelectedTab}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        tags={tags}
+        tags={tags.filter(tag => adminTagIds.includes(tag.id))}
         isAuthenticated={isAuthenticated}
       />
       

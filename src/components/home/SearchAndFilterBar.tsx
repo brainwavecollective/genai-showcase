@@ -4,6 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Tag } from '@/types';
+import { useEffect, useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SearchAndFilterBarProps {
   searchQuery: string;
@@ -26,6 +28,28 @@ export function SearchAndFilterBar({
   tags,
   isAuthenticated
 }: SearchAndFilterBarProps) {
+  const [adminTags, setAdminTags] = useState<Tag[]>([]);
+  
+  useEffect(() => {
+    // Filter to only show admin-created tags (for consistency with what users can select)
+    const fetchAdminTags = async () => {
+      try {
+        const { data: adminTagsData, error } = await supabase
+          .from('tags')
+          .select('*')
+          .eq('description', 'Admin created tag')
+          .order('name');
+          
+        if (error) throw error;
+        setAdminTags(adminTagsData || []);
+      } catch (error) {
+        console.error('Error fetching admin tags:', error);
+      }
+    };
+    
+    fetchAdminTags();
+  }, []);
+
   const handleTagToggle = (tagId: string) => {
     // Fix: Instead of using a function form that returns a new array,
     // we compute the new array first and then pass it to setSelectedTags
@@ -35,6 +59,9 @@ export function SearchAndFilterBar({
     
     setSelectedTags(newSelectedTags);
   };
+
+  // Use adminTags instead of all tags
+  const displayTags = adminTags.length > 0 ? adminTags : tags;
 
   return (
     <div className="mb-8 space-y-4">
@@ -65,13 +92,13 @@ export function SearchAndFilterBar({
         </TabsList>
       </Tabs>
 
-      {/* Tags Filter */}
+      {/* Tags Filter - Only Admin Tags */}
       <div className="mt-4">
         <div className="flex flex-wrap gap-2 items-center">
           <Search className="h-4 w-4 text-muted-foreground mr-1" />
           <span className="text-sm text-muted-foreground">Filter by tags:</span>
           
-          {tags.map((tag) => (
+          {displayTags.map((tag) => (
             <Badge
               key={tag.id}
               variant={selectedTags.includes(tag.id) ? "default" : "outline"}
