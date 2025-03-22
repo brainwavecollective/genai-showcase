@@ -1,7 +1,7 @@
 
 import { NavLink } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Home, Bot, Mountain, Brain } from 'lucide-react';
+import { Home, Bot, MountainSnow, Brain } from 'lucide-react';
 
 export function DesktopNav() {
   return (
@@ -14,7 +14,7 @@ export function DesktopNav() {
       </NavLink>
       <NavLink to="/about" className="text-foreground/90 hover:text-foreground">
         <Button variant="ghost" className="text-base gap-2">
-          <Mountain size={16} />
+          <MountainSnow size={16} />
           About
         </Button>
       </NavLink>

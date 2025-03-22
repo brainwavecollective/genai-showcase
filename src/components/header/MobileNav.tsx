@@ -2,7 +2,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, X, Home, Bot, Mountain, Brain } from 'lucide-react';
+import { Menu, X, Home, Bot, MountainSnow, Brain } from 'lucide-react';
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -59,7 +59,7 @@ export function MobileNav() {
                   className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
                   onClick={handleLinkClick}
                 >
-                  <Mountain size={20} />
+                  <MountainSnow size={20} />
                   About
                 </Link>
               </li>
