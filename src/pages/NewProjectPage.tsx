@@ -13,7 +13,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { TagSelector } from '@/components/project/TagSelector';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Save, Loader2, Image, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Save, Loader2, Image, Eye, EyeOff, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function NewProjectPage() {
@@ -111,83 +111,85 @@ export default function NewProjectPage() {
         <Separator className="mb-8" />
         
         <form onSubmit={handleSubmit} className="space-y-8">
-          <Card>
+          <Card className="bg-background border-input">
             <CardContent className="pt-6">
               <div className="space-y-6">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Project Title <span className="text-red-500">*</span></Label>
-                  <Input
-                    id="title"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    placeholder="Enter project title"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <Label htmlFor="description" className="text-xl font-semibold">Description</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe your project..."
-                    rows={4}
+                    placeholder="this is my project"
+                    rows={6}
+                    className="bg-background border-input resize-none"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="coverImage">Cover Image URL</Label>
+                  <Label htmlFor="coverImage" className="text-xl font-semibold">Cover Image URL</Label>
                   <div className="flex gap-2">
                     <Input
                       id="coverImage"
                       value={coverImageUrl}
                       onChange={(e) => setCoverImageUrl(e.target.value)}
                       placeholder="https://example.com/image.jpg"
+                      className="bg-background border-input"
                     />
                     <Button 
                       type="button" 
                       variant="outline"
+                      className="bg-muted border-muted-foreground rounded-xl px-4 aspect-square flex items-center justify-center"
                       onClick={() => {
                         // In a real app, this would open an image upload dialog
                         toast.info('Image upload functionality would open here');
                       }}
                     >
-                      <Image className="h-4 w-4" />
+                      <Image className="h-6 w-6" />
                     </Button>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     For demo purposes, you can enter any valid image URL
                   </p>
                 </div>
                 
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-3">
                   <Switch
                     id="private"
                     checked={isPrivate}
                     onCheckedChange={setIsPrivate}
+                    className="data-[state=unchecked]:bg-background"
                   />
-                  <Label htmlFor="private" className="flex items-center cursor-pointer">
+                  <Label htmlFor="private" className="flex items-center text-base cursor-pointer">
                     {isPrivate ? (
                       <>
-                        <EyeOff className="h-4 w-4 mr-2" />
+                        <EyeOff className="h-5 w-5 mr-2" />
                         Private Project
                       </>
                     ) : (
                       <>
-                        <Eye className="h-4 w-4 mr-2" />
+                        <Eye className="h-5 w-5 mr-2" />
                         Public Project
                       </>
                     )}
                   </Label>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label>Project Tags</Label>
-                  <TagSelector 
-                    selectedTags={selectedTags} 
-                    onTagsChange={setSelectedTags} 
-                  />
+                <div className="space-y-3">
+                  <Label className="text-xl font-semibold">Project Tags</Label>
+                  <div className="bg-background border border-input rounded-md p-4">
+                    {selectedTags.length === 0 ? (
+                      <div className="flex items-center text-muted-foreground">
+                        <Info className="h-5 w-5 mr-2" />
+                        <span>No tags available. Tags will be created by administrators.</span>
+                      </div>
+                    ) : (
+                      <TagSelector 
+                        selectedTags={selectedTags} 
+                        onTagsChange={setSelectedTags} 
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
             </CardContent>
