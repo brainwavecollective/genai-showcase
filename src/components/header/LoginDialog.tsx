@@ -110,9 +110,7 @@ export function LoginDialog() {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  For demo: Use any email from the mock data (e.g., larissa@example.com, alex@example.com)
-                  <br />
-                  Password can be anything
+                  For demo: Try using test-admin-1@cu.edu with password123
                 </p>
               </div>
               
@@ -139,8 +137,6 @@ export function LoginDialog() {
                 
                 <p className="text-xs text-muted-foreground">
                   We'll send a secure login link to your email
-                  <br />
-                  For demo: Use any email from the mock data
                 </p>
                 
                 <DialogFooter>
@@ -166,9 +162,6 @@ export function LoginDialog() {
                     onChange={(e) => setMagicToken(e.target.value)}
                     required
                   />
-                  <p className="text-xs text-muted-foreground">
-                    For demo: Enter any text as token
-                  </p>
                 </div>
                 
                 <DialogFooter>
