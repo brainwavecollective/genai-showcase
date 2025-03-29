@@ -60,17 +60,17 @@ const ManageUsersPage = () => {
     enabled: shouldFetchUsers, // Only fetch when we've confirmed user access
   });
 
-  // Update user status mutation
+  // Update user status mutation - Updated to use the secure RPC function
   const updateUserStatus = useMutation({
     mutationFn: async ({ userId, status }: { userId: string; status: UserStatus }) => {
       console.log(`Updating user ${userId} status to ${status}`);
       
+      // Use the secure RPC function instead of direct table update
       const { data, error } = await supabase
-        .from('users')
-        .update({ status })
-        .eq('id', userId)
-        .select()
-        .single();
+        .rpc('update_user_status', {
+          p_user_id: userId,
+          p_status: status
+        });
 
       if (error) {
         console.error('Error updating user status:', error);
