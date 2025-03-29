@@ -43,6 +43,24 @@ export function useSupabaseAuth() {
               
               if (error) {
                 console.error('Error fetching user data:', error);
+                // Even if we fail to fetch user data, we know the user is authenticated
+                // by Supabase, so set the authentication state
+                if (mounted) {
+                  setIsAuthenticated(true);
+                  
+                  // Create a minimal user object based on auth data only
+                  const minimalUser: User = {
+                    id: currentSession.user.id,
+                    email: currentSession.user.email || '',
+                    role: 'user' as UserRole, // Default role
+                    status: 'active' as UserStatus, // Default status
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                  };
+                  
+                  setUser(minimalUser);
+                  setIsInitializing(false);
+                }
                 return;
               }
               
@@ -56,18 +74,22 @@ export function useSupabaseAuth() {
                 status: userData.status as UserStatus
               });
               setIsAuthenticated(true);
+              setIsInitializing(false);
             } catch (error) {
               console.error('Failed to fetch user data:', error);
+              if (mounted) {
+                setIsInitializing(false);
+              }
             }
           }, 0);
         } else {
           console.log('No active session, clearing user state');
           setUser(null);
           setIsAuthenticated(false);
-        }
-        
-        if (mounted) {
-          setIsInitializing(false);
+          
+          if (mounted) {
+            setIsInitializing(false);
+          }
         }
       }
     );
@@ -85,28 +107,49 @@ export function useSupabaseAuth() {
         if (existingSession?.user) {
           setSession(existingSession);
           // Fetch user data from our users table
-          const { data, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('id', existingSession.user.id)
-            .single();
-          
-          if (error) {
-            console.error('Error fetching user data on init:', error);
-            if (mounted) setIsInitializing(false);
-            return;
+          try {
+            const { data, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', existingSession.user.id)
+              .single();
+            
+            if (error) {
+              console.error('Error fetching user data on init:', error);
+              // Even if we fail to fetch user data, we know the user is authenticated
+              // by Supabase, so set the authentication state
+              if (mounted) {
+                setIsAuthenticated(true);
+                
+                // Create a minimal user object based on auth data only
+                const minimalUser: User = {
+                  id: existingSession.user.id,
+                  email: existingSession.user.email || '',
+                  role: 'user' as UserRole, // Default role
+                  status: 'active' as UserStatus, // Default status
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                };
+                
+                setUser(minimalUser);
+                setIsInitializing(false);
+              }
+              return;
+            }
+            
+            if (!mounted) return;
+            
+            console.log('User data fetched on init:', data);
+            // Cast the role to UserRole type to match our type definition
+            setUser({
+              ...data,
+              role: data.role as UserRole,
+              status: data.status as UserStatus
+            });
+            setIsAuthenticated(true);
+          } catch (err) {
+            console.error('Exception fetching user data:', err);
           }
-          
-          if (!mounted) return;
-          
-          console.log('User data fetched on init:', data);
-          // Cast the role to UserRole type to match our type definition
-          setUser({
-            ...data,
-            role: data.role as UserRole,
-            status: data.status as UserStatus
-          });
-          setIsAuthenticated(true);
         }
         
         if (mounted) {
@@ -127,6 +170,7 @@ export function useSupabaseAuth() {
     };
   }, []);
 
+  // Determine admin status
   const isAdmin = user?.role === 'admin';
 
   return {

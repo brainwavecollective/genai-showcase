@@ -51,10 +51,13 @@ export function LoginDialog() {
   useEffect(() => {
     if (isAuthenticated && isLoginOpen) {
       console.log('User authenticated, closing login dialog');
-      setIsLoginOpen(false);
-      setEmail('');
-      setPassword('');
-      setIsSubmitting(false);
+      // Add a slight delay to ensure the UI updates properly
+      setTimeout(() => {
+        setIsLoginOpen(false);
+        setEmail('');
+        setPassword('');
+        setIsSubmitting(false);
+      }, 300);
     }
   }, [isAuthenticated, isLoginOpen]);
 
@@ -72,13 +75,11 @@ export function LoginDialog() {
       const success = await login(email, password);
       console.log('Login attempt result:', success);
       
-      if (success) {
-        console.log('Login successful, closing dialog');
-        // Dialog will close automatically via the useEffect above when isAuthenticated changes
-      } else {
+      if (!success) {
         setLoginError('Invalid login credentials. Please try again.');
         setIsSubmitting(false);
       }
+      // If successful, dialog will close via the useEffect when isAuthenticated changes
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('An unexpected error occurred during login.');

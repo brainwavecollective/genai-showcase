@@ -105,7 +105,7 @@ export function useAuthMethods() {
       // For Supabase, this is usually handled automatically via URL parameters
       console.log("Confirming magic link with token:", token);
       
-      // For demo purposes, we'll just return true
+      // For demo purposes, we'll simulate success
       toast({
         title: "Magic link confirmed",
         description: "You have been successfully logged in",

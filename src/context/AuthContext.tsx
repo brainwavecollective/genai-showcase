@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '../types';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useAuthMethods } from '@/hooks/useAuthMethods';
@@ -30,6 +30,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   
   const { login, requestMagicLink: reqMagicLink, confirmMagicLink: confMagicLink, logout } = useAuthMethods();
 
+  // Debug authentication state
+  const [debugAuthState, setDebugAuthState] = useState({
+    user: null as User | null,
+    isAuthenticated: false,
+    isAdmin: false,
+    isInitializing: true
+  });
+
+  // Update debug state whenever auth state changes
+  useEffect(() => {
+    setDebugAuthState({
+      user,
+      isAuthenticated,
+      isAdmin,
+      isInitializing
+    });
+    
+    console.log('AuthProvider state updated:', { 
+      isAuthenticated, 
+      isAdmin, 
+      isInitializing,
+      userEmail: user?.email
+    });
+  }, [isAuthenticated, user, isAdmin, isInitializing]);
+
   // Wrap the original requestMagicLink to update the magicLinkRequested state
   const requestMagicLink = async (email: string): Promise<boolean> => {
     const result = await reqMagicLink(email);
@@ -47,11 +72,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     return result;
   };
-
-  // Log authentication state for debugging
-  useEffect(() => {
-    console.log('AuthProvider state:', { isAuthenticated, user, isAdmin, isInitializing });
-  }, [isAuthenticated, user, isAdmin, isInitializing]);
 
   return (
     <AuthContext.Provider

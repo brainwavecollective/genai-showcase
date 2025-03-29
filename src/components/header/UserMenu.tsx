@@ -19,6 +19,8 @@ export function UserMenu() {
   const navigate = useNavigate();
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [localIsAuthenticated, setLocalIsAuthenticated] = useState(false);
+  const [localUser, setLocalUser] = useState<typeof user>(null);
 
   // This effect ensures the component renders properly after hydration
   useEffect(() => {
@@ -26,16 +28,28 @@ export function UserMenu() {
     // Short timeout to ensure we don't show loading state unnecessarily
     const timer = setTimeout(() => setIsLoading(false), 500);
     
-    console.log('UserMenu rendered, auth state:', { isAuthenticated, user, isInitializing });
-    
     return () => clearTimeout(timer);
+  }, []);
+
+  // Use local state to prevent UI flicker during auth state changes
+  useEffect(() => {
+    if (!isInitializing) {
+      setLocalIsAuthenticated(isAuthenticated);
+      setLocalUser(user);
+    }
+    
+    console.log('UserMenu rendered, auth state:', { 
+      isAuthenticated, 
+      userEmail: user?.email, 
+      isInitializing 
+    });
   }, [isAuthenticated, user, isInitializing]);
 
   const getInitials = () => {
-    if (user?.name) {
-      return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    if (localUser?.name) {
+      return localUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
     }
-    return user?.email?.charAt(0).toUpperCase() || 'U';
+    return localUser?.email?.charAt(0).toUpperCase() || 'U';
   };
 
   const handleSignInClick = (e: React.MouseEvent) => {
@@ -55,7 +69,7 @@ export function UserMenu() {
   }
 
   // Only show sign-in button if definitely not authenticated
-  if (!isAuthenticated) {
+  if (!localIsAuthenticated) {
     console.log('Rendering sign-in button (not authenticated)');
     return (
       <Button 
@@ -71,17 +85,17 @@ export function UserMenu() {
   }
 
   // Show the user menu if authenticated
-  if (isAuthenticated && user) {
-    console.log('Rendering authenticated user menu for', user.name || user.email);
+  if (localIsAuthenticated && localUser) {
+    console.log('Rendering authenticated user menu for', localUser.name || localUser.email);
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center gap-1">
             <Avatar className="h-6 w-6">
-              <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
+              <AvatarImage src={localUser?.avatar_url} alt={localUser?.name || 'User'} />
               <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
-            <span className="hidden md:inline ml-2">{user?.name || user?.email}</span>
+            <span className="hidden md:inline ml-2">{localUser?.name || localUser?.email}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

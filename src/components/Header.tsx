@@ -11,6 +11,14 @@ import { useAuth } from '@/context/AuthContext';
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const { isAuthenticated, isInitializing } = useAuth();
+  const [localIsAuthenticated, setLocalIsAuthenticated] = useState(false);
+
+  // Use a local state to track authentication to prevent issues during re-renders
+  useEffect(() => {
+    if (!isInitializing) {
+      setLocalIsAuthenticated(isAuthenticated);
+    }
+  }, [isAuthenticated, isInitializing]);
 
   useEffect(() => {
     // Add scroll event listener to change header style on scroll
@@ -19,11 +27,14 @@ export function Header() {
     };
 
     // Ensure the login dialog is properly initialized on mount
-    console.log('Header component mounted, auth state:', { isAuthenticated, isInitializing });
+    console.log('Header component mounted, auth state:', { 
+      isAuthenticated: localIsAuthenticated, 
+      isInitializing 
+    });
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isAuthenticated, isInitializing]);
+  }, [localIsAuthenticated, isInitializing]);
 
   return (
     <header 
