@@ -1,10 +1,10 @@
-
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { User } from '@/types';
+import { GetUserByIdResponse } from '@/types/supabase-functions';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -35,18 +35,15 @@ const UserProfilePage = () => {
     return null;
   }
 
-  // Fetch full user details using direct query to avoid TypeScript issues
+  // Fetch full user details using the RPC function to avoid RLS recursion
   const { data: userDetails, isLoading, error } = useQuery({
     queryKey: ['user', user?.id],
     queryFn: async () => {
       console.log('Fetching user details for ID:', user?.id);
       
-      // Use a direct query instead of RPC
+      // Use the RPC function instead of direct query to avoid recursion
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user?.id)
-        .single();
+        .rpc('get_user_by_id', { user_id: user?.id });
 
       if (error) {
         console.error('Error fetching user details:', error);

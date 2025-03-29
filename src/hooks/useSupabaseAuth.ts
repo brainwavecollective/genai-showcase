@@ -36,15 +36,12 @@ export function useSupabaseAuth() {
             try {
               console.log('Fetching user data for', currentSession.user?.id);
               
-              // Try to fetch the user data using a direct query instead of RPC
+              // Use the RPC function to safely fetch user data
               const { data: userData, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', currentSession.user?.id)
-                .maybeSingle();
+                .rpc('get_user_by_id', { user_id: currentSession.user?.id });
               
               if (error || !userData) {
-                console.error('Error fetching user data with direct query:', error);
+                console.error('Error fetching user data with RPC:', error);
                 
                 // Fallback to a minimal user object based on auth data
                 const email = currentSession.user.email || '';
@@ -70,12 +67,8 @@ export function useSupabaseAuth() {
               
               console.log('User data fetched:', userData);
               
-              // Cast the role to UserRole type to match our type definition
-              setUser({
-                ...userData,
-                role: userData.role as UserRole,
-                status: userData.status as UserStatus
-              });
+              // Cast the user data to our User type
+              setUser(userData as User);
               setIsAuthenticated(true);
               setIsInitializing(false);
             } catch (error) {
@@ -128,15 +121,12 @@ export function useSupabaseAuth() {
           setSession(existingSession);
           // Fetch user data from our users table
           try {
-            // Try to use a direct query instead of RPC
+            // Use the RPC function to get user data
             const { data, error } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', existingSession.user.id)
-              .maybeSingle();
+              .rpc('get_user_by_id', { user_id: existingSession.user.id });
             
             if (error || !data) {
-              console.error('Error fetching user data on init with direct query:', error);
+              console.error('Error fetching user data on init with RPC:', error);
               
               // Even if we fail to fetch user data, we know the user is authenticated
               // by Supabase, so set the authentication state
@@ -164,12 +154,8 @@ export function useSupabaseAuth() {
             if (!mounted) return;
             
             console.log('User data fetched on init:', data);
-            // Cast the role to UserRole type to match our type definition
-            setUser({
-              ...data,
-              role: data.role as UserRole,
-              status: data.status as UserStatus
-            });
+            // Set the user data
+            setUser(data as User);
             setIsAuthenticated(true);
           } catch (err) {
             console.error('Exception fetching user data:', err);
