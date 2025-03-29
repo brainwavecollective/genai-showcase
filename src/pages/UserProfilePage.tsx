@@ -35,16 +35,17 @@ const UserProfilePage = () => {
     return null;
   }
 
-  // Fetch full user details using the RPC function to avoid RLS recursion
+  // Fetch full user details using direct query to avoid TypeScript issues
   const { data: userDetails, isLoading, error } = useQuery({
     queryKey: ['user', user?.id],
     queryFn: async () => {
       console.log('Fetching user details for ID:', user?.id);
       
-      // Use a simple query with only the necessary fields instead of a direct table access
-      // This avoids triggering the infinite recursion in RLS policies
+      // Use a direct query instead of RPC
       const { data, error } = await supabase
-        .rpc('get_user_by_id', { user_id: user?.id })
+        .from('users')
+        .select('*')
+        .eq('id', user?.id)
         .single();
 
       if (error) {
