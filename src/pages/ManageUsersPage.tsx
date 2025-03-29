@@ -39,17 +39,15 @@ const ManageUsersPage = () => {
     }
   }, [isAuthenticated, isAdmin, navigate, toast]);
 
-  // Fetch all users
+  // Fetch all users using our secure function
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      console.log('Fetching users...');
+      console.log('Fetching users through secure function...');
       
-      // Use the Supabase client to fetch users
+      // Use the Supabase RPC function to fetch users securely
       const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .order('created_at', { ascending: false });
+        .rpc('get_all_users');
 
       if (error) {
         console.error('Error fetching users:', error);

@@ -369,6 +369,24 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      get_all_users: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          avatar_url: string | null
+          course: string | null
+          created_at: string | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          name: string
+          notes: string | null
+          role: string
+          semester: string | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          updated_at: string | null
+        }[]
+      }
       get_user_by_id: {
         Args: {
           user_id: string
