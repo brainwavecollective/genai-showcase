@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,23 +41,19 @@ const AddUserForm = ({ onSuccess }: AddUserFormProps) => {
 
   const addUser = useMutation({
     mutationFn: async (userData: typeof formData) => {
-      // Create a user in the users table
+      // Use the secure insert_user RPC function instead of direct insert
       const { data, error } = await supabase
-        .from('users')
-        .insert([
-          {
-            email: userData.email,
-            name: `${userData.first_name} ${userData.last_name}`,
-            role: 'creator', // Default role
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-            course: userData.course,
-            semester: userData.semester,
-            notes: userData.notes,
-            status: userData.status
-          }
-        ])
-        .select();
+        .rpc('insert_user', {
+          p_email: userData.email,
+          p_name: `${userData.first_name} ${userData.last_name}`,
+          p_role: 'creator', // Default role
+          p_first_name: userData.first_name,
+          p_last_name: userData.last_name,
+          p_course: userData.course || null,
+          p_semester: userData.semester || null,
+          p_notes: userData.notes || null,
+          p_status: userData.status
+        });
 
       if (error) throw error;
       return data;

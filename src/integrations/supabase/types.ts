@@ -393,6 +393,34 @@ export type Database = {
         }
         Returns: Json
       }
+      insert_user: {
+        Args: {
+          p_email: string
+          p_name: string
+          p_role: string
+          p_first_name?: string
+          p_last_name?: string
+          p_course?: string
+          p_semester?: string
+          p_notes?: string
+          p_status?: string
+        }
+        Returns: {
+          avatar_url: string | null
+          course: string | null
+          created_at: string | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          name: string
+          notes: string | null
+          role: string
+          semester: string | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          updated_at: string | null
+        }[]
+      }
       is_admin: {
         Args: {
           user_id: string
