@@ -13,6 +13,7 @@ interface AuthContextType {
   logout: () => void;
   isAdmin: boolean;
   magicLinkRequested: boolean;
+  isInitializing: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,7 +24,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAuthenticated, 
     magicLinkRequested, 
     setMagicLinkRequested,
-    isAdmin
+    isAdmin,
+    isInitializing
   } = useSupabaseAuth();
   
   const { login, requestMagicLink: reqMagicLink, confirmMagicLink: confMagicLink, logout } = useAuthMethods();
@@ -47,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Log authentication state for debugging
-  console.log('AuthProvider state:', { isAuthenticated, user, isAdmin });
+  console.log('AuthProvider state:', { isAuthenticated, user, isAdmin, isInitializing });
 
   return (
     <AuthContext.Provider
@@ -60,6 +62,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         logout,
         isAdmin,
         magicLinkRequested,
+        isInitializing,
       }}
     >
       {children}

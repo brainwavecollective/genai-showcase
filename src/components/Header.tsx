@@ -6,9 +6,11 @@ import { MobileNav } from '@/components/header/MobileNav';
 import { DesktopNav } from '@/components/header/DesktopNav';
 import { UserMenu } from '@/components/header/UserMenu';
 import { LoginDialog } from '@/components/header/LoginDialog';
+import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     // Add scroll event listener to change header style on scroll
@@ -17,11 +19,11 @@ export function Header() {
     };
 
     // Ensure the login dialog is properly initialized on mount
-    console.log('Header component mounted');
+    console.log('Header component mounted, auth state:', { isAuthenticated });
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <header 

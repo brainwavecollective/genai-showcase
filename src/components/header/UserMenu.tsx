@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, UserCircle, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, UserCircle, LayoutDashboard, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -18,11 +18,17 @@ export function UserMenu() {
   const { isAuthenticated, user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [isClient, setIsClient] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // This effect ensures the component renders properly after hydration
   useEffect(() => {
     setIsClient(true);
+    // Short timeout to ensure we don't show loading state unnecessarily
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    
     console.log('UserMenu rendered, auth state:', { isAuthenticated, user });
+    
+    return () => clearTimeout(timer);
   }, [isAuthenticated, user]);
 
   const getInitials = () => {
@@ -38,8 +44,18 @@ export function UserMenu() {
     document.dispatchEvent(new Event('open-login-dialog'));
   };
 
+  // Loading state
+  if (!isClient || isLoading) {
+    return (
+      <Button variant="ghost" size="sm" disabled className="flex items-center gap-1">
+        <Loader2 className="h-4 w-4 animate-spin" />
+        <span className="hidden md:inline">Loading...</span>
+      </Button>
+    );
+  }
+
   // Only show sign-in button if definitely not authenticated
-  if (isClient && !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <Button 
         variant="ghost" 
@@ -54,7 +70,8 @@ export function UserMenu() {
   }
 
   // Show the user menu if authenticated
-  if (isClient && isAuthenticated && user) {
+  if (isAuthenticated && user) {
+    console.log('Rendering authenticated user menu for', user.name || user.email);
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -63,7 +80,7 @@ export function UserMenu() {
               <AvatarImage src={user?.avatar_url} alt={user?.name || 'User'} />
               <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
-            <span className="hidden md:inline ml-2">{user?.name}</span>
+            <span className="hidden md:inline ml-2">{user?.name || user?.email}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
@@ -105,12 +122,6 @@ export function UserMenu() {
     );
   }
 
-  // Loading state - show a simplified avatar while we wait for auth status
-  return (
-    <Button variant="ghost" size="sm" disabled className="flex items-center gap-1">
-      <Avatar className="h-6 w-6">
-        <AvatarFallback>...</AvatarFallback>
-      </Avatar>
-    </Button>
-  );
+  // Fallback for edge cases
+  return null;
 }

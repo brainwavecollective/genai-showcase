@@ -29,11 +29,15 @@ export function LoginDialog() {
   const [magicToken, setMagicToken] = useState('');
   const [loginMethod, setLoginMethod] = useState<'password' | 'magic'>('password');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleOpenLoginDialog = () => {
       console.log('Open login dialog event received');
       setIsLoginOpen(true);
+      // Reset the form state when opening
+      setLoginError(null);
+      setIsSubmitting(false);
     };
     
     document.addEventListener('open-login-dialog', handleOpenLoginDialog);
@@ -49,18 +53,25 @@ export function LoginDialog() {
     
     if (isSubmitting) return;
     
+    setLoginError(null);
     setIsSubmitting(true);
+    
     try {
+      console.log('Attempting login with credentials...');
       const success = await login(email, password);
       console.log('Login attempt result:', success);
       
       if (success) {
+        console.log('Login successful, closing dialog');
         setIsLoginOpen(false);
         setEmail('');
         setPassword('');
+      } else {
+        setLoginError('Invalid login credentials. Please try again.');
       }
     } catch (error) {
       console.error('Login error:', error);
+      setLoginError('An unexpected error occurred during login.');
     } finally {
       setIsSubmitting(false);
     }
@@ -72,11 +83,14 @@ export function LoginDialog() {
     
     if (isSubmitting) return;
     
+    setLoginError(null);
     setIsSubmitting(true);
+    
     try {
       await requestMagicLink(email);
     } catch (error) {
       console.error('Magic link request error:', error);
+      setLoginError('Failed to send magic link. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -88,23 +102,36 @@ export function LoginDialog() {
     
     if (isSubmitting) return;
     
+    setLoginError(null);
     setIsSubmitting(true);
+    
     try {
       const success = await confirmMagicLink(magicToken);
       if (success) {
         setIsLoginOpen(false);
         setEmail('');
         setMagicToken('');
+      } else {
+        setLoginError('Invalid or expired token. Please try again.');
       }
     } catch (error) {
       console.error('Magic link confirmation error:', error);
+      setLoginError('Failed to verify the magic link token.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handleDialogChange = (open: boolean) => {
+    if (!open && !isSubmitting) {
+      setIsLoginOpen(false);
+      // Reset form state when closing
+      setLoginError(null);
+    }
+  };
+
   return (
-    <Dialog open={isLoginOpen} onOpenChange={setIsLoginOpen}>
+    <Dialog open={isLoginOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="sm:max-w-md animate-fade-in animate-slide-up">
         <DialogHeader>
           <DialogTitle>Sign in</DialogTitle>
@@ -112,6 +139,12 @@ export function LoginDialog() {
             Sign in to access your account
           </DialogDescription>
         </DialogHeader>
+        
+        {loginError && (
+          <Alert variant="destructive" className="my-2">
+            <AlertDescription>{loginError}</AlertDescription>
+          </Alert>
+        )}
         
         <Tabs defaultValue="password" onValueChange={(value) => setLoginMethod(value as 'password' | 'magic')}>
           <TabsList className="grid w-full grid-cols-2">
@@ -136,6 +169,7 @@ export function LoginDialog() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isSubmitting}
                 />
               </div>
               
@@ -148,6 +182,7 @@ export function LoginDialog() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isSubmitting}
                 />
                 <p className="text-xs text-muted-foreground">
                   For demo: Try using test-admin-1@cu.edu with password123
@@ -178,6 +213,7 @@ export function LoginDialog() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 
@@ -213,6 +249,7 @@ export function LoginDialog() {
                     value={magicToken}
                     onChange={(e) => setMagicToken(e.target.value)}
                     required
+                    disabled={isSubmitting}
                   />
                 </div>
                 

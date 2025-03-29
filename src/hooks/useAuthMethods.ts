@@ -9,6 +9,16 @@ export function useAuthMethods() {
     try {
       console.log('Attempting login with:', email);
       
+      if (!email || !password) {
+        console.warn('Login failed: Empty email or password');
+        toast({
+          title: "Login failed",
+          description: "Email and password are required",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -47,6 +57,15 @@ export function useAuthMethods() {
   // Function to request a magic link
   const requestMagicLink = async (email: string): Promise<boolean> => {
     try {
+      if (!email) {
+        toast({
+          title: "Failed to send magic link",
+          description: "Email is required",
+          variant: "destructive",
+        });
+        return false;
+      }
+      
       const { data, error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -88,22 +107,33 @@ export function useAuthMethods() {
   };
 
   const logout = async () => {
-    const { error } = await supabase.auth.signOut();
-    
-    if (error) {
-      console.error('Logout error:', error);
+    try {
+      console.log('Attempting logout');
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+        toast({
+          title: "Logout failed",
+          description: error.message,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      console.log('Logout successful');
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out",
+      });
+    } catch (error) {
+      console.error('Unexpected logout error:', error);
       toast({
         title: "Logout failed",
-        description: error.message,
+        description: "An unexpected error occurred",
         variant: "destructive",
       });
-      return;
     }
-    
-    toast({
-      title: "Logged out",
-      description: "You have been successfully logged out",
-    });
   };
 
   return {
