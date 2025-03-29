@@ -437,6 +437,27 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
+      update_user_status: {
+        Args: {
+          p_user_id: string
+          p_status: string
+        }
+        Returns: {
+          avatar_url: string | null
+          course: string | null
+          created_at: string | null
+          email: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          name: string
+          notes: string | null
+          role: string
+          semester: string | null
+          status: Database["public"]["Enums"]["user_status"] | null
+          updated_at: string | null
+        }[]
+      }
     }
     Enums: {
       user_status: "pending_review" | "approved" | "denied"
