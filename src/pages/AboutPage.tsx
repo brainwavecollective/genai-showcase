@@ -1,20 +1,35 @@
-
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { FluidCursor } from '@/components/ui/fluid-cursor'; // Import the FluidCursor component
 
 const AboutPage = () => {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      {/* Add FluidCursor as a background element */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <FluidCursor 
+          config={{
+            DENSITY_DISSIPATION: 0.97,
+            VELOCITY_DISSIPATION: 0.98,
+            SPLAT_RADIUS: 0.25,
+            SPLAT_FORCE: 6000,
+            CURL: 30,
+            SHADING: true,
+          }}
+        />
+      </div>
+      
       <Header />
       
-      <main className="flex-1 pt-24 pb-16">
+      <main className="flex-1 pt-24 pb-16 relative z-10">
         <div className="container max-w-4xl mx-auto px-4 md:px-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
             animate={{ opacity: 1, y: 0 }} 
             transition={{ duration: 0.5 }}
+            className="bg-background/80 backdrop-blur-sm p-6 rounded-lg shadow-lg"
           >
             <h1 className="text-4xl md:text-5xl font-display font-bold mb-8 border-b-2 border-cu-gold pb-2">
               About the Showcase
