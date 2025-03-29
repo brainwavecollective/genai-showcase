@@ -121,6 +121,7 @@ serve(async (req) => {
     console.log('System prompt created with project information');
 
     // Make the API request to Anthropic's Claude
+    // Note: Anthropic API requires system message as a top-level parameter
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -130,11 +131,8 @@ serve(async (req) => {
       },
       body: JSON.stringify({
         model: 'claude-3-haiku-20240307',
+        system: systemPrompt, // System prompt as a top-level parameter
         messages: [
-          {
-            role: 'system',
-            content: systemPrompt
-          },
           {
             role: 'user',
             content: message
