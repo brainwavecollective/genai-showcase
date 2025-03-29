@@ -35,32 +35,30 @@ export function useSupabaseAuth() {
             
             try {
               console.log('Fetching user data for', currentSession.user?.id);
-              const { data: userData, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', currentSession.user?.id)
-                .single();
               
-              if (error) {
-                console.error('Error fetching user data:', error);
-                // Even if we fail to fetch user data, we know the user is authenticated
-                // by Supabase, so set the authentication state
+              // Try to use the RPC function first for safer access
+              const { data: userData, error } = await supabase
+                .rpc('get_user_by_id', { user_id: currentSession.user?.id })
+                .maybeSingle();
+              
+              if (error || !userData) {
+                console.error('Error fetching user data with RPC:', error);
+                
+                // Fallback to a minimal user object based on auth data
+                const email = currentSession.user.email || '';
+                const minimalUser: User = {
+                  id: currentSession.user.id,
+                  email: email,
+                  name: email.split('@')[0] || 'User', // Use part of email as name or default to 'User'
+                  role: 'visitor' as UserRole, // Default role
+                  status: 'pending_review' as UserStatus, // Default status
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                };
+                
                 if (mounted) {
-                  setIsAuthenticated(true);
-                  
-                  // Create a minimal user object based on auth data only
-                  const email = currentSession.user.email || '';
-                  const minimalUser: User = {
-                    id: currentSession.user.id,
-                    email: email,
-                    name: email.split('@')[0] || 'User', // Use part of email as name or default to 'User'
-                    role: 'visitor' as UserRole, // Default role
-                    status: 'pending_review' as UserStatus, // Default status
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString()
-                  };
-                  
                   setUser(minimalUser);
+                  setIsAuthenticated(true);
                   setIsInitializing(false);
                 }
                 return;
@@ -69,6 +67,7 @@ export function useSupabaseAuth() {
               if (!mounted) return;
               
               console.log('User data fetched:', userData);
+              
               // Cast the role to UserRole type to match our type definition
               setUser({
                 ...userData,
@@ -79,7 +78,24 @@ export function useSupabaseAuth() {
               setIsInitializing(false);
             } catch (error) {
               console.error('Failed to fetch user data:', error);
+              
+              // Even on failure, set authenticated if we have a session
               if (mounted) {
+                setIsAuthenticated(true);
+                
+                // Create a minimal user object based on auth data
+                const email = currentSession.user.email || '';
+                const minimalUser: User = {
+                  id: currentSession.user.id,
+                  email: email,
+                  name: email.split('@')[0] || 'User',
+                  role: 'visitor' as UserRole,
+                  status: 'pending_review' as UserStatus,
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                };
+                
+                setUser(minimalUser);
                 setIsInitializing(false);
               }
             }
@@ -110,14 +126,14 @@ export function useSupabaseAuth() {
           setSession(existingSession);
           // Fetch user data from our users table
           try {
+            // Try to use the RPC function first
             const { data, error } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', existingSession.user.id)
-              .single();
+              .rpc('get_user_by_id', { user_id: existingSession.user.id })
+              .maybeSingle();
             
-            if (error) {
-              console.error('Error fetching user data on init:', error);
+            if (error || !data) {
+              console.error('Error fetching user data on init with RPC:', error);
+              
               // Even if we fail to fetch user data, we know the user is authenticated
               // by Supabase, so set the authentication state
               if (mounted) {
@@ -128,9 +144,9 @@ export function useSupabaseAuth() {
                 const minimalUser: User = {
                   id: existingSession.user.id,
                   email: email,
-                  name: email.split('@')[0] || 'User', // Use part of email as name or default to 'User'
-                  role: 'visitor' as UserRole, // Default role
-                  status: 'pending_review' as UserStatus, // Default status
+                  name: email.split('@')[0] || 'User', 
+                  role: 'visitor' as UserRole, 
+                  status: 'pending_review' as UserStatus,
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString()
                 };
@@ -153,6 +169,22 @@ export function useSupabaseAuth() {
             setIsAuthenticated(true);
           } catch (err) {
             console.error('Exception fetching user data:', err);
+            
+            // Create a minimal user object on error
+            if (mounted) {
+              setIsAuthenticated(true);
+              const email = existingSession.user.email || '';
+              const minimalUser: User = {
+                id: existingSession.user.id,
+                email: email,
+                name: email.split('@')[0] || 'User',
+                role: 'visitor' as UserRole,
+                status: 'pending_review' as UserStatus,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              };
+              setUser(minimalUser);
+            }
           }
         }
         
