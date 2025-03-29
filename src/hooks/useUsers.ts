@@ -2,46 +2,33 @@
 import { useState, useEffect } from 'react';
 import { User, UserStatus } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
 
 export function useUsers() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        // Using the get_all_users RPC function instead of direct table query to avoid RLS recursion
-        const { data, error } = await supabase
-          .rpc('get_all_users');
-
-        if (error) {
-          console.error('Error fetching users:', error);
-          setError(error.message);
-        } else {
-          const typedUsers = data?.map(user => ({
-            ...user,
-            role: user.role as User['role'],
-            status: user.status as UserStatus
-          })) || [];
-          setUsers(typedUsers);
-        }
-      } catch (err: any) {
-        console.error('Unexpected error fetching users:', err);
-        setError(err.message || 'An unexpected error occurred');
-      } finally {
-        setLoading(false);
+  // Use React Query for fetching and caching users
+  const { data: users = [], isLoading, error } = useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      console.log('Fetching users from Supabase');
+      const { data, error } = await supabase.rpc('get_all_users');
+      
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
       }
-    };
-
-    fetchUsers();
-  }, []);
+      
+      // Convert to properly typed User array
+      return data?.map(user => ({
+        ...user,
+        role: user.role as User['role'],
+        status: user.status as UserStatus
+      })) || [];
+    }
+  });
 
   const updateUserStatus = useMutation({
     mutationFn: async (params: { userId: string; status: UserStatus }) => {
@@ -61,7 +48,9 @@ export function useUsers() {
       return data;
     },
     onSuccess: () => {
+      // This invalidates the query and triggers a refetch
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      
       toast({
         title: "Success",
         description: "User status updated successfully.",
@@ -79,8 +68,8 @@ export function useUsers() {
 
   return {
     users,
-    isLoading: loading,
-    error,
+    isLoading,
+    error: error ? (error as Error).message : null,
     updateUserStatus: (userId: string, status: UserStatus) => 
       updateUserStatus.mutate({ userId, status })
   };
