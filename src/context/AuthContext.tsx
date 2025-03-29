@@ -46,6 +46,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return result;
   };
 
+  // Log authentication state for debugging
+  console.log('AuthProvider state:', { isAuthenticated, user, isAdmin });
+
   return (
     <AuthContext.Provider
       value={{

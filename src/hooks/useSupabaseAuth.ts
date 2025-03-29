@@ -22,31 +22,29 @@ export function useSupabaseAuth() {
         
         if (session?.user) {
           // Fetch user data from our users table
-          setTimeout(async () => {
-            try {
-              const { data: userData, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('id', session.user.id)
-                .single();
-              
-              if (error) {
-                console.error('Error fetching user data:', error);
-                return;
-              }
-              
-              console.log('User data fetched:', userData);
-              // Cast the role to UserRole type to match our type definition
-              setUser({
-                ...userData,
-                role: userData.role as UserRole,
-                status: userData.status as UserStatus
-              });
-              setIsAuthenticated(true);
-            } catch (error) {
-              console.error('Failed to fetch user data:', error);
+          try {
+            const { data: userData, error } = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            
+            if (error) {
+              console.error('Error fetching user data:', error);
+              return;
             }
-          }, 0);
+            
+            console.log('User data fetched:', userData);
+            // Cast the role to UserRole type to match our type definition
+            setUser({
+              ...userData,
+              role: userData.role as UserRole,
+              status: userData.status as UserStatus
+            });
+            setIsAuthenticated(true);
+          } catch (error) {
+            console.error('Failed to fetch user data:', error);
+          }
         } else {
           setUser(null);
           setIsAuthenticated(false);
