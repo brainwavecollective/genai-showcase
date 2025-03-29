@@ -1,6 +1,6 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User } from '../types';
+import { User, UserRole, UserStatus } from '../types';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Session } from '@supabase/supabase-js';
@@ -48,7 +48,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
               }
               
               console.log('User data fetched:', userData);
-              setUser(userData);
+              // Cast the role to UserRole type to match our type definition
+              setUser({
+                ...userData,
+                role: userData.role as UserRole,
+                status: userData.status as UserStatus
+              });
               setIsAuthenticated(true);
             } catch (error) {
               console.error('Failed to fetch user data:', error);
@@ -78,7 +83,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             
             console.log('User data fetched on init:', data);
-            setUser(data);
+            // Cast the role to UserRole type to match our type definition
+            setUser({
+              ...data,
+              role: data.role as UserRole,
+              status: data.status as UserStatus
+            });
             setIsAuthenticated(true);
           });
       }
