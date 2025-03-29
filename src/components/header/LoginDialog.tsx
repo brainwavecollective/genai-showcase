@@ -28,9 +28,14 @@ export function LoginDialog() {
   const [password, setPassword] = useState('');
   const [magicToken, setMagicToken] = useState('');
   const [loginMethod, setLoginMethod] = useState<'password' | 'magic'>('password');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const handleOpenLoginDialog = () => setIsLoginOpen(true);
+    const handleOpenLoginDialog = () => {
+      console.log('Open login dialog event received');
+      setIsLoginOpen(true);
+    };
+    
     document.addEventListener('open-login-dialog', handleOpenLoginDialog);
     
     return () => {
@@ -40,26 +45,61 @@ export function LoginDialog() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await login(email, password);
-    if (success) {
-      setIsLoginOpen(false);
-      setEmail('');
-      setPassword('');
+    console.log('Login form submitted', { email, password });
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await login(email, password);
+      console.log('Login attempt result:', success);
+      
+      if (success) {
+        setIsLoginOpen(false);
+        setEmail('');
+        setPassword('');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleMagicLinkRequest = async (e: React.FormEvent) => {
     e.preventDefault();
-    await requestMagicLink(email);
+    console.log('Magic link requested for:', email);
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      await requestMagicLink(email);
+    } catch (error) {
+      console.error('Magic link request error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleMagicLinkConfirm = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await confirmMagicLink(magicToken);
-    if (success) {
-      setIsLoginOpen(false);
-      setEmail('');
-      setMagicToken('');
+    console.log('Magic link confirmation with token:', magicToken);
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    try {
+      const success = await confirmMagicLink(magicToken);
+      if (success) {
+        setIsLoginOpen(false);
+        setEmail('');
+        setMagicToken('');
+      }
+    } catch (error) {
+      console.error('Magic link confirmation error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -115,7 +155,13 @@ export function LoginDialog() {
               </div>
               
               <DialogFooter>
-                <Button type="submit" className="w-full">Sign in</Button>
+                <Button 
+                  type="submit" 
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Signing in...' : 'Sign in'}
+                </Button>
               </DialogFooter>
             </form>
           </TabsContent>
@@ -140,7 +186,13 @@ export function LoginDialog() {
                 </p>
                 
                 <DialogFooter>
-                  <Button type="submit" className="w-full">Send Magic Link</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Sending...' : 'Send Magic Link'}
+                  </Button>
                 </DialogFooter>
               </form>
             ) : (
@@ -165,7 +217,13 @@ export function LoginDialog() {
                 </div>
                 
                 <DialogFooter>
-                  <Button type="submit" className="w-full">Verify Token</Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? 'Verifying...' : 'Verify Token'}
+                  </Button>
                 </DialogFooter>
               </form>
             )}

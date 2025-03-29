@@ -32,13 +32,19 @@ export function UserMenu() {
     return user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
+  const handleSignInClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    console.log('Sign in button clicked, dispatching open-login-dialog event');
+    document.dispatchEvent(new Event('open-login-dialog'));
+  };
+
   // Only show sign-in button if definitely not authenticated
   if (isClient && !isAuthenticated) {
     return (
       <Button 
         variant="ghost" 
         size="sm"
-        onClick={() => document.dispatchEvent(new Event('open-login-dialog'))}
+        onClick={handleSignInClick}
         className="flex items-center gap-1"
       >
         <User className="h-4 w-4" />

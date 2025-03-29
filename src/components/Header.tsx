@@ -16,6 +16,9 @@ export function Header() {
       setIsScrolled(window.scrollY > 10);
     };
 
+    // Ensure the login dialog is properly initialized on mount
+    console.log('Header component mounted');
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -47,6 +50,7 @@ export function Header() {
         </nav>
       </div>
 
+      {/* Always render the login dialog so it's accessible via the custom event */}
       <LoginDialog />
     </header>
   );
