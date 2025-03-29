@@ -174,8 +174,14 @@ export function useSupabaseAuth() {
     };
   }, []);
 
-  // Determine admin status
+  // Determine admin status - add debugging to see if we're getting the correct role
   const isAdmin = user?.role === 'admin';
+  
+  useEffect(() => {
+    // Add debug logging for admin status
+    console.log('User role:', user?.role);
+    console.log('Is admin?', isAdmin);
+  }, [user?.role, isAdmin]);
 
   return {
     user,
@@ -187,4 +193,3 @@ export function useSupabaseAuth() {
     isInitializing
   };
 }
-

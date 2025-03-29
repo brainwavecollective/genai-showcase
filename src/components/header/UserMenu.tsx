@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, UserCircle, LayoutDashboard, Loader2 } from 'lucide-react';
+import { User, LogOut, UserCircle, LayoutDashboard, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { 
   DropdownMenu, 
@@ -21,6 +21,7 @@ export function UserMenu() {
   const [isLoading, setIsLoading] = useState(true);
   const [localIsAuthenticated, setLocalIsAuthenticated] = useState(false);
   const [localUser, setLocalUser] = useState<typeof user>(null);
+  const [localIsAdmin, setLocalIsAdmin] = useState(false);
 
   // This effect ensures the component renders properly after hydration
   useEffect(() => {
@@ -36,14 +37,16 @@ export function UserMenu() {
     if (!isInitializing) {
       setLocalIsAuthenticated(isAuthenticated);
       setLocalUser(user);
+      setLocalIsAdmin(isAdmin);
     }
     
     console.log('UserMenu rendered, auth state:', { 
       isAuthenticated, 
-      userEmail: user?.email, 
+      userEmail: user?.email,
+      isAdmin,
       isInitializing 
     });
-  }, [isAuthenticated, user, isInitializing]);
+  }, [isAuthenticated, user, isAdmin, isInitializing]);
 
   const getInitials = () => {
     if (localUser?.name) {
@@ -62,7 +65,7 @@ export function UserMenu() {
   if (!isClient || isLoading || isInitializing) {
     return (
       <Button variant="ghost" size="sm" disabled className="flex items-center gap-1">
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <User className="h-4 w-4" />
         <span className="hidden md:inline">Loading...</span>
       </Button>
     );
@@ -86,7 +89,7 @@ export function UserMenu() {
 
   // Show the user menu if authenticated
   if (localIsAuthenticated && localUser) {
-    console.log('Rendering authenticated user menu for', localUser.name || localUser.email);
+    console.log('Rendering authenticated user menu for', localUser.name || localUser.email, 'isAdmin:', localIsAdmin);
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -115,12 +118,12 @@ export function UserMenu() {
             <LayoutDashboard className="mr-2 h-4 w-4" />
             Dashboard
           </DropdownMenuItem>
-          {isAdmin && (
+          {localIsAdmin && (
             <DropdownMenuItem 
               className="cursor-pointer"
               onClick={() => navigate('/manage-users')}
             >
-              <User className="mr-2 h-4 w-4" />
+              <Users className="mr-2 h-4 w-4" />
               Manage Users
             </DropdownMenuItem>
           )}
