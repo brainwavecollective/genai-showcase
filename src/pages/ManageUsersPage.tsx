@@ -122,7 +122,7 @@ export function ManageUsersPage() {
       
       // Use the secure RPC function instead of direct table update
       const { data, error } = await supabase
-        .rpc<UpdateUserStatusResponse>('update_user_status', {
+        .rpc<UpdateUserStatusResponse, { p_user_id: string; p_status: string }>('update_user_status', {
           p_user_id: userId,
           p_status: status
         });

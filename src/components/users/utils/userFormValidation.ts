@@ -10,7 +10,7 @@ export const userFormSchema = z.object({
   course: z.string().optional(),
   semester: z.string().optional(),
   notes: z.string().optional(),
-  status: z.enum(['pending_review', 'approved', 'denied']),
+  status: z.enum(['pending_review', 'approved', 'denied', 'active', 'suspended']),
 });
 
 export type UserFormData = z.infer<typeof userFormSchema>;
