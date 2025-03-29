@@ -196,9 +196,6 @@ export function LoginDialog() {
                   required
                   disabled={isSubmitting}
                 />
-                <p className="text-xs text-muted-foreground">
-                  For demo: Try using test-admin-1@cu.edu with password123
-                </p>
               </div>
               
               <DialogFooter>
@@ -282,3 +279,4 @@ export function LoginDialog() {
     </Dialog>
   );
 }
+

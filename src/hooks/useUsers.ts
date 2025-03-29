@@ -4,6 +4,7 @@ import { User, UserStatus } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
+import { RPCFunctionNames } from '@/types/rpc-types';
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -49,7 +50,7 @@ export function useUsers() {
       console.log(`Updating user ${params.userId} status to ${params.status}`);
       
       const { data, error } = await supabase
-        .rpc('update_user_status', {
+        .rpc('update_user_status' as RPCFunctionNames, {
           p_user_id: params.userId,
           p_status: params.status
         });
