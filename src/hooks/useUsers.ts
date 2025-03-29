@@ -18,10 +18,9 @@ export function useUsers() {
       setLoading(true);
       setError(null);
       try {
+        // Using the get_all_users RPC function instead of direct table query to avoid RLS recursion
         const { data, error } = await supabase
-          .from('users')
-          .select('*')
-          .order('created_at', { ascending: false });
+          .rpc('get_all_users');
 
         if (error) {
           console.error('Error fetching users:', error);
