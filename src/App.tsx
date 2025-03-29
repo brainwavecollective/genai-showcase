@@ -8,7 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import Index from "./pages/Index";
 import ShowcasePage from "./pages/ShowcasePage";
 import NotFound from "./pages/NotFound";
-import ManageUsersPage from "./pages/ManageUsersPage";
+import ManageUsersPage from "./pages/ManageUsersPage"; // Fixed the import
 import UserProfilePage from "./pages/UserProfilePage";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";

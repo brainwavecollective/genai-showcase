@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole, UserStatus } from '@/types';
@@ -62,7 +61,7 @@ export function ManageUsersPage() {
   const [error, setError] = useState<string | null>(null);
   const queryClient = useQueryClient();
   const { toast } = useToast();
-	const navigate = useNavigate();
+  const navigate = useNavigate();
   const { isAdmin, isAuthenticated } = useAuth();
 
   useEffect(() => {
@@ -97,7 +96,13 @@ export function ManageUsersPage() {
           console.error('Error fetching users:', error);
           setError(error.message);
         } else {
-          setUsers(data || []);
+          // Cast the role string to UserRole
+          const typedUsers = data?.map(user => ({
+            ...user,
+            role: user.role as UserRole,
+            status: user.status as UserStatus
+          })) || [];
+          setUsers(typedUsers);
         }
       } catch (err: any) {
         console.error('Unexpected error fetching users:', err);
@@ -352,3 +357,5 @@ function RoleDropdown({ userId, currentRole, updateUserRole }: RoleDropdownProps
     </Select>
   );
 }
+
+export default ManageUsersPage;

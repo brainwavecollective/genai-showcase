@@ -1,6 +1,5 @@
-
-export type UserRole = 'admin' | 'creator' | 'visitor';
-export type UserStatus = 'pending_review' | 'approved' | 'denied';
+export type UserRole = 'admin' | 'creator' | 'visitor' | 'member'; // Added 'member' to match the options
+export type UserStatus = 'pending_review' | 'approved' | 'denied' | 'active' | 'suspended'; // Added 'active' and 'suspended' to match the UI options
 
 export interface User {
   id: string;
