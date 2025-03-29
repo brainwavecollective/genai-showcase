@@ -43,12 +43,20 @@ const ManageUsersPage = () => {
   const { data: users, isLoading, error } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
+      console.log('Fetching users...');
+      
+      // Use the Supabase client to fetch users
       const { data, error } = await supabase
         .from('users')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
+      
+      console.log('Users fetched:', data);
       return data as User[];
     },
     enabled: shouldFetchUsers, // Only fetch when we've confirmed user access
@@ -57,6 +65,8 @@ const ManageUsersPage = () => {
   // Update user status mutation
   const updateUserStatus = useMutation({
     mutationFn: async ({ userId, status }: { userId: string; status: UserStatus }) => {
+      console.log(`Updating user ${userId} status to ${status}`);
+      
       const { data, error } = await supabase
         .from('users')
         .update({ status })
@@ -64,7 +74,12 @@ const ManageUsersPage = () => {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error updating user status:', error);
+        throw error;
+      }
+      
+      console.log('User status updated:', data);
       return data;
     },
     onSuccess: () => {
