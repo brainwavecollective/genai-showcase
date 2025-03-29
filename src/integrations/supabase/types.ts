@@ -371,6 +371,12 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_admin_secure: {
+        Args: {
+          check_user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       user_status: "pending_review" | "approved" | "denied"
