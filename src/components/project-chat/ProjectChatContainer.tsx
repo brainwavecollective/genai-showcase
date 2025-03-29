@@ -19,6 +19,10 @@ type Message = {
   isUser: boolean;
 };
 
+// Maximum number of retries for overloaded API
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 2000; // 2 seconds
+
 export function ProjectChatContainer() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -35,33 +39,49 @@ export function ProjectChatContainer() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [showProjects, setShowProjects] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [retryMessage, setRetryMessage] = useState<string | null>(null);
 
   // Fetch projects on initial load
   useEffect(() => {
     fetchProjects();
   }, []);
 
-  const sendMessage = async (content: string) => {
-    if (!content.trim() || isLoading || limitReached) return;
+  // Helper to sleep for ms milliseconds
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    // Add user message
-    const userMessage = {
-      id: Date.now().toString(),
-      content,
-      isUser: true,
-    };
-    setMessages((prev) => [...prev, userMessage]);
+  const sendMessage = async (content: string, isRetry = false) => {
+    if (!content.trim() || (isLoading && !isRetry) || limitReached) return;
 
-    // Add loading message
-    const loadingId = (Date.now() + 1).toString();
-    setMessages((prev) => [
-      ...prev,
-      {
-        id: loadingId,
-        content: "",
-        isUser: false,
-      },
-    ]);
+    // For new messages (not retries), add user message and reset retry state
+    if (!isRetry) {
+      // Add user message
+      const userMessage = {
+        id: Date.now().toString(),
+        content,
+        isUser: true,
+      };
+      setMessages((prev) => [...prev, userMessage]);
+      setRetryCount(0);
+      setRetryMessage(null);
+    }
+
+    // Add loading message or update existing one for retries
+    const loadingId = isRetry 
+      ? messages[messages.length - 1].id 
+      : (Date.now() + 1).toString();
+    
+    if (!isRetry) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: loadingId,
+          content: "",
+          isUser: false,
+        },
+      ]);
+    }
+    
     setIsLoading(true);
 
     try {
@@ -75,18 +95,23 @@ export function ProjectChatContainer() {
           ).join('\n');
       }
 
-      // Send to OpenAI via edge function with correctly passed API key
+      // Send to Anthropic API via edge function
       const response = await supabase.functions.invoke("project-chat", {
         body: { 
           message: content, 
           projectContext 
         },
-        // The API key is automatically included in the request by the Supabase client
       });
 
       if (response.error) {
-        console.error('Edge function error:', response.error);
         throw new Error(response.error.message);
+      }
+
+      // Handle server-side retry flag
+      if (response.data.retry === true) {
+        // Store the message for retrying
+        setRetryMessage(content);
+        throw new Error('Service overloaded, will retry automatically');
       }
 
       // Check if we've hit the daily limit
@@ -117,22 +142,63 @@ export function ProjectChatContainer() {
             : msg
         )
       );
+      
+      // Reset retry state on success
+      setRetryCount(0);
+      setRetryMessage(null);
     } catch (error) {
       console.error("Chat error:", error);
-      // Replace loading message with error
+      
+      // Handle retry for overloaded errors
+      if (error.message.includes('overloaded') || error.message.includes('Overloaded') || error.message.includes('high demand')) {
+        if (retryCount < MAX_RETRIES) {
+          // Update message to show we're retrying
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === loadingId
+                ? {
+                    ...msg,
+                    content: `The AI service is experiencing high demand. Retrying automatically (${retryCount + 1}/${MAX_RETRIES})...`,
+                  }
+                : msg
+            )
+          );
+          
+          // Increment retry count
+          setRetryCount((prev) => prev + 1);
+          
+          // Retry after delay with exponential backoff
+          setTimeout(() => {
+            sendMessage(content, true);
+          }, RETRY_DELAY_MS * Math.pow(2, retryCount));
+          
+          return;
+        }
+      }
+      
+      // If we've exhausted retries or it's another error, show error message
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === loadingId
             ? {
                 ...msg,
-                content: "Sorry, I encountered an error. Please try again.",
+                content: retryCount >= MAX_RETRIES 
+                  ? "Sorry, the AI service is currently unavailable. Please try again later." 
+                  : "Sorry, I encountered an error. Please try again.",
               }
             : msg
         )
       );
+      
+      // Reset retry state
+      setRetryCount(0);
+      setRetryMessage(null);
+      
       toast({
         title: "Error",
-        description: "Failed to get response: " + (error instanceof Error ? error.message : "Unknown error"),
+        description: error.message.includes('overloaded') || error.message.includes('Overloaded') || error.message.includes('high demand')
+          ? "The AI service is experiencing high demand. Please try again later."
+          : "Failed to get response: " + (error instanceof Error ? error.message : "Unknown error"),
         variant: "destructive",
       });
     } finally {

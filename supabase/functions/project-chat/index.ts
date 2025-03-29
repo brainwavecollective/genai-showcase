@@ -5,6 +5,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 
 const CHAT_LIMIT_PER_DAY = 100;
 const CHAT_COUNTER_KEY = "daily_chat_count";
+const MAX_RETRIES = 3;
+const RETRY_DELAY_MS = 1000; // 1 second delay between retries
 
 const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
@@ -14,6 +16,69 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Helper function to wait
+const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+// Function to call Anthropic API with retry logic
+async function callAnthropicWithRetry(systemPrompt: string, message: string, retries = MAX_RETRIES) {
+  let lastError = null;
+  
+  for (let attempt = 0; attempt < retries; attempt++) {
+    try {
+      if (attempt > 0) {
+        console.log(`Retry attempt ${attempt + 1}/${retries} after delay...`);
+        await sleep(RETRY_DELAY_MS * Math.pow(2, attempt)); // Exponential backoff
+      }
+      
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'x-api-key': anthropicApiKey!,
+          'anthropic-version': '2023-06-01',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'claude-3-haiku-20240307',
+          system: systemPrompt,
+          messages: [
+            {
+              role: 'user',
+              content: message
+            }
+          ],
+          max_tokens: 1000,
+          temperature: 0.7,
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        // Check if it's an overloaded error, which we'll retry
+        if (data.error?.type === "overloaded_error") {
+          console.log('Anthropic API overloaded, will retry...');
+          lastError = new Error(`Anthropic API error: ${data.error?.message || JSON.stringify(data.error) || 'Overloaded'}`);
+          continue; // Try again
+        }
+        
+        // For other errors, throw immediately
+        throw new Error(`Anthropic API error: ${data.error?.message || JSON.stringify(data.error) || 'Unknown error'}`);
+      }
+      
+      return data.content[0].text;
+    } catch (error) {
+      lastError = error;
+      // Only retry on overloaded errors or network issues
+      if (!error.message.includes('Overloaded') && !error.message.includes('network')) {
+        throw error; // Don't retry other types of errors
+      }
+    }
+  }
+  
+  // If we've exhausted retries
+  throw lastError || new Error('Failed to get response from Anthropic API after multiple retries');
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -120,37 +185,8 @@ serve(async (req) => {
 
     console.log('System prompt created with project information');
 
-    // Make the API request to Anthropic's Claude
-    // Note: Anthropic API requires system message as a top-level parameter
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
-        system: systemPrompt, // System prompt as a top-level parameter
-        messages: [
-          {
-            role: 'user',
-            content: message
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.7,
-      }),
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-      console.error('Anthropic API error:', data);
-      throw new Error(`Anthropic API error: ${data.error?.message || JSON.stringify(data.error) || 'Unknown error'}`);
-    }
-
-    const aiResponse = data.content[0].text;
+    // Call Anthropic API with retry logic
+    const aiResponse = await callAnthropicWithRetry(systemPrompt, message);
     console.log('Sending AI response:', aiResponse.substring(0, 100) + '...');
 
     // Increment the chat counter
@@ -166,7 +202,17 @@ serve(async (req) => {
     });
   } catch (error) {
     console.error('Error in project chat function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    
+    // Provide a more helpful error message to the user
+    let errorMessage = error.message;
+    if (error.message.includes('Overloaded')) {
+      errorMessage = "The AI service is currently experiencing high demand. Please try again in a moment.";
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: errorMessage,
+      retry: error.message.includes('Overloaded') // Flag to indicate if frontend should retry
+    }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
