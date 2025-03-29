@@ -10,6 +10,7 @@ interface FormFieldProps extends InputHTMLAttributes<HTMLInputElement | HTMLText
   error?: string;
   required?: boolean;
   as?: 'input' | 'textarea';
+  rows?: number; // Added rows property for textareas
 }
 
 const FormField = ({ 
@@ -18,6 +19,7 @@ const FormField = ({
   error, 
   required, 
   as = 'input',
+  rows = 3, // Default value for rows
   ...props 
 }: FormFieldProps) => {
   return (
@@ -38,6 +40,7 @@ const FormField = ({
           id={name}
           name={name}
           className={error ? "border-red-500" : ""}
+          rows={rows}
           {...props as InputHTMLAttributes<HTMLTextAreaElement>}
         />
       )}
