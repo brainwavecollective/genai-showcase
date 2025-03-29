@@ -49,11 +49,13 @@ export function useSupabaseAuth() {
                   setIsAuthenticated(true);
                   
                   // Create a minimal user object based on auth data only
+                  const email = currentSession.user.email || '';
                   const minimalUser: User = {
                     id: currentSession.user.id,
-                    email: currentSession.user.email || '',
-                    role: 'user' as UserRole, // Default role
-                    status: 'active' as UserStatus, // Default status
+                    email: email,
+                    name: email.split('@')[0] || 'User', // Use part of email as name or default to 'User'
+                    role: 'visitor' as UserRole, // Default role
+                    status: 'pending_review' as UserStatus, // Default status
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                   };
@@ -122,11 +124,13 @@ export function useSupabaseAuth() {
                 setIsAuthenticated(true);
                 
                 // Create a minimal user object based on auth data only
+                const email = existingSession.user.email || '';
                 const minimalUser: User = {
                   id: existingSession.user.id,
-                  email: existingSession.user.email || '',
-                  role: 'user' as UserRole, // Default role
-                  status: 'active' as UserStatus, // Default status
+                  email: email,
+                  name: email.split('@')[0] || 'User', // Use part of email as name or default to 'User'
+                  role: 'visitor' as UserRole, // Default role
+                  status: 'pending_review' as UserStatus, // Default status
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString()
                 };
@@ -183,3 +187,4 @@ export function useSupabaseAuth() {
     isInitializing
   };
 }
+
