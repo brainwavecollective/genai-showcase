@@ -6,7 +6,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.7";
 const CHAT_LIMIT_PER_DAY = 100;
 const CHAT_COUNTER_KEY = "daily_chat_count";
 
-const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
 const supabaseUrl = Deno.env.get('SUPABASE_URL');
 const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -46,9 +46,9 @@ serve(async (req) => {
     
     const { message, projectContext } = await req.json();
 
-    if (!openAIApiKey) {
-      console.error('OpenAI API key is not configured in environment');
-      throw new Error('OpenAI API key is not configured in environment');
+    if (!anthropicApiKey) {
+      console.error('Anthropic API key is not configured in environment');
+      throw new Error('Anthropic API key is not configured in environment');
     }
 
     console.log('Received request for project chat:', { message, projectContext });
@@ -120,15 +120,16 @@ serve(async (req) => {
 
     console.log('System prompt created with project information');
 
-    // Make the API request to OpenAI
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Make the API request to Anthropic's Claude
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
+        'x-api-key': anthropicApiKey,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'claude-3-haiku-20240307',
         messages: [
           {
             role: 'system',
@@ -139,19 +140,19 @@ serve(async (req) => {
             content: message
           }
         ],
+        max_tokens: 1000,
         temperature: 0.7,
-        max_tokens: 1000
       }),
     });
 
     const data = await response.json();
     
     if (!response.ok) {
-      console.error('OpenAI API error:', data);
-      throw new Error(`OpenAI API error: ${data.error?.message || 'Unknown error'}`);
+      console.error('Anthropic API error:', data);
+      throw new Error(`Anthropic API error: ${data.error?.message || JSON.stringify(data.error) || 'Unknown error'}`);
     }
 
-    const aiResponse = data.choices[0].message.content;
+    const aiResponse = data.content[0].text;
     console.log('Sending AI response:', aiResponse.substring(0, 100) + '...');
 
     // Increment the chat counter
