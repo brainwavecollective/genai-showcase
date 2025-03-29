@@ -33,8 +33,9 @@ export function useSessionHandler() {
     try {
       console.log('Fetching user data for', userId);
       
+      // Fix: Add proper type arguments to the rpc method call
       const { data: userData, error } = await supabase
-        .rpc<GetUserByIdResponse, { user_id: string }>('get_user_by_id', { user_id: userId });
+        .rpc('get_user_by_id', { user_id: userId });
       
       if (error || !userData) {
         console.error('Error fetching user data with RPC:', error);

@@ -46,9 +46,9 @@ const UserProfilePage = () => {
     queryFn: async () => {
       console.log('Fetching user details for ID:', user?.id);
       
-      // Use the RPC function instead of direct query to avoid recursion
+      // Fix: Remove type parameters from rpc call
       const { data, error } = await supabase
-        .rpc<GetUserByIdResponse, { user_id: string }>('get_user_by_id', { user_id: user?.id });
+        .rpc('get_user_by_id', { user_id: user?.id });
 
       if (error) {
         console.error('Error fetching user details:', error);
