@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { User, UserRole, UserStatus } from '@/types';
+import { GetUserByIdResponse } from '@/types/supabase-functions';
 import { useToast } from '@/hooks/use-toast';
 
 export function useSupabaseAuth() {
@@ -38,7 +39,7 @@ export function useSupabaseAuth() {
               
               // Use the RPC function to safely fetch user data
               const { data: userData, error } = await supabase
-                .rpc('get_user_by_id', { user_id: currentSession.user?.id });
+                .rpc<GetUserByIdResponse>('get_user_by_id', { user_id: currentSession.user?.id });
               
               if (error || !userData) {
                 console.error('Error fetching user data with RPC:', error);
@@ -123,7 +124,7 @@ export function useSupabaseAuth() {
           try {
             // Use the RPC function to get user data
             const { data, error } = await supabase
-              .rpc('get_user_by_id', { user_id: existingSession.user.id });
+              .rpc<GetUserByIdResponse>('get_user_by_id', { user_id: existingSession.user.id });
             
             if (error || !data) {
               console.error('Error fetching user data on init with RPC:', error);

@@ -43,7 +43,7 @@ const UserProfilePage = () => {
       
       // Use the RPC function instead of direct query to avoid recursion
       const { data, error } = await supabase
-        .rpc('get_user_by_id', { user_id: user?.id });
+        .rpc<GetUserByIdResponse>('get_user_by_id', { user_id: user?.id });
 
       if (error) {
         console.error('Error fetching user details:', error);

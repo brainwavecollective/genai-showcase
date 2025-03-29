@@ -365,6 +365,16 @@ export type Database = {
       }
     }
     Functions: {
+      check_is_admin: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      get_user_by_id: {
+        Args: {
+          user_id: string
+        }
+        Returns: Json
+      }
       is_admin: {
         Args: {
           user_id: string
