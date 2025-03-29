@@ -17,7 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { CreateTestUsersButton } from '@/components/admin/CreateTestUsersButton';
 
 const ManageUsersPage = () => {
   const { isAdmin, isAuthenticated } = useAuth();
@@ -111,7 +110,6 @@ const ManageUsersPage = () => {
         >
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold">Manage Users</h1>
-            <CreateTestUsersButton />
           </div>
 
           <Tabs defaultValue="users" className="w-full">
