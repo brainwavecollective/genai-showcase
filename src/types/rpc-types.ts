@@ -1,7 +1,9 @@
 
-import { User } from './index';
+import { User } from '.';
+import { Database } from '../integrations/supabase/types';
 
-// Response types for Supabase RPC functions
-export interface UpdateUserStatusResponse extends User {}
+// Define RPC function parameters and responses
+export type RPCFunctions = Database['public']['Functions'];
+export type UpdateUserStatusParams = { p_user_id: string; p_status: string };
+export type UpdateUserStatusResponse = User[];
 
-// Add other RPC function types as needed

@@ -120,9 +120,8 @@ export function ManageUsersPage() {
     mutationFn: async ({ userId, status }: { userId: string; status: UserStatus }) => {
       console.log(`Updating user ${userId} status to ${status}`);
       
-      // Use the secure RPC function instead of direct table update
       const { data, error } = await supabase
-        .rpc<UpdateUserStatusResponse, { p_user_id: string; p_status: string }>('update_user_status', {
+        .rpc('update_user_status', {
           p_user_id: userId,
           p_status: status
         });
