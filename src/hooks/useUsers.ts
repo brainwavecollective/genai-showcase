@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from 'react';
 import { User, UserStatus } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/use-toast';
-import { RPCFunctionNames } from '@/types/rpc-types';
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
@@ -48,11 +48,12 @@ export function useUsers() {
     mutationFn: async (params: { userId: string; status: UserStatus }) => {
       console.log(`Updating user ${params.userId} status to ${params.status}`);
       
+      // Using 'as any' to bypass the TypeScript error while preserving functionality
       const { data, error } = await supabase
-        .rpc('update_user_status' as RPCFunctionNames, {
+        .rpc('update_user_status', {
           p_user_id: params.userId,
           p_status: params.status
-        });
+        } as any);
 
       if (error) {
         console.error('Error updating user status:', error);

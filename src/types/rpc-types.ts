@@ -15,4 +15,3 @@ export type RPCFunctionNames =
   | "is_admin" 
   | "is_admin_secure" 
   | "is_admin_user";
-
