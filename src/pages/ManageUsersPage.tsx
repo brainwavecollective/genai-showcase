@@ -1,4 +1,5 @@
-import { useState } from 'react';
+
+import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Header } from '@/components/Header';
@@ -23,17 +24,21 @@ const ManageUsersPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [shouldFetchUsers, setShouldFetchUsers] = useState(false);
   
-  // Redirect if not admin
-  if (!isAuthenticated || !isAdmin) {
-    toast({
-      title: "Access Denied",
-      description: "You must be an admin to access this page",
-      variant: "destructive",
-    });
-    navigate('/');
-    return null;
-  }
+  // Handle redirection with useEffect instead of conditional rendering
+  useEffect(() => {
+    if (!isAuthenticated || !isAdmin) {
+      toast({
+        title: "Access Denied",
+        description: "You must be an admin to access this page",
+        variant: "destructive",
+      });
+      navigate('/');
+    } else {
+      setShouldFetchUsers(true);
+    }
+  }, [isAuthenticated, isAdmin, navigate, toast]);
 
   // Fetch all users
   const { data: users, isLoading, error } = useQuery({
@@ -47,6 +52,7 @@ const ManageUsersPage = () => {
       if (error) throw error;
       return data as User[];
     },
+    enabled: shouldFetchUsers, // Only fetch when we've confirmed user access
   });
 
   // Update user status mutation
@@ -82,6 +88,11 @@ const ManageUsersPage = () => {
   const handleStatusChange = (userId: string, status: UserStatus) => {
     updateUserStatus.mutate({ userId, status });
   };
+
+  // If not authorized, show nothing while the redirect happens
+  if (!shouldFetchUsers) {
+    return null;
+  }
 
   if (error) {
     return (
