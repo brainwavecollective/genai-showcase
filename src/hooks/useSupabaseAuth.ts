@@ -16,46 +16,59 @@ export function useSupabaseAuth() {
   // Initialize auth state and setup listeners
   useEffect(() => {
     console.log('Setting up auth state listeners...');
+    let mounted = true;
     
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, currentSession) => {
+      (event, currentSession) => {
         console.log('Auth state changed:', event, currentSession?.user?.email);
+        
+        if (!mounted) return;
+        
         setSession(currentSession);
         
         if (currentSession?.user) {
-          // Fetch user data from our users table
-          try {
-            console.log('Fetching user data for', currentSession.user.id);
-            const { data: userData, error } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', currentSession.user.id)
-              .single();
+          // Fetch user data from our users table using setTimeout
+          // to avoid potential deadlocks
+          setTimeout(async () => {
+            if (!mounted) return;
             
-            if (error) {
-              console.error('Error fetching user data:', error);
-              return;
+            try {
+              console.log('Fetching user data for', currentSession.user?.id);
+              const { data: userData, error } = await supabase
+                .from('users')
+                .select('*')
+                .eq('id', currentSession.user?.id)
+                .single();
+              
+              if (error) {
+                console.error('Error fetching user data:', error);
+                return;
+              }
+              
+              if (!mounted) return;
+              
+              console.log('User data fetched:', userData);
+              // Cast the role to UserRole type to match our type definition
+              setUser({
+                ...userData,
+                role: userData.role as UserRole,
+                status: userData.status as UserStatus
+              });
+              setIsAuthenticated(true);
+            } catch (error) {
+              console.error('Failed to fetch user data:', error);
             }
-            
-            console.log('User data fetched:', userData);
-            // Cast the role to UserRole type to match our type definition
-            setUser({
-              ...userData,
-              role: userData.role as UserRole,
-              status: userData.status as UserStatus
-            });
-            setIsAuthenticated(true);
-          } catch (error) {
-            console.error('Failed to fetch user data:', error);
-          }
+          }, 0);
         } else {
           console.log('No active session, clearing user state');
           setUser(null);
           setIsAuthenticated(false);
         }
         
-        setIsInitializing(false);
+        if (mounted) {
+          setIsInitializing(false);
+        }
       }
     );
 
@@ -64,6 +77,8 @@ export function useSupabaseAuth() {
       try {
         console.log('Checking for existing session...');
         const { data: { session: existingSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
         
         console.log('Initial session check:', existingSession?.user?.email);
         
@@ -78,9 +93,11 @@ export function useSupabaseAuth() {
           
           if (error) {
             console.error('Error fetching user data on init:', error);
-            setIsInitializing(false);
+            if (mounted) setIsInitializing(false);
             return;
           }
+          
+          if (!mounted) return;
           
           console.log('User data fetched on init:', data);
           // Cast the role to UserRole type to match our type definition
@@ -92,10 +109,12 @@ export function useSupabaseAuth() {
           setIsAuthenticated(true);
         }
         
-        setIsInitializing(false);
+        if (mounted) {
+          setIsInitializing(false);
+        }
       } catch (error) {
         console.error('Error checking existing session:', error);
-        setIsInitializing(false);
+        if (mounted) setIsInitializing(false);
       }
     };
     
@@ -103,6 +122,7 @@ export function useSupabaseAuth() {
 
     return () => {
       console.log('Cleaning up auth state listeners');
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);

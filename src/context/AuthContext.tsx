@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 import { User } from '../types';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { useAuthMethods } from '@/hooks/useAuthMethods';
@@ -49,7 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   // Log authentication state for debugging
-  console.log('AuthProvider state:', { isAuthenticated, user, isAdmin, isInitializing });
+  useEffect(() => {
+    console.log('AuthProvider state:', { isAuthenticated, user, isAdmin, isInitializing });
+  }, [isAuthenticated, user, isAdmin, isInitializing]);
 
   return (
     <AuthContext.Provider

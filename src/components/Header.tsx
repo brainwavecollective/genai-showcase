@@ -10,7 +10,7 @@ import { useAuth } from '@/context/AuthContext';
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isInitializing } = useAuth();
 
   useEffect(() => {
     // Add scroll event listener to change header style on scroll
@@ -19,11 +19,11 @@ export function Header() {
     };
 
     // Ensure the login dialog is properly initialized on mount
-    console.log('Header component mounted, auth state:', { isAuthenticated });
+    console.log('Header component mounted, auth state:', { isAuthenticated, isInitializing });
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isInitializing]);
 
   return (
     <header 

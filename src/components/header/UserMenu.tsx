@@ -15,7 +15,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
 
 export function UserMenu() {
-  const { isAuthenticated, user, logout, isAdmin } = useAuth();
+  const { isAuthenticated, user, logout, isAdmin, isInitializing } = useAuth();
   const navigate = useNavigate();
   const [isClient, setIsClient] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -26,10 +26,10 @@ export function UserMenu() {
     // Short timeout to ensure we don't show loading state unnecessarily
     const timer = setTimeout(() => setIsLoading(false), 500);
     
-    console.log('UserMenu rendered, auth state:', { isAuthenticated, user });
+    console.log('UserMenu rendered, auth state:', { isAuthenticated, user, isInitializing });
     
     return () => clearTimeout(timer);
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, isInitializing]);
 
   const getInitials = () => {
     if (user?.name) {
@@ -45,7 +45,7 @@ export function UserMenu() {
   };
 
   // Loading state
-  if (!isClient || isLoading) {
+  if (!isClient || isLoading || isInitializing) {
     return (
       <Button variant="ghost" size="sm" disabled className="flex items-center gap-1">
         <Loader2 className="h-4 w-4 animate-spin" />
@@ -56,6 +56,7 @@ export function UserMenu() {
 
   // Only show sign-in button if definitely not authenticated
   if (!isAuthenticated) {
+    console.log('Rendering sign-in button (not authenticated)');
     return (
       <Button 
         variant="ghost" 

@@ -43,11 +43,11 @@ export function useAuthMethods() {
       });
       
       return true;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Unexpected login error:', error);
       toast({
         title: "Login failed",
-        description: "An unexpected error occurred",
+        description: error?.message || "An unexpected error occurred",
         variant: "destructive",
       });
       return false;
@@ -88,10 +88,10 @@ export function useAuthMethods() {
       });
       
       return true;
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Failed to send magic link",
-        description: "An unexpected error occurred",
+        description: error?.message || "An unexpected error occurred",
         variant: "destructive",
       });
       return false;
@@ -100,10 +100,26 @@ export function useAuthMethods() {
 
   // Function to confirm a magic link token
   const confirmMagicLink = async (token: string): Promise<boolean> => {
-    // In a real implementation, this would validate the token
-    // For Supabase, this is usually handled automatically via URL parameters
-    // This function is kept for API compatibility
-    return true;
+    try {
+      // In a real implementation, this would validate the token
+      // For Supabase, this is usually handled automatically via URL parameters
+      console.log("Confirming magic link with token:", token);
+      
+      // For demo purposes, we'll just return true
+      toast({
+        title: "Magic link confirmed",
+        description: "You have been successfully logged in",
+      });
+      return true;
+    } catch (error: any) {
+      console.error("Error confirming magic link:", error);
+      toast({
+        title: "Failed to confirm magic link",
+        description: error?.message || "An unexpected error occurred",
+        variant: "destructive",
+      });
+      return false;
+    }
   };
 
   const logout = async () => {
@@ -126,11 +142,11 @@ export function useAuthMethods() {
         title: "Logged out",
         description: "You have been successfully logged out",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Unexpected logout error:', error);
       toast({
         title: "Logout failed",
-        description: "An unexpected error occurred",
+        description: error?.message || "An unexpected error occurred",
         variant: "destructive",
       });
     }

@@ -22,7 +22,7 @@ import {
 } from '@/components/ui/tabs';
 
 export function LoginDialog() {
-  const { login, requestMagicLink, confirmMagicLink, magicLinkRequested } = useAuth();
+  const { login, requestMagicLink, confirmMagicLink, magicLinkRequested, isAuthenticated } = useAuth();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,6 +47,17 @@ export function LoginDialog() {
     };
   }, []);
 
+  // Close dialog when authenticated
+  useEffect(() => {
+    if (isAuthenticated && isLoginOpen) {
+      console.log('User authenticated, closing login dialog');
+      setIsLoginOpen(false);
+      setEmail('');
+      setPassword('');
+      setIsSubmitting(false);
+    }
+  }, [isAuthenticated, isLoginOpen]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Login form submitted', { email, password });
@@ -63,16 +74,14 @@ export function LoginDialog() {
       
       if (success) {
         console.log('Login successful, closing dialog');
-        setIsLoginOpen(false);
-        setEmail('');
-        setPassword('');
+        // Dialog will close automatically via the useEffect above when isAuthenticated changes
       } else {
         setLoginError('Invalid login credentials. Please try again.');
+        setIsSubmitting(false);
       }
     } catch (error) {
       console.error('Login error:', error);
       setLoginError('An unexpected error occurred during login.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -87,11 +96,14 @@ export function LoginDialog() {
     setIsSubmitting(true);
     
     try {
-      await requestMagicLink(email);
+      const success = await requestMagicLink(email);
+      if (!success) {
+        setLoginError('Failed to send magic link. Please try again.');
+      }
+      setIsSubmitting(false);
     } catch (error) {
       console.error('Magic link request error:', error);
       setLoginError('Failed to send magic link. Please try again.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -107,17 +119,15 @@ export function LoginDialog() {
     
     try {
       const success = await confirmMagicLink(magicToken);
-      if (success) {
-        setIsLoginOpen(false);
-        setEmail('');
-        setMagicToken('');
-      } else {
+      
+      if (!success) {
         setLoginError('Invalid or expired token. Please try again.');
+        setIsSubmitting(false);
       }
+      // If successful, dialog will close via the useEffect when isAuthenticated changes
     } catch (error) {
       console.error('Magic link confirmation error:', error);
       setLoginError('Failed to verify the magic link token.');
-    } finally {
       setIsSubmitting(false);
     }
   };
@@ -127,6 +137,7 @@ export function LoginDialog() {
       setIsLoginOpen(false);
       // Reset form state when closing
       setLoginError(null);
+      setIsSubmitting(false);
     }
   };
 
