@@ -15,4 +15,8 @@ export interface AuthState {
 // Auth hook return interface
 export interface AuthHookReturn extends AuthState {
   setMagicLinkRequested: (value: boolean) => void;
+  login: (email: string, password: string) => Promise<boolean>;
+  requestMagicLink: (email: string) => Promise<boolean>;
+  confirmMagicLink: (token: string) => Promise<boolean>;
+  logout: () => Promise<void>;
 }
