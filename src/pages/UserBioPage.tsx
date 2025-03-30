@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { User, Project } from '@/types';
+import { User, Project, getUserFullName } from '@/types';
 import { Layout } from '@/components/Layout';
 import { PublicBioCard } from '@/components/profile/PublicBioCard';
 import ProjectGrid from '@/components/home/ProjectGrid';
@@ -92,7 +93,7 @@ const UserBioPage = () => {
             
             {/* User's Projects Section */}
             <div>
-              <h2 className="text-2xl font-semibold mb-6">Projects by {user.first_name || 'this user'}</h2>
+              <h2 className="text-2xl font-semibold mb-6">Projects by {getUserFullName(user)}</h2>
               
               {projectsLoading ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

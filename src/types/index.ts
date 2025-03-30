@@ -14,6 +14,8 @@ export interface User {
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;
+  // Legacy field
+  name?: string;
   // Bio and social fields
   bio?: string;
   website?: string;
@@ -97,11 +99,18 @@ export interface ProjectTag {
   created_at?: string;
 }
 
-// Update the utility function to accept partial user objects
-export function getUserFullName(user: Pick<User, 'first_name' | 'last_name' | 'email'>): string {
+// Update the utility function to handle both new and legacy name formats
+export function getUserFullName(user: Pick<User, 'first_name' | 'last_name' | 'email' | 'name'>): string {
+  // Check for first_name/last_name fields first
   if (user.first_name || user.last_name) {
     return `${user.first_name || ''} ${user.last_name || ''}`.trim();
   }
   
+  // Fall back to legacy name field if it exists
+  if (user.name) {
+    return user.name;
+  }
+  
+  // Last resort: use email username
   return user.email?.split('@')[0] || 'User';
 }

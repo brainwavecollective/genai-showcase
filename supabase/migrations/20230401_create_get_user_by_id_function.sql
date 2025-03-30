@@ -28,7 +28,16 @@ BEGIN
       'linkedin', u.linkedin,
       'twitter', u.twitter,
       'github', u.github,
-      'instagram', u.instagram
+      'instagram', u.instagram,
+      'is_last_name_public', u.is_last_name_public,
+      'is_avatar_public', u.is_avatar_public,
+      'is_bio_public', u.is_bio_public,
+      'is_email_public', u.is_email_public,
+      'is_website_public', u.is_website_public,
+      'is_linkedin_public', u.is_linkedin_public,
+      'is_twitter_public', u.is_twitter_public,
+      'is_github_public', u.is_github_public,
+      'is_instagram_public', u.is_instagram_public
     ) INTO user_data
   FROM
     public.users u
