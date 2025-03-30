@@ -29,11 +29,18 @@ const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
     );
   });
   
-  // Group users by status
-  const pendingUsers = filteredUsers.filter(user => user.status === 'pending_review');
-  const approvedUsers = filteredUsers.filter(user => user.status === 'approved');
-  const deniedUsers = filteredUsers.filter(user => user.status === 'denied');
-  const noStatusUsers = filteredUsers.filter(user => !user.status);
+  // Helper function to sort users alphabetically by email
+  const sortByEmail = (users: User[]) => {
+    return [...users].sort((a, b) => 
+      (a.email || '').toLowerCase().localeCompare((b.email || '').toLowerCase())
+    );
+  };
+  
+  // Group users by status and sort each group alphabetically by email
+  const pendingUsers = sortByEmail(filteredUsers.filter(user => user.status === 'pending_review'));
+  const approvedUsers = sortByEmail(filteredUsers.filter(user => user.status === 'approved'));
+  const deniedUsers = sortByEmail(filteredUsers.filter(user => user.status === 'denied'));
+  const noStatusUsers = sortByEmail(filteredUsers.filter(user => !user.status));
 
   // Combine in this order: pending first, then no status, then approved, then denied
   const sortedUsers = [...pendingUsers, ...noStatusUsers, ...approvedUsers, ...deniedUsers];
