@@ -5,6 +5,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Comment, MediaItem, getUserFullName } from '@/types';
 import { toast } from 'sonner';
 
+// Define type for the user info returned by the RPC function
+interface CommentUserInfo {
+  first_name: string | null;
+  last_name: string | null;
+  avatar_url: string | null;
+}
+
 export function useCommentOperations(selectedMedia: MediaItem | null) {
   const { user, isAuthenticated } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
@@ -31,8 +38,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
             console.error('Error fetching user info:', userError);
           }
           
-          // Parse the user data
-          const userInfo = userData || {};
+          // Parse the user data with proper type assertion
+          const userInfo = userData as CommentUserInfo || {};
           
           return {
             ...comment,
@@ -97,7 +104,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         console.error('Error fetching user info:', userError);
       }
       
-      const userInfo = userData || {};
+      // Parse the user data with proper type assertion
+      const userInfo = userData as CommentUserInfo || {};
       
       // Format the new comment
       const formattedComment = {
