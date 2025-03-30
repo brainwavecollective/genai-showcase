@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -94,23 +93,6 @@ const UserBioPage = () => {
             {/* User's Projects Section */}
             <div>
               <h2 className="text-2xl font-semibold mb-6">Projects by {user.first_name || 'this user'}</h2>
-              
-              {!isAuthenticated && (
-                <Alert variant="default" className="mb-6">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Viewing as guest</AlertTitle>
-                  <AlertDescription className="flex flex-col gap-2">
-                    <p>You're viewing public projects only. Sign in to see all projects.</p>
-                    <Button 
-                      variant="outline" 
-                      className="w-auto self-start"
-                      onClick={() => document.dispatchEvent(new Event('open-login-dialog'))}
-                    >
-                      Sign in
-                    </Button>
-                  </AlertDescription>
-                </Alert>
-              )}
               
               {projectsLoading ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
