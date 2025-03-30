@@ -66,6 +66,42 @@ export function useUsers() {
     },
   });
 
+  // New mutation for updating user information
+  const updateUserInfo = useMutation({
+    mutationFn: async (params: { userId: string; userData: Partial<User> }) => {
+      console.log(`Updating user ${params.userId} information`, params.userData);
+      
+      const { data, error } = await supabase
+        .from('users')
+        .update(params.userData)
+        .eq('id', params.userId)
+        .select();
+
+      if (error) {
+        console.error('Error updating user information:', error);
+        throw error;
+      }
+      
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      
+      toast({
+        title: "Success",
+        description: "User information updated successfully.",
+      });
+    },
+    onError: (error: any) => {
+      console.error('Error updating user information:', error);
+      toast({
+        title: "Error",
+        description: `Failed to update user information: ${error.message || 'An unexpected error occurred'}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Helper function to check if a user is denied
   const isUserDenied = (userId: string): boolean => {
     const user = users.find(u => u.id === userId);
@@ -78,6 +114,8 @@ export function useUsers() {
     error: error ? (error as Error).message : null,
     updateUserStatus: (userId: string, status: UserStatus) => 
       updateUserStatus.mutate({ userId, status }),
+    updateUserInfo: (userId: string, userData: Partial<User>) =>
+      updateUserInfo.mutate({ userId, userData }),
     isUserDenied
   };
 }

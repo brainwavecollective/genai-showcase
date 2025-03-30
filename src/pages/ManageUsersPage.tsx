@@ -15,7 +15,7 @@ export function ManageUsersPage() {
   const { isAdmin, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { users, isLoading, error, updateUserStatus } = useUsers();
+  const { users, isLoading, error, updateUserStatus, updateUserInfo } = useUsers();
   const [activeTab, setActiveTab] = useState('view');
 
   useEffect(() => {
@@ -87,6 +87,7 @@ export function ManageUsersPage() {
             users={users} 
             isLoading={isLoading} 
             onStatusChange={updateUserStatus}
+            onUserUpdate={updateUserInfo}
           />
         ) : (
           <div className="bg-card p-6 rounded-lg border">

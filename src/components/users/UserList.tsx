@@ -12,9 +12,10 @@ interface UserListProps {
   users: User[];
   isLoading: boolean;
   onStatusChange: (userId: string, status: UserStatus) => void;
+  onUserUpdate?: (userId: string, userData: Partial<User>) => void;
 }
 
-const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
+const UserList = ({ users, isLoading, onStatusChange, onUserUpdate }: UserListProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   
@@ -73,6 +74,7 @@ const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
           open={!!selectedUser} 
           onOpenChange={() => setSelectedUser(null)}
           onStatusChange={onStatusChange}
+          onUserUpdate={onUserUpdate}
         />
       )}
     </div>
