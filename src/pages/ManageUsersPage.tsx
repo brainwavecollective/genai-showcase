@@ -8,7 +8,7 @@ import AddUserForm from '@/components/users/AddUserForm';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { useUsers } from '@/hooks/useUsers';
-import { UserPlus } from 'lucide-react';
+import { UserPlus, Loader2 } from 'lucide-react';
 
 export function ManageUsersPage() {
   const { isAdmin, isAuthenticated } = useAuth();
@@ -65,25 +65,31 @@ export function ManageUsersPage() {
       <div className="container mx-auto py-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <h1 className="text-3xl font-semibold">Manage Users</h1>
-          {!showAddUserForm && (
-            <Button
-              onClick={() => setShowAddUserForm(true)}
-              className="flex items-center gap-2"
-            >
-              <UserPlus size={16} />
-              Add User
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {showAddUserForm ? (
+              <Button
+                variant="outline"
+                onClick={handleCancelAddUser}
+                className="flex items-center gap-2"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                Cancel
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setShowAddUserForm(true)}
+                className="flex items-center gap-2"
+              >
+                <UserPlus size={16} />
+                Add User
+              </Button>
+            )}
+          </div>
         </div>
 
         {showAddUserForm ? (
           <div className="bg-card p-6 rounded-lg border">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">Add New User</h2>
-              <Button variant="outline" onClick={handleCancelAddUser}>
-                Cancel
-              </Button>
-            </div>
+            <h2 className="text-2xl font-semibold mb-6">Add New User</h2>
             <AddUserForm onSuccess={handleAddUserSuccess} />
           </div>
         ) : (
