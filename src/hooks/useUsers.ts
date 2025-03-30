@@ -34,6 +34,11 @@ export function useUsers() {
     mutationFn: async (params: { userId: string; status: UserStatus }) => {
       console.log(`Updating user ${params.userId} status to ${params.status}`);
       
+      // Ensure the status is one of the allowed values in the database
+      if (!['pending_review', 'approved', 'denied'].includes(params.status)) {
+        throw new Error(`Invalid status: ${params.status}. Must be one of: pending_review, approved, denied`);
+      }
+      
       const { data, error } = await supabase
         .rpc('update_user_status', {
           p_user_id: params.userId,
@@ -71,9 +76,28 @@ export function useUsers() {
     mutationFn: async (params: { userId: string; userData: Partial<User> }) => {
       console.log(`Updating user ${params.userId} information`, params.userData);
       
+      // Create a new object with only the fields that are valid for the database
+      const validUserData: Record<string, any> = {};
+      
+      // Copy over all fields except status (handle it separately)
+      Object.entries(params.userData).forEach(([key, value]) => {
+        if (key !== 'status') {
+          validUserData[key] = value;
+        }
+      });
+      
+      // Handle status separately to ensure it's a valid value for the database
+      if (params.userData.status) {
+        if (['pending_review', 'approved', 'denied'].includes(params.userData.status)) {
+          validUserData.status = params.userData.status;
+        } else {
+          console.warn(`Ignoring invalid status: ${params.userData.status}`);
+        }
+      }
+      
       const { data, error } = await supabase
         .from('users')
-        .update(params.userData)
+        .update(validUserData)
         .eq('id', params.userId)
         .select();
 
