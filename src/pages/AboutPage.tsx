@@ -37,7 +37,7 @@ const AboutPage = () => {
             <div className="mb-8 rounded-lg overflow-hidden shadow-lg">
               <AspectRatio ratio={16 / 9}>
                 <img 
-                  src="/lovable-uploads/270d895b-0c75-453f-a328-6157826d68ab.png" 
+                  src="/lovable-uploads/BWC270d895b-0c75-453f-a328-6157826d68ab.png" 
                   alt="View of University of Colorado Boulder with the Flatirons in the background" 
                   className="object-cover w-full h-full" 
                 />
