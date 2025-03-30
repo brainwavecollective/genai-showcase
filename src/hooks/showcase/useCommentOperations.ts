@@ -29,11 +29,11 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       // Format comments to match the Comment type
       const formattedComments = commentsData.map((comment: any) => {
-        // Create a user-like object from the joined data to use getUserFullName
+        // Create a user-like object from the joined data with required fields for getUserFullName
         const userObj = {
           first_name: comment.users?.first_name || '',
           last_name: comment.users?.last_name || '',
-          email: 'unknown@example.com' // Fallback email (won't be shown)
+          email: 'unknown@example.com' // Fallback email
         };
         
         return {
@@ -79,7 +79,7 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       if (error) throw error;
       
-      // Format the new comment using getUserFullName utility
+      // Format the new comment
       const formattedComment = {
         ...data,
         user_name: data.users?.first_name ? 

@@ -97,8 +97,8 @@ export interface ProjectTag {
   created_at?: string;
 }
 
-// Utility function to get a user's full name
-export function getUserFullName(user: User): string {
+// Update the utility function to accept partial user objects
+export function getUserFullName(user: Pick<User, 'first_name' | 'last_name' | 'email'>): string {
   if (user.first_name || user.last_name) {
     return `${user.first_name || ''} ${user.last_name || ''}`.trim();
   }
