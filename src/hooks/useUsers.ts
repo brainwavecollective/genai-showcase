@@ -66,11 +66,18 @@ export function useUsers() {
     },
   });
 
+  // Helper function to check if a user is denied
+  const isUserDenied = (userId: string): boolean => {
+    const user = users.find(u => u.id === userId);
+    return user?.status === 'denied';
+  };
+
   return {
     users,
     isLoading,
     error: error ? (error as Error).message : null,
     updateUserStatus: (userId: string, status: UserStatus) => 
-      updateUserStatus.mutate({ userId, status })
+      updateUserStatus.mutate({ userId, status }),
+    isUserDenied
   };
 }
