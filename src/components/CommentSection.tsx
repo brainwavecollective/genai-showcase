@@ -55,10 +55,13 @@ export function CommentSection({ comments, mediaItemId, onAddComment, isLoading 
     });
   };
 
-  // Prevent form submission on Enter key
+  // Handle Enter key to submit comment, Shift+Enter for line break
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
+      if (newComment.trim() && !isSubmitting && !isLoading) {
+        handleSubmit(e);
+      }
     }
   };
 
