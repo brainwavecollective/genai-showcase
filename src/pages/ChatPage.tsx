@@ -1,6 +1,5 @@
 
 import { useParams } from "react-router-dom";
-import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { Loader2 } from "lucide-react";
@@ -24,11 +23,6 @@ const ChatPage = () => {
     limitReached,
     sendMessage
   } = useProjectChatPage(projectId);
-  
-  // Scroll to top when the component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [projectId]);
 
   return (
     <div className="flex min-h-screen flex-col">

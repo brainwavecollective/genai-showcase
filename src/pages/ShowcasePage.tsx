@@ -1,6 +1,5 @@
 
 import { useParams, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -33,11 +32,6 @@ const ShowcasePage = () => {
     handleAddMedia,
     handlePrivacyToggle
   } = useShowcaseData(id);
-  
-  // Scroll to top when the component mounts
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
 
   if (isLoading) {
     return <ShowcaseLoading />;
