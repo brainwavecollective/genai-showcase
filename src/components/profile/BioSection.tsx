@@ -1,5 +1,4 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,8 +27,8 @@ export const BioSection = ({ user }: BioSectionProps) => {
     instagram: user?.instagram || '',
   });
 
-  // Update local state when user prop changes
-  useState(() => {
+  // Update local state when user prop changes - fixed to useEffect instead of useState
+  useEffect(() => {
     if (user) {
       setBioData({
         bio: user.bio || '',
