@@ -13,7 +13,7 @@ interface ProjectCardProps {
   tags?: Tag[];
 }
 
-export function ProjectCard({ project, tags }: ProjectCardProps) {
+export function ProjectCard({ project, tags = [] }: ProjectCardProps) {
   const { isAuthenticated } = useAuth();
   const [imageLoaded, setImageLoaded] = useState(false);
   const isPrivate = project.is_private;
@@ -35,6 +35,13 @@ export function ProjectCard({ project, tags }: ProjectCardProps) {
       setImageLoaded(true);
     }
   }, [project.cover_image_url]);
+
+  // Filter to only show tags that exist in the tags array
+  const displayTags = project.tag_ids
+    ? project.tag_ids
+        .map(tagId => tags.find(tag => tag.id === tagId))
+        .filter(tag => tag !== undefined) as Tag[]
+    : [];
 
   return (
     <Link to={`/project/${project.id}`}>
@@ -84,9 +91,9 @@ export function ProjectCard({ project, tags }: ProjectCardProps) {
             </p>
           )}
 
-          {(isAuthenticated || !isPrivate) && tags && tags.length > 0 && (
+          {(isAuthenticated || !isPrivate) && displayTags.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-1">
-              {tags.map(tag => (
+              {displayTags.map(tag => (
                 <TooltipProvider key={tag.id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -95,7 +102,7 @@ export function ProjectCard({ project, tags }: ProjectCardProps) {
                         {tag.name}
                       </Badge>
                     </TooltipTrigger>
-                    {tag.description && (
+                    {tag.description && tag.description !== 'Admin created tag' && tag.description !== 'User created tag' && (
                       <TooltipContent className="max-w-[200px]">
                         <p>{tag.description}</p>
                       </TooltipContent>

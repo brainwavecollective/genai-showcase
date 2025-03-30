@@ -4,7 +4,6 @@ import { useAuth } from '@/context/AuthContext';
 import { Project, Tag } from '@/types';
 import { SearchAndFilterBar } from './SearchAndFilterBar';
 import ProjectGrid from './ProjectGrid';
-import { supabase } from '@/integrations/supabase/client';
 
 interface ProjectSectionProps {
   projects: Project[];
@@ -18,28 +17,8 @@ export function ProjectSection({ projects, tags, isLoading = false }: ProjectSec
   const [selectedTab, setSelectedTab] = useState<'all' | 'public' | 'private'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
-  const [adminTagIds, setAdminTagIds] = useState<string[]>([]);
   const [isFilteringData, setIsFilteringData] = useState(false);
   
-  // Get admin tag IDs for filtering
-  useEffect(() => {
-    const fetchAdminTagIds = async () => {
-      try {
-        const { data, error } = await supabase
-          .from('tags')
-          .select('id')
-          .eq('description', 'Admin created tag');
-          
-        if (error) throw error;
-        setAdminTagIds((data || []).map(tag => tag.id));
-      } catch (error) {
-        console.error('Error fetching admin tag IDs:', error);
-      }
-    };
-    
-    fetchAdminTagIds();
-  }, []);
-
   // Filter projects based on authentication state, selected tab, search query, and tags
   useEffect(() => {
     setIsFilteringData(true);
@@ -70,10 +49,10 @@ export function ProjectSection({ projects, tags, isLoading = false }: ProjectSec
         );
       }
       
-      // Filter by selected tags (only admin tags are selectable in the UI)
+      // Filter by selected tags
       if (selectedTags.length > 0) {
         filtered = filtered.filter(project => 
-          selectedTags.some(tagId => project.tag_ids?.includes(tagId))
+          project.tag_ids?.some(tagId => selectedTags.includes(tagId))
         );
       }
       
@@ -91,7 +70,7 @@ export function ProjectSection({ projects, tags, isLoading = false }: ProjectSec
         setSelectedTab={setSelectedTab}
         selectedTags={selectedTags}
         setSelectedTags={setSelectedTags}
-        tags={tags.filter(tag => adminTagIds.includes(tag.id))}
+        tags={tags}
         isAuthenticated={isAuthenticated}
       />
       

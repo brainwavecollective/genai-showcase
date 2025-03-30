@@ -28,10 +28,11 @@ const Index = () => {
           throw projectsError;
         }
         
-        // Fetch tags
+        // Fetch all tags (not just admin tags)
         const { data: tagsData, error: tagsError } = await supabase
           .from('tags')
-          .select('*');
+          .select('*')
+          .order('name');
           
         if (tagsError) {
           throw tagsError;
