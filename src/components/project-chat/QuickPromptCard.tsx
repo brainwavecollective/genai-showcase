@@ -1,5 +1,5 @@
 
-import { Search } from 'lucide-react';
+import { Search, Code, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
@@ -16,7 +16,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           Let's chat about showcase projects
         </CardTitle>
         <CardDescription>
-          Get help discovering projects, understanding concepts, or finding specific information.
+          Get help discovering projects, understanding technologies, or learning about the students.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -25,7 +25,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
             variant="outline" 
             size="sm" 
             className="gap-2 border-cu-gold/50 hover:bg-cu-gold/10"
-            onClick={() => sendMessage("What kinds of projects are in the showcase?")}
+            onClick={() => sendMessage("What kinds of projects are in the showcase? I'd like to explore more.")}
             disabled={disabled}
           >
             <Search size={14} />
@@ -34,20 +34,22 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           <Button 
             variant="outline" 
             size="sm"
-            className="border-cu-gold/50 hover:bg-cu-gold/10"
-            onClick={() => sendMessage("Show me projects related to machine learning")}
+            className="gap-2 border-cu-gold/50 hover:bg-cu-gold/10"
+            onClick={() => sendMessage("What technologies and tools were used in these projects? I'm interested in learning more about them.")}
             disabled={disabled}
           >
-            ML projects
+            <Code size={14} />
+            Technologies used
           </Button>
           <Button 
             variant="outline" 
             size="sm"
-            className="border-cu-gold/50 hover:bg-cu-gold/10"
-            onClick={() => sendMessage("Which projects use generative AI?")}
+            className="gap-2 border-cu-gold/50 hover:bg-cu-gold/10"
+            onClick={() => sendMessage("Tell me about the students who created these projects. What programs are they in?")}
             disabled={disabled}
           >
-            Generative AI
+            <Users size={14} />
+            Meet the creators
           </Button>
         </div>
       </CardContent>
