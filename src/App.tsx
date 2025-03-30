@@ -3,12 +3,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
 import Index from "./pages/Index";
 import ShowcasePage from "./pages/ShowcasePage";
 import NotFound from "./pages/NotFound";
-import ManageUsersPage from "./pages/ManageUsersPage"; // Fixed the import
+import ManageUsersPage from "./pages/ManageUsersPage";
 import UserProfilePage from "./pages/UserProfilePage";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
@@ -39,6 +39,8 @@ const App = () => (
               <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/terms" element={<TermsPage />} />
+              {/* Redirect /login to home page since there's no actual login page route */}
+              <Route path="/login" element={<Navigate to="/" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AnimatePresence>

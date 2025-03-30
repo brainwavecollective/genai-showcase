@@ -55,6 +55,48 @@ export function useSessionHandler() {
     console.log('Setting up auth state listeners...');
     let mounted = true;
     
+    // Check for an existing session first to avoid flashing login state
+    const checkExistingSession = async () => {
+      try {
+        console.log('Checking for existing session...');
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        
+        if (!mounted) return;
+        
+        console.log('Initial session check:', existingSession?.user?.email);
+        
+        if (existingSession?.user) {
+          setSession(existingSession);
+          setIsAuthenticated(true);
+          
+          // Fetch user data from our users table
+          try {
+            await fetchUserData(existingSession.user.id, (userData) => {
+              if (mounted) {
+                setUser(userData);
+                setIsInitializing(false);
+              }
+            });
+          } catch (err) {
+            console.error('Exception fetching user data:', err);
+            
+            // Create a minimal user object on error
+            if (mounted) {
+              setUser(createMinimalUser(existingSession.user));
+              setIsInitializing(false);
+            }
+          }
+        } else {
+          if (mounted) {
+            setIsInitializing(false);
+          }
+        }
+      } catch (error) {
+        console.error('Error checking existing session:', error);
+        if (mounted) setIsInitializing(false);
+      }
+    };
+    
     // Set up auth state change listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
@@ -65,6 +107,8 @@ export function useSessionHandler() {
         setSession(currentSession);
         
         if (currentSession?.user) {
+          setIsAuthenticated(true);
+          
           // Fetch user data from our users table using setTimeout
           // to avoid potential deadlocks
           setTimeout(async () => {
@@ -74,7 +118,6 @@ export function useSessionHandler() {
               await fetchUserData(currentSession.user.id, (userData) => {
                 if (mounted) {
                   setUser(userData);
-                  setIsAuthenticated(true);
                   setIsInitializing(false);
                 }
               });
@@ -83,7 +126,6 @@ export function useSessionHandler() {
               
               // Even on failure, set authenticated if we have a session
               if (mounted) {
-                setIsAuthenticated(true);
                 setUser(createMinimalUser(currentSession.user));
                 setIsInitializing(false);
               }
@@ -101,48 +143,7 @@ export function useSessionHandler() {
       }
     );
 
-    // Initial check for an existing session
-    const checkExistingSession = async () => {
-      try {
-        console.log('Checking for existing session...');
-        const { data: { session: existingSession } } = await supabase.auth.getSession();
-        
-        if (!mounted) return;
-        
-        console.log('Initial session check:', existingSession?.user?.email);
-        
-        if (existingSession?.user) {
-          setSession(existingSession);
-          // Fetch user data from our users table
-          try {
-            await fetchUserData(existingSession.user.id, (userData) => {
-              if (mounted) {
-                setUser(userData);
-                setIsAuthenticated(true);
-                setIsInitializing(false);
-              }
-            });
-          } catch (err) {
-            console.error('Exception fetching user data:', err);
-            
-            // Create a minimal user object on error
-            if (mounted) {
-              setIsAuthenticated(true);
-              setUser(createMinimalUser(existingSession.user));
-              setIsInitializing(false);
-            }
-          }
-        } else {
-          if (mounted) {
-            setIsInitializing(false);
-          }
-        }
-      } catch (error) {
-        console.error('Error checking existing session:', error);
-        if (mounted) setIsInitializing(false);
-      }
-    };
-    
+    // Execute initial check
     checkExistingSession();
 
     return () => {
@@ -152,11 +153,16 @@ export function useSessionHandler() {
     };
   }, []);
 
-  // Add debug logging for admin status
+  // Add debug logging for auth state
   useEffect(() => {
-    console.log('User role:', user?.role);
-    console.log('Is admin?', isAdmin);
-  }, [user?.role, isAdmin]);
+    console.log('Auth state updated:', {
+      isAuthenticated,
+      user: user?.email,
+      role: user?.role,
+      isAdmin,
+      isInitializing
+    });
+  }, [isAuthenticated, user, isAdmin, isInitializing]);
 
   return {
     user,
