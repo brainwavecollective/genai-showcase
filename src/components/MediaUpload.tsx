@@ -49,6 +49,7 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       // Create media item in the database
       const finalMediaUrl = mediaType === 'text' ? mediaContent : mediaUrl;
       
+      // Direct insertion to avoid the infinite recursion issue
       const { data, error } = await supabase
         .from('media_items')
         .insert({
@@ -59,7 +60,7 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
           media_url: finalMediaUrl,
           creator_id: user.id
         })
-        .select('*')
+        .select('*, creator:creator_id(first_name, last_name, avatar_url)')
         .single();
       
       if (error) {
@@ -70,22 +71,12 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
         throw new Error('No data returned from insert operation');
       }
       
-      // Get creator info for the full media item object
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('first_name, last_name, avatar_url')
-        .eq('id', user.id)
-        .single();
-      
-      if (userError) {
-        console.error('Error fetching user data:', userError);
-      }
-      
-      // Create the media item with creator info
+      // Create the media item with creator info from the join
+      const creator = data.creator || {};
       const newMedia: MediaItem = {
         ...data,
-        creator_name: userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : '',
-        creator_avatar: userData?.avatar_url || null
+        creator_name: creator ? `${creator.first_name || ''} ${creator.last_name || ''}`.trim() : '',
+        creator_avatar: creator?.avatar_url || null
       };
       
       onMediaAdded(newMedia);
@@ -97,8 +88,59 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       toast.success("Media added successfully");
     } catch (error: any) {
       console.error('Error adding media:', error);
-      toast.error(`Failed to add media: ${error.message || 'Unknown error'}`);
-      setIsSubmitting(false);
+      
+      // Fallback approach if we encounter the infinite recursion error
+      if (error.message?.includes('infinite recursion') || error.code === '42P17') {
+        try {
+          // First insert without trying to get creator info
+          const { data: insertedData, error: insertError } = await supabase
+            .from('media_items')
+            .insert({
+              project_id: projectId,
+              title,
+              description,
+              media_type: mediaType,
+              media_url: mediaType === 'text' ? mediaContent : mediaUrl,
+              creator_id: user.id
+            })
+            .select('*')
+            .single();
+            
+          if (insertError) throw insertError;
+          
+          if (!insertedData) {
+            throw new Error('No data returned from insert operation');
+          }
+          
+          // Separate query to get user info
+          const { data: userData } = await supabase
+            .from('users')
+            .select('first_name, last_name, avatar_url')
+            .eq('id', user.id)
+            .single();
+          
+          // Create the complete media item
+          const newMedia: MediaItem = {
+            ...insertedData,
+            creator_name: userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : '',
+            creator_avatar: userData?.avatar_url || null
+          };
+          
+          onMediaAdded(newMedia);
+          setIsSubmitting(false);
+          setIsOpen(false);
+          resetForm();
+          toast.success("Media added successfully");
+          
+        } catch (fallbackError: any) {
+          console.error('Fallback error adding media:', fallbackError);
+          toast.error(`Failed to add media: ${fallbackError.message || 'Unknown error'}`);
+          setIsSubmitting(false);
+        }
+      } else {
+        toast.error(`Failed to add media: ${error.message || 'Unknown error'}`);
+        setIsSubmitting(false);
+      }
     }
   };
 

@@ -17,16 +17,44 @@ export function useMediaOperations(projectId: string | undefined) {
       try {
         setIsLoading(true);
         
-        // We use media_items_with_creator view to get both media details and creator info
-        const { data: mediaItems, error } = await supabase
+        // First try to use the view which includes creator information
+        let { data: mediaItems, error } = await supabase
           .from('media_items_with_creator')
           .select('*')
           .eq('project_id', projectId)
           .order('created_at', { ascending: false });
         
         if (error) {
-          console.error('Error fetching media items:', error);
-          throw error;
+          console.error('Error fetching from view, trying direct table:', error);
+          
+          // Fallback to direct querying if view fails
+          const { data: directMediaItems, error: directError } = await supabase
+            .from('media_items')
+            .select(`
+              *,
+              creator:creator_id (
+                first_name,
+                last_name,
+                avatar_url
+              )
+            `)
+            .eq('project_id', projectId)
+            .order('created_at', { ascending: false });
+            
+          if (directError) {
+            console.error('Error fetching media items directly:', directError);
+            throw directError;
+          }
+          
+          // Format direct query results to match MediaItem type
+          mediaItems = directMediaItems?.map(item => {
+            const creator = item.creator || {};
+            return {
+              ...item,
+              creator_name: creator ? `${creator.first_name || ''} ${creator.last_name || ''}`.trim() : '',
+              creator_avatar: creator?.avatar_url || null
+            };
+          });
         }
         
         console.log('Fetched media items:', mediaItems);
