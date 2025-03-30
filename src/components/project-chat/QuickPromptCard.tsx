@@ -12,7 +12,9 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
   return (
     <Card className="mb-6">
       <CardHeader className="pb-3">
-        <CardTitle>Ask me about showcase projects</CardTitle>
+        <CardTitle className="text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">
+          Let's chat about showcase projects
+        </CardTitle>
         <CardDescription>
           Get help discovering projects, understanding concepts, or finding specific information.
         </CardDescription>
@@ -22,7 +24,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           <Button 
             variant="outline" 
             size="sm" 
-            className="gap-2"
+            className="gap-2 border-cu-gold/50 hover:bg-cu-gold/10"
             onClick={() => sendMessage("What kinds of projects are in the showcase?")}
             disabled={disabled}
           >
@@ -32,6 +34,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           <Button 
             variant="outline" 
             size="sm"
+            className="border-cu-gold/50 hover:bg-cu-gold/10"
             onClick={() => sendMessage("Show me projects related to machine learning")}
             disabled={disabled}
           >
@@ -40,6 +43,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           <Button 
             variant="outline" 
             size="sm"
+            className="border-cu-gold/50 hover:bg-cu-gold/10"
             onClick={() => sendMessage("Which projects use generative AI?")}
             disabled={disabled}
           >
