@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { HeroSection } from '@/components/home/HeroSection';
 import { ProjectSection } from '@/components/home/ProjectSection';
+import { FeaturedProjects } from '@/components/home/FeaturedProjects';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { Project, Tag } from '@/types';
@@ -57,6 +58,12 @@ const Index = () => {
       
       <main className="flex-1 pt-24 pb-16">
         <HeroSection />
+        
+        {/* Featured Projects Carousel */}
+        <div className="container max-w-7xl mx-auto">
+          <FeaturedProjects projects={projects} isLoading={isLoading} />
+        </div>
+        
         <ProjectSection 
           projects={projects} 
           tags={tags} 

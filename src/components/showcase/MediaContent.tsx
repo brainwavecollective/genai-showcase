@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { MediaItem, Comment } from "@/types";
 import { EmptyMediaState } from "./media-content/EmptyMediaState";
@@ -12,9 +13,10 @@ interface MediaContentProps {
   selectedMedia: MediaItem | null;
   comments: Comment[];
   onAddComment: (content: string) => void;
+  mediaItems: MediaItem[];
 }
 
-export function MediaContent({ selectedMedia, comments, onAddComment }: MediaContentProps) {
+export function MediaContent({ selectedMedia, comments, onAddComment, mediaItems }: MediaContentProps) {
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [media, setMedia] = useState<MediaItem | null>(selectedMedia);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,6 +87,7 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
   return (
     <MediaContentWrapper
       media={displayMedia}
+      mediaItems={mediaItems}
       comments={comments}
       onAddComment={onAddComment}
       loadingError={loadingError}

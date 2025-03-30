@@ -9,6 +9,7 @@ import { ShowcaseError } from '@/components/showcase/ShowcaseError';
 import { ShowcaseNotFound } from '@/components/showcase/ShowcaseNotFound';
 import { ProjectHeader } from '@/components/showcase/ProjectHeader';
 import { ShowcaseContent } from '@/components/showcase/ShowcaseContent';
+import { FloatingAIAssistant } from '@/components/showcase/FloatingAIAssistant';
 import { useShowcaseData } from '@/hooks/useShowcaseData';
 import { formatDate } from '@/utils/dateUtils';
 
@@ -92,6 +93,9 @@ const ShowcasePage = () => {
       </main>
       
       <Footer />
+      
+      {/* Floating AI Assistant */}
+      <FloatingAIAssistant projectId={project.id} />
     </div>
   );
 };

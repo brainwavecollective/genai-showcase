@@ -1,16 +1,19 @@
-
 import { MediaItem } from '@/types';
 import { File, Image, LinkIcon, Video, FileText } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { ImageLightbox } from './ImageLightbox';
 
 interface MediaDisplayProps {
   media: MediaItem;
+  mediaItems: MediaItem[];
   error?: string | null;
 }
 
-export function MediaDisplay({ media, error }: MediaDisplayProps) {
+export function MediaDisplay({ media, mediaItems, error }: MediaDisplayProps) {
   const [imgError, setImgError] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
 
   // If there's an error, display it
   if (error) {
@@ -26,32 +29,47 @@ export function MediaDisplay({ media, error }: MediaDisplayProps) {
   switch (media.media_type) {
     case 'image':
       return (
-        <div className="flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden max-h-[500px]">
-          {imgError ? (
-            <div className="p-8 text-center">
-              <Image className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Image failed to load</p>
-              <a 
-                href={media.media_url} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-sm text-primary hover:underline mt-2 inline-block"
-              >
-                View image directly
-              </a>
-            </div>
-          ) : (
-            <img 
-              src={media.media_url} 
-              alt={media.title} 
-              className="max-w-full max-h-[500px] object-contain"
-              onError={(e) => {
-                console.error("Image failed to load:", media.media_url);
-                setImgError(true);
-              }}
-            />
-          )}
-        </div>
+        <>
+          <div className="flex items-center justify-center bg-muted/30 rounded-lg overflow-hidden max-h-[500px]">
+            {imgError ? (
+              <div className="p-8 text-center">
+                <Image className="h-12 w-12 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">Image failed to load</p>
+                <a 
+                  href={media.media_url} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline mt-2 inline-block"
+                >
+                  View image directly
+                </a>
+              </div>
+            ) : (
+              <div className="relative group cursor-pointer" onClick={() => setLightboxOpen(true)}>
+                <img 
+                  src={media.media_url} 
+                  alt={media.title} 
+                  className="max-w-full max-h-[500px] object-contain"
+                  onError={(e) => {
+                    console.error("Image failed to load:", media.media_url);
+                    setImgError(true);
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                  <Button variant="secondary" className="bg-background/80 hover:bg-background">
+                    View Fullscreen
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+          <ImageLightbox 
+            isOpen={lightboxOpen} 
+            onClose={() => setLightboxOpen(false)} 
+            media={media}
+            mediaItems={mediaItems.filter(item => item.media_type === 'image')}
+          />
+        </>
       );
     case 'video':
       return (
