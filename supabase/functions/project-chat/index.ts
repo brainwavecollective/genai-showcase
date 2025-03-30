@@ -129,36 +129,32 @@ serve(async (req) => {
       throw new Error(`Error fetching public projects: ${projectsError.message}`);
     }
     
-    // Log detailed information about projects to help with debugging
+    // Log projects for debugging
     console.log(`Successfully fetched ${publicProjects?.length || 0} public projects`);
-    console.log('Projects info:', publicProjects?.map(p => ({ id: p.id, title: p.title, tags: p.tag_names })));
     
     // Format public projects for the system prompt - ensuring ONLY real project data is used
-    const projectsInfo = publicProjects?.map(project => {
-      return `
-        Project: ${project.title || 'Untitled Project'}
-        Description: ${project.description || 'No description provided'}
-        Tags: ${project.tag_names?.join(', ') || 'No tags'}
-        Creator: ${project.creator_name || 'Unknown'}
-        Created: ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
-      `;
-    }).join('\n') || 'No public projects available';
+    let projectsInfo = "";
+    if (publicProjects && publicProjects.length > 0) {
+      projectsInfo = publicProjects.map(project => {
+        return `
+          Project: ${project.title || 'Untitled Project'}
+          Description: ${project.description || 'No description provided'}
+          Tags: ${project.tag_names?.join(', ') || 'No tags'}
+          Creator: ${project.creator_name || 'Unknown'}
+          Created: ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
+        `;
+      }).join('\n');
+    } else {
+      projectsInfo = 'Currently there are no public projects available in the showcase.';
+    }
     
     // About page information for context
     const aboutPageInfo = `
       About the CU Boulder ATLAS Institute Generative AI Showcase:
-      This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
-      Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
+      This showcase platform was developed as part of Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
       both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
-      experience design, and content management. The workshop explored innovative approaches to rapid 
-      prototyping and development, focusing on the integration of aesthetic and functional elements.
+      experience design, and content management.
       
-      As part of Professor Schwartz's Generative AI curriculum, this project provided students with 
-      hands-on experience in collaborative development environments, user interface design for creative portfolios,
-      integration of generative AI components in web applications, exploration of iterative design processes using 
-      low-code/no-code tools, and background understanding of vibe coding and related experiences.
-      
-      All student projects featured on this platform remain the intellectual property of their respective creators.
       Students retain full ownership of their intellectual property, grant display rights for educational 
       and demonstration purposes, acknowledge responsibility for the content they upload, and have direct control 
       over their content through individual login accounts, including the ability to edit or remove their work at any time.
@@ -183,12 +179,10 @@ serve(async (req) => {
       If asked about unrelated topics, politely redirect the conversation to the showcase platform.
       
       Keep your responses concise, informative, and student-friendly.
-      Base your responses ONLY on the information provided about the actual projects in the database. 
-      If you don't have enough information, suggest what might be relevant or state that you don't have that specific information.
       
-      IMPORTANT: Never mention or refer to fictional projects like "Interactive Solar System", "Virtual Reality Gallery", 
-      or "Mobile Weather App" unless these projects explicitly exist in the database information provided above.
-      Only discuss the actual projects that are listed in the database information.
+      IMPORTANT: Only discuss projects that are actually in the database as shown in the project information provided above.
+      If you don't know details about a specific project or if the showcase doesn't currently have many projects,
+      be honest about this rather than inventing fictional projects or details.
     `;
 
     console.log('System prompt created with project information');

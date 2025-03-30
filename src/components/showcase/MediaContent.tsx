@@ -8,6 +8,7 @@ import { File, Image, LinkIcon, Video, FileText } from 'lucide-react';
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MediaContentProps {
   selectedMedia: MediaItem | null;
@@ -18,6 +19,7 @@ interface MediaContentProps {
 export function MediaContent({ selectedMedia, comments, onAddComment }: MediaContentProps) {
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [media, setMedia] = useState<MediaItem | null>(selectedMedia);
+  const [isLoading, setIsLoading] = useState(false);
 
   // If media is not preloaded, try to fetch it
   useEffect(() => {
@@ -26,9 +28,19 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
     
     if (!selectedMedia) return;
     
+    // For debugging - log the media item
+    console.log('Selected media:', selectedMedia);
+    
     // Try to fetch additional media details if needed
     const loadMediaDetails = async () => {
       try {
+        setIsLoading(true);
+        // Check if the media_url is accessible
+        if (selectedMedia.media_type === 'image' && selectedMedia.media_url) {
+          // We could also test if the URL is valid here if needed
+          console.log('Media URL:', selectedMedia.media_url);
+        }
+        
         // Example: If we need to fetch more details about the media item
         const { data, error } = await supabase
           .from('media_items')
@@ -43,11 +55,14 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
         }
         
         if (data) {
+          console.log('Fetched media details:', data);
           setMedia(data as MediaItem);
         }
       } catch (error) {
         console.error('Error processing media:', error);
         setLoadingError('An unexpected error occurred loading media');
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -75,7 +90,25 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
     );
   }
   
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">
+        <p className="text-muted-foreground">Loading media content...</p>
+      </div>
+    );
+  }
+  
   const displayMedia = media || selectedMedia;
+  
+  if (!displayMedia) {
+    return (
+      <Alert variant="destructive" className="my-4">
+        <AlertDescription>
+          Error: Media content not found
+        </AlertDescription>
+      </Alert>
+    );
+  }
   
   return (
     <motion.div
