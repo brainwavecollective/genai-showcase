@@ -253,48 +253,66 @@ export type Database = {
       users: {
         Row: {
           avatar_url: string | null
+          bio: string | null
           course: string | null
           created_at: string | null
           email: string
           first_name: string | null
+          github: string | null
           id: string
+          instagram: string | null
           last_name: string | null
+          linkedin: string | null
           name: string
           notes: string | null
           role: string
           semester: string | null
           status: Database["public"]["Enums"]["user_status"] | null
+          twitter: string | null
           updated_at: string | null
+          website: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
           course?: string | null
           created_at?: string | null
           email: string
           first_name?: string | null
+          github?: string | null
           id?: string
+          instagram?: string | null
           last_name?: string | null
+          linkedin?: string | null
           name: string
           notes?: string | null
           role: string
           semester?: string | null
           status?: Database["public"]["Enums"]["user_status"] | null
+          twitter?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
           course?: string | null
           created_at?: string | null
           email?: string
           first_name?: string | null
+          github?: string | null
           id?: string
+          instagram?: string | null
           last_name?: string | null
+          linkedin?: string | null
           name?: string
           notes?: string | null
           role?: string
           semester?: string | null
           status?: Database["public"]["Enums"]["user_status"] | null
+          twitter?: string | null
           updated_at?: string | null
+          website?: string | null
         }
         Relationships: []
       }
@@ -373,18 +391,24 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: {
           avatar_url: string | null
+          bio: string | null
           course: string | null
           created_at: string | null
           email: string
           first_name: string | null
+          github: string | null
           id: string
+          instagram: string | null
           last_name: string | null
+          linkedin: string | null
           name: string
           notes: string | null
           role: string
           semester: string | null
           status: Database["public"]["Enums"]["user_status"] | null
+          twitter: string | null
           updated_at: string | null
+          website: string | null
         }[]
       }
       get_user_by_id: {
@@ -407,18 +431,24 @@ export type Database = {
         }
         Returns: {
           avatar_url: string | null
+          bio: string | null
           course: string | null
           created_at: string | null
           email: string
           first_name: string | null
+          github: string | null
           id: string
+          instagram: string | null
           last_name: string | null
+          linkedin: string | null
           name: string
           notes: string | null
           role: string
           semester: string | null
           status: Database["public"]["Enums"]["user_status"] | null
+          twitter: string | null
           updated_at: string | null
+          website: string | null
         }[]
       }
       is_admin: {
@@ -444,18 +474,24 @@ export type Database = {
         }
         Returns: {
           avatar_url: string | null
+          bio: string | null
           course: string | null
           created_at: string | null
           email: string
           first_name: string | null
+          github: string | null
           id: string
+          instagram: string | null
           last_name: string | null
+          linkedin: string | null
           name: string
           notes: string | null
           role: string
           semester: string | null
           status: Database["public"]["Enums"]["user_status"] | null
+          twitter: string | null
           updated_at: string | null
+          website: string | null
         }[]
       }
     }
