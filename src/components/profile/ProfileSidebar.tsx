@@ -3,9 +3,8 @@ import { User, getUserFullName } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, User as UserIcon, UserCog } from 'lucide-react';
-import { useState } from 'react';
-import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import { LogOut, Edit, UserCog } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 interface ProfileSidebarProps {
   user: User | null;
@@ -13,12 +12,17 @@ interface ProfileSidebarProps {
   isAdmin: boolean;
   onLogout: () => void;
   isFieldVisible: (field: string) => boolean;
+  onEdit: () => void;
 }
 
-export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVisible }: ProfileSidebarProps) {
-  const [editMode, setEditMode] = useState<'private' | 'public'>('private');
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+export function ProfileSidebar({ 
+  user, 
+  displayUser, 
+  isAdmin, 
+  onLogout, 
+  isFieldVisible,
+  onEdit 
+}: ProfileSidebarProps) {
   const isOwnProfile = user?.id === displayUser?.id;
   const canEdit = isOwnProfile || isAdmin;
   
@@ -35,16 +39,6 @@ export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVi
       }
     }
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
-  };
-  
-  const handleEditPrivate = () => {
-    setEditMode('private');
-    setIsDialogOpen(true);
-  };
-  
-  const handleEditPublic = () => {
-    setEditMode('public');
-    setIsDialogOpen(true);
   };
   
   return (
@@ -66,6 +60,15 @@ export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVi
           <CardDescription className="text-center">
             {displayUser?.email}
           </CardDescription>
+          
+          {displayUser?.role && (
+            <Badge 
+              variant="secondary"
+              className={displayUser.role === 'admin' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200 mt-2' : 'mt-2'}
+            >
+              {displayUser.role}
+            </Badge>
+          )}
         </div>
       </CardHeader>
       
@@ -75,19 +78,10 @@ export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVi
             <Button 
               variant="outline" 
               className="w-full justify-start" 
-              onClick={handleEditPrivate}
+              onClick={onEdit}
             >
-              <UserCog className="mr-2 h-4 w-4" />
-              Edit Private Profile
-            </Button>
-            
-            <Button 
-              variant="outline" 
-              className="w-full justify-start" 
-              onClick={handleEditPublic}
-            >
-              <UserIcon className="mr-2 h-4 w-4" />
-              Edit Public Bio
+              <Edit className="mr-2 h-4 w-4" />
+              Edit Profile
             </Button>
             
             {isOwnProfile && (
@@ -109,15 +103,6 @@ export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVi
           </p>
         )}
       </CardContent>
-      
-      {canEdit && (
-        <EditProfileDialog 
-          user={displayUser} 
-          isOpen={isDialogOpen} 
-          mode={editMode}
-          onClose={() => setIsDialogOpen(false)} 
-        />
-      )}
     </Card>
   );
 }

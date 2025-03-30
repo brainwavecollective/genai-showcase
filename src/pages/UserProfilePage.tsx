@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -9,12 +10,9 @@ import { motion } from 'framer-motion';
 import { Layout } from '@/components/Layout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
-import { ProfileDetails } from '@/components/profile/ProfileDetails';
 import { BioSection } from '@/components/profile/BioSection';
 import { ProfileError } from '@/components/profile/ProfileError';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
-import { Button } from '@/components/ui/button';
-import { Edit, UserCog } from 'lucide-react';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 
 const UserProfilePage = () => {
@@ -23,7 +21,6 @@ const UserProfilePage = () => {
   const { toast } = useToast();
   const [redirectTriggered, setRedirectTriggered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [editMode, setEditMode] = useState<'private' | 'public'>('private');
   
   // Helper function for initials
   const getInitials = () => {
@@ -91,6 +88,10 @@ const UserProfilePage = () => {
         return displayUser?.is_bio_public !== false; // Default to true if not set
       case 'email':
         return displayUser?.is_email_public === true;
+      case 'course':
+        return true; // Always show course
+      case 'semester':
+        return true; // Always show semester
       case 'website':
         return displayUser?.is_website_public !== false; // Default to true if not set
       case 'linkedin':
@@ -104,11 +105,6 @@ const UserProfilePage = () => {
       default:
         return true;
     }
-  };
-
-  const handleEditProfile = (mode: 'private' | 'public') => {
-    setEditMode(mode);
-    setIsDialogOpen(true);
   };
 
   if (error) {
@@ -153,38 +149,11 @@ const UserProfilePage = () => {
                 isAdmin={isAdmin} 
                 onLogout={logout}
                 isFieldVisible={isFieldVisible}
+                onEdit={() => setIsDialogOpen(true)}
               />
-              
-              {canEdit && (
-                <div className="mt-6 grid gap-3">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start" 
-                    onClick={() => handleEditProfile('private')}
-                  >
-                    <UserCog className="mr-2 h-4 w-4" />
-                    Edit Profile Information
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start" 
-                    onClick={() => handleEditProfile('public')}
-                  >
-                    <Edit className="mr-2 h-4 w-4" />
-                    Edit Public Bio & Links
-                  </Button>
-                </div>
-              )}
             </div>
             
-            <div className="md:col-span-2 space-y-6">
-              <ProfileDetails 
-                displayUser={displayUser} 
-                user={user}
-                isFieldVisible={isFieldVisible}
-              />
-              
+            <div className="md:col-span-2">
               <BioSection 
                 user={displayUser}
                 isFieldVisible={isFieldVisible}
@@ -195,8 +164,8 @@ const UserProfilePage = () => {
           {canEdit && (
             <EditProfileDialog 
               user={displayUser} 
-              isOpen={isDialogOpen} 
-              mode={editMode}
+              isOpen={isDialogOpen}
+              mode="all"
               onClose={() => setIsDialogOpen(false)} 
             />
           )}
@@ -204,6 +173,6 @@ const UserProfilePage = () => {
       </main>
     </Layout>
   );
-};
+}
 
 export default UserProfilePage;
