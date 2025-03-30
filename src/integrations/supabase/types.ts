@@ -467,38 +467,72 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: boolean
       }
-      update_user_bio: {
-        Args: {
-          p_user_id: string
-          p_bio: string
-          p_website: string
-          p_linkedin: string
-          p_twitter: string
-          p_github: string
-          p_instagram: string
-        }
-        Returns: {
-          avatar_url: string | null
-          bio: string | null
-          course: string | null
-          created_at: string | null
-          email: string
-          first_name: string | null
-          github: string | null
-          id: string
-          instagram: string | null
-          last_name: string | null
-          linkedin: string | null
-          name: string
-          notes: string | null
-          role: string
-          semester: string | null
-          status: Database["public"]["Enums"]["user_status"] | null
-          twitter: string | null
-          updated_at: string | null
-          website: string | null
-        }[]
-      }
+      update_user_bio:
+        | {
+            Args: {
+              p_user_id: string
+              p_bio: string
+              p_email: string
+              p_website: string
+              p_linkedin: string
+              p_twitter: string
+              p_github: string
+              p_instagram: string
+            }
+            Returns: {
+              avatar_url: string | null
+              bio: string | null
+              course: string | null
+              created_at: string | null
+              email: string
+              first_name: string | null
+              github: string | null
+              id: string
+              instagram: string | null
+              last_name: string | null
+              linkedin: string | null
+              name: string
+              notes: string | null
+              role: string
+              semester: string | null
+              status: Database["public"]["Enums"]["user_status"] | null
+              twitter: string | null
+              updated_at: string | null
+              website: string | null
+            }[]
+          }
+        | {
+            Args: {
+              p_user_id: string
+              p_bio: string
+              p_website: string
+              p_linkedin: string
+              p_twitter: string
+              p_github: string
+              p_instagram: string
+            }
+            Returns: {
+              avatar_url: string | null
+              bio: string | null
+              course: string | null
+              created_at: string | null
+              email: string
+              first_name: string | null
+              github: string | null
+              id: string
+              instagram: string | null
+              last_name: string | null
+              linkedin: string | null
+              name: string
+              notes: string | null
+              role: string
+              semester: string | null
+              status: Database["public"]["Enums"]["user_status"] | null
+              twitter: string | null
+              updated_at: string | null
+              website: string | null
+            }[]
+          }
       update_user_status: {
         Args: {
           p_user_id: string
