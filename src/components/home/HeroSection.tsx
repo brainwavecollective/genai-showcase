@@ -22,11 +22,14 @@ export function HeroSection() {
             </h1>
             <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-4 md:p-6 mb-6">
               <p className="text-lg md:text-xl text-foreground/90 mb-4">
-                This showcase platform was developed during a Spring 2025 workshop as part of 
-                the Generative AI course at the ATLAS Institute, CU Boulder.
+                Explore the frontier of AI innovation through cutting-edge student projects
+                from CU Boulder's ATLAS Institute. This curated showcase highlights 
+                exceptional work from Spring 2025's Generative AI course.
               </p>
               <p className="text-muted-foreground">
-                Featuring innovative student projects exploring the intersection of AI, creativity, and technology.
+                Discover how tomorrow's creators are reimagining the intersection of 
+                artificial intelligence, art, and interactive technology. 
+                Each project represents a unique vision of AI's creative potential.
               </p>
             </div>
             <Button size="lg" className="rounded-full bg-cu-gold text-cu-black hover:bg-cu-light-gold" asChild>
