@@ -1,4 +1,3 @@
-
 import { User, getUserFullName } from '@/types';
 import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { User } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +21,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
   
   const [bioData, setBioData] = useState({
     bio: user?.bio || '',
+    email: user?.email || '',
     website: user?.website || '',
     linkedin: user?.linkedin || '',
     twitter: user?.twitter || '',
@@ -32,6 +34,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
     if (user) {
       setBioData({
         bio: user.bio || '',
+        email: user.email || '',
         website: user.website || '',
         linkedin: user.linkedin || '',
         twitter: user.twitter || '',
@@ -52,11 +55,12 @@ export const BioSection = ({ user }: BioSectionProps) => {
     setIsLoading(true);
     
     try {
-      // Use the new update_user_bio RPC function instead of direct update
+      // Use the update_user_bio RPC function with the added email parameter
       const { data, error } = await supabase
         .rpc('update_user_bio', {
           p_user_id: user.id,
           p_bio: bioData.bio,
+          p_email: bioData.email,
           p_website: bioData.website,
           p_linkedin: bioData.linkedin,
           p_twitter: bioData.twitter,
@@ -72,6 +76,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
         // Update user info directly in this component
         setBioData({
           bio: updatedUser.bio || '',
+          email: updatedUser.email || '',
           website: updatedUser.website || '',
           linkedin: updatedUser.linkedin || '',
           twitter: updatedUser.twitter || '',
@@ -100,7 +105,10 @@ export const BioSection = ({ user }: BioSectionProps) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
-        <CardTitle>Bio & Social Links</CardTitle>
+        <div>
+          <CardTitle>Bio & Social Links</CardTitle>
+          <p className="text-sm text-muted-foreground mt-1">Your public info</p>
+        </div>
         <Button 
           variant="ghost" 
           size="sm" 
@@ -124,6 +132,17 @@ export const BioSection = ({ user }: BioSectionProps) => {
                 onChange={handleChange}
                 placeholder="Tell others about yourself..."
                 rows={5}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input 
+                id="email" 
+                name="email"
+                value={bioData.email} 
+                onChange={handleChange}
+                placeholder="your@email.com" 
               />
             </div>
             
@@ -190,6 +209,13 @@ export const BioSection = ({ user }: BioSectionProps) => {
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Bio</h3>
               <p className="text-sm">
                 {bioData.bio || "No bio provided yet."}
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-sm font-medium text-muted-foreground mb-2">Email</h3>
+              <p className="text-sm">
+                {bioData.email || "No email provided."}
               </p>
             </div>
             

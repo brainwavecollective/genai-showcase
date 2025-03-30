@@ -16,7 +16,7 @@ export const ProfileDetails = ({ displayUser, user }: ProfileDetailsProps) => {
   return (
     <Card className="md:col-span-2">
       <CardHeader>
-        <CardTitle>Profile Details</CardTitle>
+        <CardTitle>Private Profile Details</CardTitle>
         <CardDescription>
           Your personal information and settings
         </CardDescription>
