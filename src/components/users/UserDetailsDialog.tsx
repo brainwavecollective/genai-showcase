@@ -1,4 +1,3 @@
-
 import { User, UserStatus } from '@/types';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -20,7 +19,7 @@ const UserDetailsDialog = ({ user, open, onOpenChange, onStatusChange }: UserDet
     if (!dateString) return 'Not available';
     return format(new Date(dateString), 'PPP');
   };
-
+  
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">

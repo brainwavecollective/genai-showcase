@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { User, UserStatus } from '@/types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
@@ -7,9 +6,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { CheckCircle, XCircle, Search, Info, RefreshCcw } from 'lucide-react';
-import UserStatusBadge from './UserStatusBadge';
 import UserDetailsDialog from './UserDetailsDialog';
 import { StatusDropdown } from './StatusDropdown';
+import UserStatusBadge from './UserStatusBadge';
 
 interface UserListProps {
   users: User[];
@@ -98,9 +97,7 @@ const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
                   <TableCell>{user.course || 'Not set'}</TableCell>
                   <TableCell>
                     <StatusDropdown 
-                      userId={user.id}
                       currentStatus={user.status || 'pending_review'}
-                      updateUserStatus={({ userId, status }) => onStatusChange(userId, status)}
                     />
                   </TableCell>
                   <TableCell className="text-right">
