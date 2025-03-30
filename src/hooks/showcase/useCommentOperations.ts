@@ -16,6 +16,25 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
   const { user, isAuthenticated } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
 
+  // Helper function to parse the user information safely
+  const parseUserInfo = (userData: any): CommentUserInfo => {
+    if (!userData) {
+      return { first_name: null, last_name: null, avatar_url: null };
+    }
+    
+    // If it's an object with the expected properties, use those
+    if (typeof userData === 'object' && userData !== null) {
+      return {
+        first_name: userData.first_name || null,
+        last_name: userData.last_name || null,
+        avatar_url: userData.avatar_url || null
+      };
+    }
+    
+    // Default fallback
+    return { first_name: null, last_name: null, avatar_url: null };
+  };
+
   // Fetch comments for a media item
   const fetchComments = async (mediaItemId: string) => {
     try {
@@ -38,8 +57,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
             console.error('Error fetching user info:', userError);
           }
           
-          // Parse the user data with proper type assertion
-          const userInfo = userData as CommentUserInfo || { first_name: null, last_name: null, avatar_url: null };
+          // Parse the user data with proper type handling
+          const userInfo = parseUserInfo(userData);
           
           return {
             ...comment,
@@ -104,8 +123,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         console.error('Error fetching user info:', userError);
       }
       
-      // Parse the user data with proper type assertion
-      const userInfo = userData as CommentUserInfo || { first_name: null, last_name: null, avatar_url: null };
+      // Parse the user data with proper type handling
+      const userInfo = parseUserInfo(userData);
       
       // Format the new comment
       const formattedComment = {
