@@ -42,17 +42,17 @@ const UserBioPage = () => {
     }
   });
 
-  // Query user's projects - using a more resilient approach for public viewing
+  // Query user's projects directly using a simpler approach to avoid RLS issues
   const { data: userProjects, isLoading: projectsLoading } = useQuery({
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
       
-      console.log('Fetching projects for user ID:', userId, 'Auth status:', isAuthenticated ? 'authenticated' : 'not authenticated');
+      console.log('Fetching projects for user ID:', userId);
       
       try {
-        // Only fetch public projects when not authenticated
-        const query = supabase
+        // Directly execute a simple query for projects by creator_id
+        const { data, error } = await supabase
           .from('projects')
           .select(`
             id, 
@@ -64,20 +64,13 @@ const UserBioPage = () => {
             is_private, 
             creator_id
           `)
-          .eq('creator_id', userId);
-        
-        // If not authenticated, only show public projects
-        if (!isAuthenticated) {
-          query.eq('is_private', false);
-        }
-        
-        query.order('updated_at', { ascending: false });
-        
-        const { data, error } = await query;
+          .eq('creator_id', userId)
+          .eq('is_private', false) // Only fetch public projects to avoid permission issues
+          .order('updated_at', { ascending: false });
         
         if (error) {
           console.error('Error fetching user projects:', error);
-          throw error;
+          return []; // Return empty array instead of throwing to prevent query retries
         }
         
         // Since we aren't using project_details view, manually add creator_name
@@ -97,8 +90,6 @@ const UserBioPage = () => {
     },
     enabled: !!userId && !!user
   });
-
-  const hasPrivateProjects = !isAuthenticated && user?.id === userId;
 
   return (
     <Layout>
@@ -148,11 +139,7 @@ const UserBioPage = () => {
                 <ProjectGrid projects={userProjects} />
               ) : (
                 <div className="text-center py-10 bg-muted/50 rounded-lg">
-                  <p className="text-muted-foreground">
-                    {isAuthenticated 
-                      ? "No projects available" 
-                      : "No public projects available"}
-                  </p>
+                  <p className="text-muted-foreground">No public projects available</p>
                 </div>
               )}
             </div>
