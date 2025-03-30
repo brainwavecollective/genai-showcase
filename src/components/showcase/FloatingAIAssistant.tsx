@@ -99,7 +99,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
     <div className="fixed inset-y-0 right-0 z-50 flex">
       {/* Toggle button - positioned absolutely to the left of the panel */}
       <Button
-        variant="primary"
+        variant="default" 
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
