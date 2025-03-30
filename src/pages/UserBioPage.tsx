@@ -8,10 +8,15 @@ import { Layout } from '@/components/Layout';
 import { PublicBioCard } from '@/components/profile/PublicBioCard';
 import ProjectGrid from '@/components/home/ProjectGrid';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAuth } from '@/context/AuthContext';
+import { AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 
 const UserBioPage = () => {
   const { userId } = useParams();
   const [error, setError] = useState<string | null>(null);
+  const { isAuthenticated } = useAuth();
 
   // Query user details
   const { data: user, isLoading: userLoading } = useQuery({
@@ -37,49 +42,63 @@ const UserBioPage = () => {
     }
   });
 
-  // Query user's projects - fixing infinite recursion issue by using a direct query
+  // Query user's projects - using a more resilient approach for public viewing
   const { data: userProjects, isLoading: projectsLoading } = useQuery({
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
       
-      console.log('Fetching projects for user ID:', userId);
+      console.log('Fetching projects for user ID:', userId, 'Auth status:', isAuthenticated ? 'authenticated' : 'not authenticated');
       
-      // Using public.projects table without joining to users to avoid RLS recursion
-      const { data, error } = await supabase
-        .from('projects')
-        .select(`
-          id, 
-          title, 
-          description, 
-          cover_image_url, 
-          created_at, 
-          updated_at, 
-          is_private, 
-          creator_id
-        `)
-        .eq('creator_id', userId)
-        .order('updated_at', { ascending: false });
-      
-      if (error) {
-        console.error('Error fetching user projects:', error);
-        throw error;
+      try {
+        // Only fetch public projects when not authenticated
+        const query = supabase
+          .from('projects')
+          .select(`
+            id, 
+            title, 
+            description, 
+            cover_image_url, 
+            created_at, 
+            updated_at, 
+            is_private, 
+            creator_id
+          `)
+          .eq('creator_id', userId);
+        
+        // If not authenticated, only show public projects
+        if (!isAuthenticated) {
+          query.eq('is_private', false);
+        }
+        
+        query.order('updated_at', { ascending: false });
+        
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error('Error fetching user projects:', error);
+          throw error;
+        }
+        
+        // Since we aren't using project_details view, manually add creator_name
+        const projectsWithCreatorName = data?.map(project => ({
+          ...project,
+          creator_name: user?.first_name && user?.last_name 
+            ? `${user.first_name} ${user.last_name}`.trim() 
+            : user?.first_name || 'Unknown'
+        }));
+        
+        console.log('User projects fetched successfully:', projectsWithCreatorName?.length || 0, 'projects');
+        return projectsWithCreatorName as Project[];
+      } catch (err) {
+        console.error('Failed to fetch projects:', err);
+        return []; // Return empty array instead of throwing to prevent query retries
       }
-      
-      // Since we aren't using project_details view, we need to manually add creator_name
-      // But we already have the user's info from the previous query
-      const projectsWithCreatorName = data?.map(project => ({
-        ...project,
-        creator_name: user?.first_name && user?.last_name 
-          ? `${user.first_name} ${user.last_name}`.trim() 
-          : user?.first_name || 'Unknown'
-      }));
-      
-      console.log('User projects fetched:', projectsWithCreatorName);
-      return projectsWithCreatorName as Project[];
     },
-    enabled: !!userId && !!user // Only run this query when we have both userId and user data
+    enabled: !!userId && !!user
   });
+
+  const hasPrivateProjects = !isAuthenticated && user?.id === userId;
 
   return (
     <Layout>
@@ -102,6 +121,23 @@ const UserBioPage = () => {
             <div>
               <h2 className="text-2xl font-semibold mb-6">Projects by {user.first_name || 'this user'}</h2>
               
+              {!isAuthenticated && (
+                <Alert variant="default" className="mb-6">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertTitle>Viewing as guest</AlertTitle>
+                  <AlertDescription className="flex flex-col gap-2">
+                    <p>You're viewing public projects only. Sign in to see all projects.</p>
+                    <Button 
+                      variant="outline" 
+                      className="w-auto self-start"
+                      onClick={() => document.dispatchEvent(new Event('open-login-dialog'))}
+                    >
+                      Sign in
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+              
               {projectsLoading ? (
                 <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                   {[...Array(4)].map((_, i) => (
@@ -112,7 +148,11 @@ const UserBioPage = () => {
                 <ProjectGrid projects={userProjects} />
               ) : (
                 <div className="text-center py-10 bg-muted/50 rounded-lg">
-                  <p className="text-muted-foreground">No public projects available</p>
+                  <p className="text-muted-foreground">
+                    {isAuthenticated 
+                      ? "No projects available" 
+                      : "No public projects available"}
+                  </p>
                 </div>
               )}
             </div>
