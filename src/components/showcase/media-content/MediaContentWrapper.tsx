@@ -34,7 +34,8 @@ export function MediaContentWrapper({
       
       <CommentSection 
         comments={comments} 
-        onSubmitComment={onAddComment} 
+        onAddComment={onAddComment}
+        mediaItemId={media.id}
       />
     </div>
   );
