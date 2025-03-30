@@ -24,6 +24,7 @@ const ShowcasePage = () => {
     mediaItems,
     comments,
     isLoading,
+    commentsLoading,
     error,
     canEdit,
     handleMediaSelect,
@@ -82,6 +83,7 @@ const ShowcasePage = () => {
             onAddComment={handleAddComment}
             onMediaAdded={handleAddMedia}
             isLoading={isLoading}
+            commentsLoading={commentsLoading}
           />
           
           {/* Last updated date at the bottom */}

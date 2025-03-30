@@ -31,6 +31,7 @@ export function useShowcaseData(projectId: string | undefined) {
   
   const { 
     comments, 
+    isLoading: commentsLoading,
     fetchComments, 
     handleAddComment 
   } = useCommentOperations(selectedMedia);
@@ -41,13 +42,6 @@ export function useShowcaseData(projectId: string | undefined) {
       setCanEdit(user.role === 'admin' || user.id === project.creator_id);
     }
   }, [user, project, setCanEdit]);
-
-  // Fetch comments when selected media changes
-  useEffect(() => {
-    if (selectedMedia) {
-      fetchComments(selectedMedia.id);
-    }
-  }, [selectedMedia, fetchComments]);
 
   // Wrap the privacy toggle to show toast messages
   const handlePrivacyToggleWithToast = async (isPrivate: boolean) => {
@@ -69,6 +63,7 @@ export function useShowcaseData(projectId: string | undefined) {
     mediaItems,
     comments,
     isLoading,
+    commentsLoading,
     error,
     canEdit,
     handleMediaSelect,

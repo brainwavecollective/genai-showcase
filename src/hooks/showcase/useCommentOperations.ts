@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Comment, MediaItem, getUserFullName } from '@/types';
@@ -15,6 +15,7 @@ interface CommentUserInfo {
 export function useCommentOperations(selectedMedia: MediaItem | null) {
   const { user, isAuthenticated } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Helper function to parse the user information safely
   const parseUserInfo = (userData: any): CommentUserInfo => {
@@ -36,8 +37,13 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
   };
 
   // Fetch comments for a media item
-  const fetchComments = async (mediaItemId: string) => {
+  const fetchComments = useCallback(async (mediaItemId: string) => {
+    if (!mediaItemId) return;
+    
     try {
+      setIsLoading(true);
+      console.log(`Fetching comments for media item ${mediaItemId}`);
+      
       const { data: commentsData, error: commentsError } = await supabase
         .from('comments')
         .select('*')
@@ -70,12 +76,24 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         })
       );
       
+      console.log(`Loaded ${formattedComments.length} comments for media item ${mediaItemId}`);
       setComments(formattedComments);
     } catch (error) {
       console.error('Error fetching comments:', error);
       toast.error('Failed to load comments');
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, []);
+
+  // Clear comments when switching media items
+  useEffect(() => {
+    if (selectedMedia) {
+      // Reset the comments state to prevent flickering of old comments
+      setComments([]);
+      fetchComments(selectedMedia.id);
+    }
+  }, [selectedMedia, fetchComments]);
 
   // Handle adding new comment
   const handleAddComment = async (content: string) => {
@@ -145,6 +163,7 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
 
   return {
     comments,
+    isLoading,
     fetchComments,
     handleAddComment
   };

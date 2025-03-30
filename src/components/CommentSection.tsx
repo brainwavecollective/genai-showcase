@@ -10,14 +10,16 @@ import { MessageSquare } from 'lucide-react';
 import { Comment } from '@/types';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CommentSectionProps {
   comments: Comment[];
   mediaItemId: string;
   onAddComment: (content: string) => void;
+  isLoading?: boolean;
 }
 
-export function CommentSection({ comments, mediaItemId, onAddComment }: CommentSectionProps) {
+export function CommentSection({ comments, mediaItemId, onAddComment, isLoading = false }: CommentSectionProps) {
   const { isAuthenticated, user } = useAuth();
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -59,7 +61,7 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
       <div className="flex items-center gap-2">
         <MessageSquare className="h-5 w-5" />
         <h3 className="text-lg font-medium">Comments</h3>
-        <span className="text-muted-foreground text-sm">({comments.length})</span>
+        <span className="text-muted-foreground text-sm">({isLoading ? '...' : comments.length})</span>
       </div>
 
       {isAuthenticated ? (
@@ -69,11 +71,12 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
             onChange={(e) => setNewComment(e.target.value)}
             placeholder="Add a comment..."
             className="min-h-[100px]"
+            disabled={isLoading}
           />
           <div className="flex justify-end">
             <Button 
               type="submit" 
-              disabled={!newComment.trim() || isSubmitting}
+              disabled={!newComment.trim() || isSubmitting || isLoading}
               size="sm"
             >
               {isSubmitting ? 'Posting...' : 'Post Comment'}
@@ -90,7 +93,14 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
         </Card>
       )}
 
-      {comments.length > 0 && (
+      {isLoading ? (
+        <div className="space-y-4">
+          <Separator />
+          <LoadingCommentSkeleton />
+          <Separator />
+          <LoadingCommentSkeleton />
+        </div>
+      ) : comments.length > 0 ? (
         <div className="space-y-4">
           <Separator />
           
@@ -131,7 +141,28 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
             </div>
           ))}
         </div>
+      ) : (
+        <div className="py-8 text-center text-muted-foreground">
+          <p>No comments yet. Be the first to comment!</p>
+        </div>
       )}
+    </div>
+  );
+}
+
+// Loading skeleton for comments
+function LoadingCommentSkeleton() {
+  return (
+    <div className="flex items-start gap-3">
+      <Skeleton className="h-8 w-8 rounded-full" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-3 w-16" />
+        </div>
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
     </div>
   );
 }

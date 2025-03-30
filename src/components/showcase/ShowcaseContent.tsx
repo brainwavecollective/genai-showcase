@@ -15,6 +15,7 @@ interface ShowcaseContentProps {
   onAddComment: (content: string) => void;
   onMediaAdded: (media: MediaItem) => void;
   isLoading: boolean;
+  commentsLoading?: boolean;
 }
 
 export function ShowcaseContent({
@@ -26,7 +27,8 @@ export function ShowcaseContent({
   onMediaSelect,
   onAddComment,
   onMediaAdded,
-  isLoading
+  isLoading,
+  commentsLoading = false
 }: ShowcaseContentProps) {
   return (
     <div className="mt-8 grid grid-cols-1 lg:grid-cols-[350px_1fr] gap-6">
@@ -50,6 +52,7 @@ export function ShowcaseContent({
           comments={comments}
           onAddComment={onAddComment}
           mediaItems={mediaItems}
+          isCommentsLoading={commentsLoading}
         />
         
         {/* Project reactions */}

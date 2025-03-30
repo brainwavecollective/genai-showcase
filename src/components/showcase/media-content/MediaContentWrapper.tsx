@@ -11,6 +11,7 @@ interface MediaContentWrapperProps {
   comments: Comment[];
   onAddComment: (content: string) => void;
   loadingError: string | null;
+  isCommentsLoading?: boolean;
 }
 
 export function MediaContentWrapper({ 
@@ -18,7 +19,8 @@ export function MediaContentWrapper({
   mediaItems,
   comments, 
   onAddComment, 
-  loadingError 
+  loadingError,
+  isCommentsLoading = false
 }: MediaContentWrapperProps) {
   return (
     <div className="space-y-6">
@@ -36,6 +38,7 @@ export function MediaContentWrapper({
         comments={comments} 
         onAddComment={onAddComment}
         mediaItemId={media.id}
+        isLoading={isCommentsLoading}
       />
     </div>
   );

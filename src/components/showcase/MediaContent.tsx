@@ -6,17 +6,22 @@ import { LoadingState } from "./media-content/LoadingState";
 import { ErrorState } from "./media-content/ErrorState";
 import { MediaContentWrapper } from "./media-content/MediaContentWrapper";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface MediaContentProps {
   selectedMedia: MediaItem | null;
   comments: Comment[];
   onAddComment: (content: string) => void;
   mediaItems: MediaItem[];
+  isCommentsLoading?: boolean;
 }
 
-export function MediaContent({ selectedMedia, comments, onAddComment, mediaItems }: MediaContentProps) {
+export function MediaContent({ 
+  selectedMedia, 
+  comments, 
+  onAddComment, 
+  mediaItems,
+  isCommentsLoading = false
+}: MediaContentProps) {
   const [loadingError, setLoadingError] = useState<string | null>(null);
   const [media, setMedia] = useState<MediaItem | null>(selectedMedia);
   const [isLoading, setIsLoading] = useState(false);
@@ -54,6 +59,7 @@ export function MediaContent({ selectedMedia, comments, onAddComment, mediaItems
       comments={comments}
       onAddComment={onAddComment}
       loadingError={loadingError}
+      isCommentsLoading={isCommentsLoading}
     />
   );
 }
