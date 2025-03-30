@@ -48,3 +48,6 @@ export function PrivacyToggleField({
     </div>
   );
 }
+
+// Export an alias for backwards compatibility with existing code
+export const PrivacyToggle = PrivacyToggleField;

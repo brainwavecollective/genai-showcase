@@ -1,167 +1,245 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { TagSelector } from '@/components/project/TagSelector';
-import { PrivacyToggle } from '@/components/project/PrivacyToggleField';
-import { ImageUrlField } from '@/components/project/ImageUrlField';
-import { Loader2, Save } from 'lucide-react';
-import { toast } from 'sonner';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Loader2 } from 'lucide-react';
+import { PrivacyToggleField } from '@/components/project/PrivacyToggleField';
+import { TagSelector } from '@/components/TagSelector';
+import { Tag } from '@/types';
+
+const formSchema = z.object({
+  title: z.string().min(3, {
+    message: "Title must be at least 3 characters.",
+  }).max(100, {
+    message: "Title must not exceed 100 characters."
+  }),
+  description: z.string().max(500, {
+    message: "Description must not exceed 500 characters."
+  }).optional(),
+  is_private: z.boolean().default(false),
+  tag_ids: z.array(z.string()).optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 export function NewProjectForm() {
-  const { user, isAuthenticated } = useAuth();
+  const { user } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
-  
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [coverImageUrl, setCoverImageUrl] = useState('');
-  const [isPrivate, setIsPrivate] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [availableTags, setAvailableTags] = useState<Tag[]>([]);
+  
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      is_private: false,
+      tag_ids: [],
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  // Fetch available tags
+  useEffect(() => {
+    const fetchTags = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('tags')
+          .select('*')
+          .order('name');
+          
+        if (error) throw error;
+        setAvailableTags(data || []);
+      } catch (error) {
+        console.error('Error fetching tags:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load tags. Please try again.",
+          variant: "destructive",
+        });
+      }
+    };
     
-    if (!isAuthenticated || !user) {
-      toast.error('You must be logged in to create a project');
+    fetchTags();
+  }, [toast]);
+
+  async function onSubmit(values: FormValues) {
+    if (!user) {
+      toast({
+        title: "Authentication Error",
+        description: "You must be logged in to create a project.",
+        variant: "destructive",
+      });
       return;
     }
     
-    if (!title.trim()) {
-      toast.error('Please enter a project title');
-      return;
-    }
+    setIsSubmitting(true);
     
     try {
-      setIsSubmitting(true);
-      
-      // Create new project
-      const { data: projectData, error: projectError } = await supabase
+      // Insert the new project
+      const { data: project, error: projectError } = await supabase
         .from('projects')
-        .insert([
-          {
-            title,
-            description,
-            cover_image_url: coverImageUrl || null,
-            is_private: isPrivate,
-            creator_id: user.id
-          }
-        ])
+        .insert({
+          title: values.title,
+          description: values.description || '',
+          creator_id: user.id,
+          is_private: values.is_private,
+        })
         .select()
         .single();
-      
+        
       if (projectError) throw projectError;
       
-      // Add tags if selected
-      if (selectedTags.length > 0) {
-        const tagMappings = selectedTags.map(tagId => ({
-          project_id: projectData.id,
-          tag_id: tagId
+      // If tags were selected, create project-tag associations
+      if (values.tag_ids && values.tag_ids.length > 0) {
+        const tagAssociations = values.tag_ids.map(tagId => ({
+          project_id: project.id,
+          tag_id: tagId,
         }));
         
         const { error: tagError } = await supabase
           .from('project_tags')
-          .insert(tagMappings);
+          .insert(tagAssociations);
           
         if (tagError) {
-          console.error('Error adding tags:', tagError);
-          // Continue anyway as the project was created
+          console.error('Error associating tags:', tagError);
+          // Continue anyway, as the project was created successfully
         }
       }
       
-      toast.success('Project created successfully!');
-      navigate(`/project/${projectData.id}`);
+      toast({
+        title: "Success",
+        description: "Your project has been created successfully.",
+      });
       
+      // Navigate to the new project page
+      navigate(`/projects/${project.id}`);
     } catch (error) {
       console.error('Error creating project:', error);
-      toast.error('Failed to create project. Please try again.');
+      toast({
+        title: "Error",
+        description: "Failed to create project. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <Card className="bg-background border-input">
-        <CardContent className="pt-6">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="title" className="text-xl font-semibold">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="My Awesome Project"
-                className="bg-background border-input"
-                required
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description" className="text-xl font-semibold">Description</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="this is my project"
-                rows={6}
-                className="bg-background border-input resize-none"
-              />
-            </div>
-            
-            <ImageUrlField 
-              coverImageUrl={coverImageUrl} 
-              setCoverImageUrl={setCoverImageUrl} 
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>Create New Project</CardTitle>
+        <CardDescription>
+          Start a new project to showcase your work. You can add media items after creating the project.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Project Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter project title" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Choose a clear, descriptive title for your project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             
-            <PrivacyToggle 
-              isPrivate={isPrivate} 
-              setIsPrivate={setIsPrivate} 
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Textarea 
+                      placeholder="Describe your project (optional)" 
+                      className="resize-y min-h-[100px]"
+                      {...field} 
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Provide a brief description of your project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
             
-            <div className="space-y-3">
-              <Label className="text-xl font-semibold">Project Tags</Label>
-              <div className="bg-background border border-input rounded-md p-4">
-                <TagSelector 
-                  selectedTags={selectedTags} 
-                  onTagsChange={setSelectedTags} 
-                />
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <div className="flex justify-end gap-4">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={() => navigate('/dashboard')}
-          disabled={isSubmitting}
-        >
-          Cancel
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={isSubmitting}
-          className="gap-2"
-        >
-          {isSubmitting ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
-          ) : (
-            <Save className="h-4 w-4" />
-          )}
-          Create Project
-        </Button>
-      </div>
-    </form>
+            <FormField
+              control={form.control}
+              name="tag_ids"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Tags</FormLabel>
+                  <FormControl>
+                    <TagSelector
+                      availableTags={availableTags}
+                      selectedTagIds={field.value || []}
+                      onChange={field.onChange}
+                    />
+                  </FormControl>
+                  <FormDescription>
+                    Select tags that describe your project.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="is_private"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <PrivacyToggleField
+                      label="Project Visibility"
+                      description="Control who can see your project"
+                      isPublic={!field.value}
+                      onChange={(isPublic) => field.onChange(!isPublic)}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <CardFooter className="flex justify-end px-0 pt-4">
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Create Project
+              </Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </CardContent>
+    </Card>
   );
 }

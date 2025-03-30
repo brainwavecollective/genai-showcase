@@ -261,6 +261,15 @@ export type Database = {
           github: string | null
           id: string
           instagram: string | null
+          is_avatar_public: boolean | null
+          is_bio_public: boolean | null
+          is_email_public: boolean | null
+          is_github_public: boolean | null
+          is_instagram_public: boolean | null
+          is_last_name_public: boolean | null
+          is_linkedin_public: boolean | null
+          is_twitter_public: boolean | null
+          is_website_public: boolean | null
           last_name: string | null
           linkedin: string | null
           name: string
@@ -282,6 +291,15 @@ export type Database = {
           github?: string | null
           id?: string
           instagram?: string | null
+          is_avatar_public?: boolean | null
+          is_bio_public?: boolean | null
+          is_email_public?: boolean | null
+          is_github_public?: boolean | null
+          is_instagram_public?: boolean | null
+          is_last_name_public?: boolean | null
+          is_linkedin_public?: boolean | null
+          is_twitter_public?: boolean | null
+          is_website_public?: boolean | null
           last_name?: string | null
           linkedin?: string | null
           name: string
@@ -303,6 +321,15 @@ export type Database = {
           github?: string | null
           id?: string
           instagram?: string | null
+          is_avatar_public?: boolean | null
+          is_bio_public?: boolean | null
+          is_email_public?: boolean | null
+          is_github_public?: boolean | null
+          is_instagram_public?: boolean | null
+          is_last_name_public?: boolean | null
+          is_linkedin_public?: boolean | null
+          is_twitter_public?: boolean | null
+          is_website_public?: boolean | null
           last_name?: string | null
           linkedin?: string | null
           name?: string
@@ -399,6 +426,15 @@ export type Database = {
           github: string | null
           id: string
           instagram: string | null
+          is_avatar_public: boolean | null
+          is_bio_public: boolean | null
+          is_email_public: boolean | null
+          is_github_public: boolean | null
+          is_instagram_public: boolean | null
+          is_last_name_public: boolean | null
+          is_linkedin_public: boolean | null
+          is_twitter_public: boolean | null
+          is_website_public: boolean | null
           last_name: string | null
           linkedin: string | null
           name: string
@@ -439,6 +475,15 @@ export type Database = {
           github: string | null
           id: string
           instagram: string | null
+          is_avatar_public: boolean | null
+          is_bio_public: boolean | null
+          is_email_public: boolean | null
+          is_github_public: boolean | null
+          is_instagram_public: boolean | null
+          is_last_name_public: boolean | null
+          is_linkedin_public: boolean | null
+          is_twitter_public: boolean | null
+          is_website_public: boolean | null
           last_name: string | null
           linkedin: string | null
           name: string
@@ -489,6 +534,15 @@ export type Database = {
               github: string | null
               id: string
               instagram: string | null
+              is_avatar_public: boolean | null
+              is_bio_public: boolean | null
+              is_email_public: boolean | null
+              is_github_public: boolean | null
+              is_instagram_public: boolean | null
+              is_last_name_public: boolean | null
+              is_linkedin_public: boolean | null
+              is_twitter_public: boolean | null
+              is_website_public: boolean | null
               last_name: string | null
               linkedin: string | null
               name: string
@@ -521,6 +575,15 @@ export type Database = {
               github: string | null
               id: string
               instagram: string | null
+              is_avatar_public: boolean | null
+              is_bio_public: boolean | null
+              is_email_public: boolean | null
+              is_github_public: boolean | null
+              is_instagram_public: boolean | null
+              is_last_name_public: boolean | null
+              is_linkedin_public: boolean | null
+              is_twitter_public: boolean | null
+              is_website_public: boolean | null
               last_name: string | null
               linkedin: string | null
               name: string
@@ -548,6 +611,15 @@ export type Database = {
           github: string | null
           id: string
           instagram: string | null
+          is_avatar_public: boolean | null
+          is_bio_public: boolean | null
+          is_email_public: boolean | null
+          is_github_public: boolean | null
+          is_instagram_public: boolean | null
+          is_last_name_public: boolean | null
+          is_linkedin_public: boolean | null
+          is_twitter_public: boolean | null
+          is_website_public: boolean | null
           last_name: string | null
           linkedin: string | null
           name: string

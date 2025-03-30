@@ -2,7 +2,7 @@
 import { User, getUserFullName } from '@/types';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CalendarDays, Clock, Graduation, School, Hash } from 'lucide-react';
+import { CalendarDays, Clock, GraduationCap, School, Hash } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface ProfileDetailsProps {
@@ -72,7 +72,7 @@ export function ProfileDetails({ displayUser, user, isFieldVisible }: ProfileDet
           {(isOwnProfile || displayUser.semester) && (
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground flex items-center">
-                <Graduation className="h-4 w-4 mr-1" /> Semester
+                <GraduationCap className="h-4 w-4 mr-1" /> Semester
               </p>
               <p className="font-medium">{displayUser.semester || 'Not set'}</p>
             </div>
