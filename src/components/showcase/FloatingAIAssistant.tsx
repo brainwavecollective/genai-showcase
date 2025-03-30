@@ -97,102 +97,96 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
   // Desktop version with slide-out panel and resize functionality
   return (
     <>
-      {/* Invisible panel wrapper to prevent the panel from blocking clicks when closed */}
-      <div 
-        className={cn(
-          "fixed inset-y-0 right-0 z-40 pointer-events-none",
-          isOpen ? "w-auto" : "w-0"
-        )}
-      >
-        {/* The sliding chat panel with resize functionality */}
+      {/* Fixed position wrapper that just contains the panel and button */}
+      <div className="fixed inset-y-0 right-0 z-40 pointer-events-none">
+        {/* The actual panel container that slides */}
         <div 
           className={cn(
-            "h-full pointer-events-auto transition-all duration-300 ease-in-out transform",
+            "h-full pointer-events-auto transition-all duration-300 ease-in-out",
             isOpen ? "translate-x-0" : "translate-x-full"
           )}
+          style={{ width: isOpen ? `${panelSize}vw` : 0 }}
         >
           <ResizablePanelGroup direction="horizontal" onLayout={(sizes) => setPanelSize(sizes[0])}>
             <ResizablePanel 
               defaultSize={25} 
               minSize={20} 
               maxSize={40}
-              className="h-full"
+              className="h-full bg-card border-l shadow-xl flex flex-col"
             >
-              <div className="h-full bg-card border-l shadow-xl flex flex-col">
-                <div className="flex justify-between items-center p-4 border-b">
-                  <h4 className="font-semibold">Project AI Assistant</h4>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="h-8 w-8 p-0" 
-                    onClick={() => setIsOpen(false)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
+              <div className="flex justify-between items-center p-4 border-b">
+                <h4 className="font-semibold">Project AI Assistant</h4>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8 w-8 p-0" 
+                  onClick={() => setIsOpen(false)}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              
+              <ScrollArea className="flex-1 px-4">
+                <div className="space-y-2 py-4">
+                  {messages.length === 0 ? (
+                    <p className="text-sm text-muted-foreground p-2">
+                      Ask me anything about this project! I can explain the technologies, features, or implementation details.
+                    </p>
+                  ) : (
+                    messages.map((message) => (
+                      <div 
+                        key={message.id} 
+                        className={`text-sm p-3 rounded-lg ${message.isUser ? 'bg-muted ml-4' : 'bg-primary/10 mr-4'}`}
+                      >
+                        <p className="font-medium text-xs mb-1">{message.isUser ? 'You' : 'AI'}</p>
+                        <p>{message.content}</p>
+                      </div>
+                    ))
+                  )}
+                  <div ref={messagesEndRef} />
                 </div>
-                
-                <ScrollArea className="flex-1 px-4">
-                  <div className="space-y-2 py-4">
-                    {messages.length === 0 ? (
-                      <p className="text-sm text-muted-foreground p-2">
-                        Ask me anything about this project! I can explain the technologies, features, or implementation details.
-                      </p>
-                    ) : (
-                      messages.map((message) => (
-                        <div 
-                          key={message.id} 
-                          className={`text-sm p-3 rounded-lg ${message.isUser ? 'bg-muted ml-4' : 'bg-primary/10 mr-4'}`}
-                        >
-                          <p className="font-medium text-xs mb-1">{message.isUser ? 'You' : 'AI'}</p>
-                          <p>{message.content}</p>
-                        </div>
-                      ))
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
-                </ScrollArea>
-                
-                <div className="border-t p-3">
-                  <ChatInput 
-                    onSend={sendMessage} 
-                    isLoading={isLoading} 
-                    disabled={limitReached} 
-                  />
-                </div>
+              </ScrollArea>
+              
+              <div className="border-t p-3">
+                <ChatInput 
+                  onSend={sendMessage} 
+                  isLoading={isLoading} 
+                  disabled={limitReached} 
+                />
               </div>
             </ResizablePanel>
             
-            {/* Add a visible resize handle */}
-            <ResizableHandle withHandle className="bg-muted hover:bg-muted-foreground/20">
-              <div className="h-8 w-2 flex items-center justify-center">
-                <GripVertical className="h-4 w-4 text-muted-foreground" />
+            {/* Add a visible resize handle with proper sizing and styling */}
+            <ResizableHandle withHandle>
+              <div className="h-16 w-2 flex items-center justify-center bg-muted hover:bg-muted-foreground/20 rounded-sm">
+                <GripVertical className="h-5 w-5 text-muted-foreground" />
               </div>
             </ResizableHandle>
           </ResizablePanelGroup>
         </div>
       </div>
 
-      {/* Toggle button - fixed to the right edge of the screen when closed */}
+      {/* Toggle button - absolutely positioned and fixed to right side */}
       <Button
         variant="default" 
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed top-1/2 -translate-y-1/2 z-50",
-          "h-auto px-2 py-6 rounded-l-md rounded-r-none border border-border shadow-md",
-          "flex items-center gap-2",
-          isOpen ? "right-[calc(var(--panel-size)*1vw)] bg-secondary hover:bg-secondary/80" : "right-0 bg-primary hover:bg-primary/90"
+          "fixed top-1/2 -translate-y-1/2 z-50 transition-all duration-300",
+          "h-auto py-6 shadow-md border border-border",
+          isOpen 
+            ? "right-[calc(var(--panel-size)*1vw)] rounded-l-md rounded-r-none bg-secondary hover:bg-secondary/80"
+            : "right-0 rounded-l-md rounded-r-none bg-primary hover:bg-primary/90"
         )}
         style={{
           '--panel-size': panelSize,
-          transition: 'all 0.3s ease'
         } as React.CSSProperties}
       >
         {isOpen ? (
           <ChevronRight className="h-4 w-4" />
         ) : (
           <>
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 mr-2" />
             <span className="whitespace-nowrap text-xs">AI Chat</span>
           </>
         )}
