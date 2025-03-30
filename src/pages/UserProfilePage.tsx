@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,13 +13,17 @@ import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 import { ProfileDetails } from '@/components/profile/ProfileDetails';
 import { ProfileError } from '@/components/profile/ProfileError';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
-import { BioSection } from '@/components/profile/BioSection';
+import { Button } from '@/components/ui/button';
+import { Edit, UserCog } from 'lucide-react';
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 
 const UserProfilePage = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [redirectTriggered, setRedirectTriggered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [editMode, setEditMode] = useState<'private' | 'public'>('private');
   
   // Helper function for initials
   const getInitials = () => {
@@ -101,6 +106,11 @@ const UserProfilePage = () => {
     }
   };
 
+  const handleEditProfile = (mode: 'private' | 'public') => {
+    setEditMode(mode);
+    setIsDialogOpen(true);
+  };
+
   if (error) {
     return (
       <Layout>
@@ -122,6 +132,9 @@ const UserProfilePage = () => {
     );
   }
 
+  const isOwnProfile = user?.id === displayUser?.id;
+  const canEdit = isOwnProfile || isAdmin;
+
   return (
     <Layout>
       <main className="flex-1 container max-w-7xl mx-auto px-4 pt-24 pb-16">
@@ -133,22 +146,55 @@ const UserProfilePage = () => {
           <ProfileHeader title="User Profile" />
 
           <div className="grid gap-6 md:grid-cols-3">
-            <ProfileSidebar 
-              user={user} 
-              displayUser={displayUser} 
-              isAdmin={isAdmin} 
-              onLogout={logout}
-              isFieldVisible={isFieldVisible}
-            />
+            <div className="md:col-span-1">
+              <ProfileSidebar 
+                user={user} 
+                displayUser={displayUser} 
+                isAdmin={isAdmin} 
+                onLogout={logout}
+                isFieldVisible={isFieldVisible}
+              />
+              
+              {canEdit && (
+                <div className="mt-6 grid gap-3">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start" 
+                    onClick={() => handleEditProfile('private')}
+                  >
+                    <UserCog className="mr-2 h-4 w-4" />
+                    Edit Profile Information
+                  </Button>
+                  
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start" 
+                    onClick={() => handleEditProfile('public')}
+                  >
+                    <Edit className="mr-2 h-4 w-4" />
+                    Edit Public Bio & Links
+                  </Button>
+                </div>
+              )}
+            </div>
+            
             <div className="md:col-span-2 space-y-6">
               <ProfileDetails 
                 displayUser={displayUser} 
                 user={user}
                 isFieldVisible={isFieldVisible}
               />
-              {isFieldVisible('bio') && <BioSection user={displayUser} isFieldVisible={isFieldVisible} />}
             </div>
           </div>
+          
+          {canEdit && (
+            <EditProfileDialog 
+              user={displayUser} 
+              isOpen={isDialogOpen} 
+              mode={editMode}
+              onClose={() => setIsDialogOpen(false)} 
+            />
+          )}
         </motion.div>
       </main>
     </Layout>

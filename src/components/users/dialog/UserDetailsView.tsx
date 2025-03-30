@@ -1,9 +1,10 @@
+
 import { User, getUserFullName } from '@/types';
 import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { UserCircle, School, CalendarDays, ExternalLink } from 'lucide-react';
+import { UserCircle, School, CalendarDays, ExternalLink, Mail, GraduationCap, Hash, FileText } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 
@@ -22,54 +23,109 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
   };
 
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Status</Label>
-        <div className="col-span-3">
-          <UserStatusBadge status={user.status || 'pending_review'} />
+    <div className="grid gap-6 py-4">
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Account Status</h3>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Status</Label>
+          <div className="col-span-3">
+            <UserStatusBadge status={user.status || 'pending_review'} />
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Personal Information</h3>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Email</Label>
+          <div className="col-span-3 flex items-center">
+            <Mail className="h-4 w-4 mr-2 text-muted-foreground" />
+            <span className="truncate">{user.email}</span>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Name</Label>
+          <div className="col-span-3 flex items-center gap-2">
+            <UserCircle className="h-4 w-4 text-muted-foreground" />
+            {getFullName()}
+            <Button variant="ghost" size="icon" asChild className="h-6 w-6" title="View bio page">
+              <Link to={`/user/${user.id}`}>
+                <ExternalLink className="h-4 w-4" />
+              </Link>
+            </Button>
+          </div>
+        </div>
+        
+        {user.bio && (
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label className="text-right font-semibold">Bio</Label>
+            <div className="col-span-3 flex items-start">
+              <FileText className="h-4 w-4 mr-2 text-muted-foreground mt-0.5" />
+              <div className="whitespace-pre-wrap">{user.bio}</div>
+            </div>
+          </div>
+        )}
+      </div>
+      
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Education</h3>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Course</Label>
+          <div className="col-span-3 flex items-center">
+            <School className="h-4 w-4 mr-2 text-muted-foreground" />
+            {user.course || 'Not set'}
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Semester</Label>
+          <div className="col-span-3 flex items-center">
+            <GraduationCap className="h-4 w-4 mr-2 text-muted-foreground" />
+            {user.semester || 'Not set'}
+          </div>
         </div>
       </div>
       
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Email</Label>
-        <div className="col-span-3 truncate">{user.email}</div>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Name</Label>
-        <div className="col-span-3 flex items-center gap-2">
-          {getFullName()}
-          <Button variant="ghost" size="icon" asChild className="h-6 w-6" title="View bio page">
-            <Link to={`/user/${user.id}`}>
-              <ExternalLink className="h-4 w-4" />
-            </Link>
-          </Button>
+      {user.notes && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Admin Notes</h3>
+          
+          <div className="grid grid-cols-4 items-start gap-4">
+            <Label className="text-right font-semibold">Notes</Label>
+            <div className="col-span-3 whitespace-pre-wrap bg-muted/50 p-2 rounded text-sm">{user.notes}</div>
+          </div>
         </div>
-      </div>
+      )}
       
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Course</Label>
-        <div className="col-span-3">{user.course || 'Not set'}</div>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Semester</Label>
-        <div className="col-span-3">{user.semester || 'Not set'}</div>
-      </div>
-      
-      <div className="grid grid-cols-4 items-start gap-4">
-        <Label className="text-right font-semibold">Notes</Label>
-        <div className="col-span-3 whitespace-pre-wrap">{user.notes || 'Not set'}</div>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Role</Label>
-        <div className="col-span-3 capitalize">{user.role}</div>
-      </div>
-      
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label className="text-right font-semibold">Created</Label>
-        <div className="col-span-3">{formatDate(user.created_at)}</div>
+      <div className="space-y-4">
+        <h3 className="text-sm font-medium text-muted-foreground">Account Details</h3>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Role</Label>
+          <div className="col-span-3 capitalize flex items-center gap-2">
+            {user.role}
+            <Badge variant="outline" className="text-xs">{user.role}</Badge>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">Created</Label>
+          <div className="col-span-3 flex items-center">
+            <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
+            {formatDate(user.created_at)}
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label className="text-right font-semibold">ID</Label>
+          <div className="col-span-3 flex items-center">
+            <Hash className="h-4 w-4 mr-2 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground truncate">{user.id}</span>
+          </div>
+        </div>
       </div>
     </div>
   );
