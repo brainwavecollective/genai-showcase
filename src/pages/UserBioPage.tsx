@@ -33,7 +33,8 @@ const UserBioPage = () => {
         throw new Error('User not found');
       }
       
-      return data as User;
+      // Fix: Properly cast the data to User type
+      return data as unknown as User;
     }
   });
 
