@@ -1,4 +1,3 @@
-
 import { User, getUserFullName } from '@/types';
 import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';
@@ -19,9 +18,8 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
     return format(new Date(dateString), 'PPP');
   };
   
-  const getFullName = () => {
-    return getUserFullName(user);
-  };
+  // Use the consistent getUserFullName function
+  const fullName = getUserFullName(user);
 
   // Check if user has any social profiles
   const hasSocialProfiles = user.website || user.linkedin || user.twitter || user.github || user.instagram;
@@ -53,7 +51,7 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
           <Label className="text-right font-semibold">Name</Label>
           <div className="col-span-3 flex items-center gap-2">
             <UserCircle className="h-4 w-4 text-muted-foreground" />
-            {getFullName()}
+            {fullName}
             <Button variant="ghost" size="icon" asChild className="h-6 w-6" title="View bio page">
               <Link to={`/user/${user.id}`}>
                 <ExternalLink className="h-4 w-4" />

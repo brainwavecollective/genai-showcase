@@ -1,4 +1,3 @@
-
 import { User, getUserFullName } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -10,6 +9,7 @@ interface PublicBioCardProps {
 }
 
 export const PublicBioCard = ({ user }: PublicBioCardProps) => {
+  // Use getUserFullName to ensure consistency
   const fullName = getUserFullName(user);
   const initials = fullName
     .split(' ')

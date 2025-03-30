@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Project, Tag } from '@/types';
+import { Project, Tag, getUserFullName } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,6 +43,10 @@ export function ProjectCard({ project, tags = [] }: ProjectCardProps) {
         .map(tagId => tags.find(tag => tag.id === tagId))
         .filter(tag => tag !== undefined) as Tag[]
     : [];
+
+  // Format creator name using getUserFullName if creator_name is coming from a User object
+  // otherwise, use the creator_name directly or fall back to 'Unknown Creator'
+  const creatorName = project.creator_name || 'Unknown Creator';
 
   return (
     <Link to={`/project/${project.id}`}>
@@ -118,7 +121,7 @@ export function ProjectCard({ project, tags = [] }: ProjectCardProps) {
         
         <CardFooter className="pt-0 pb-4 flex justify-between">
           <div className="text-sm text-muted-foreground">
-            By {project.creator_name || 'Unknown Creator'}
+            By {creatorName}
           </div>
           
           <div className="text-xs text-muted-foreground flex items-center">

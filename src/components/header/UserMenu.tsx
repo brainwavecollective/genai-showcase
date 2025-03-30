@@ -1,4 +1,3 @@
-
 import { Link, useNavigate } from 'react-router-dom';
 import { User, LogOut, UserCircle, LayoutDashboard, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -101,7 +100,7 @@ export function UserMenu() {
               <AvatarImage src={localUser?.avatar_url} alt={displayName} />
               <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
-            <span className="hidden md:inline ml-2">{displayName || localUser?.email}</span>
+            <span className="hidden md:inline ml-2">{displayName}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
