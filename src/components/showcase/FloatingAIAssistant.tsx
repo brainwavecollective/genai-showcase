@@ -115,9 +115,9 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
               defaultSize={25} 
               minSize={20} 
               maxSize={40}
-              className="h-full bg-card border-l shadow-xl flex flex-col"
+              className="h-full bg-background border-l shadow-xl flex flex-col"
             >
-              <div className="flex justify-between items-center p-4 border-b">
+              <div className="flex justify-between items-center p-4 border-b bg-background">
                 <h4 className="font-semibold">Project AI Assistant</h4>
                 <Button 
                   variant="ghost" 
@@ -129,7 +129,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
                 </Button>
               </div>
               
-              <ScrollArea className="flex-1 px-4">
+              <ScrollArea className="flex-1 px-4 bg-background">
                 <div className="space-y-2 py-4">
                   {messages.length === 0 ? (
                     <p className="text-sm text-muted-foreground p-2">
@@ -150,7 +150,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
                 </div>
               </ScrollArea>
               
-              <div className="border-t p-3">
+              <div className="border-t p-3 bg-background">
                 <ChatInput 
                   onSend={sendMessage} 
                   isLoading={isLoading} 
