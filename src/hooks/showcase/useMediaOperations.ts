@@ -51,8 +51,8 @@ export function useMediaOperations(projectId: string | undefined) {
             const creator = item.creator || {};
             return {
               ...item,
-              creator_name: `${creator.first_name || ''} ${creator.last_name || ''}`.trim(),
-              creator_avatar: creator.avatar_url || null
+              creator_name: `${(creator as any).first_name || ''} ${(creator as any).last_name || ''}`.trim(),
+              creator_avatar: (creator as any).avatar_url || null
             };
           });
         }

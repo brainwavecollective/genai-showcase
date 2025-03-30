@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
@@ -73,13 +72,12 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       
       // Create the media item with creator info from the join
       const creator = data.creator || {};
-      const firstName = creator.first_name || '';
-      const lastName = creator.last_name || '';
       
+      // Use type assertion to tell TypeScript that these properties might exist
       const newMedia: MediaItem = {
         ...data,
-        creator_name: `${firstName} ${lastName}`.trim(),
-        creator_avatar: creator.avatar_url || null
+        creator_name: `${(creator as any).first_name || ''} ${(creator as any).last_name || ''}`.trim(),
+        creator_avatar: (creator as any).avatar_url || null
       };
       
       onMediaAdded(newMedia);
