@@ -39,7 +39,7 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
           }
           
           // Parse the user data with proper type assertion
-          const userInfo = userData as CommentUserInfo || {};
+          const userInfo = userData as CommentUserInfo || { first_name: null, last_name: null, avatar_url: null };
           
           return {
             ...comment,
@@ -105,7 +105,7 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       }
       
       // Parse the user data with proper type assertion
-      const userInfo = userData as CommentUserInfo || {};
+      const userInfo = userData as CommentUserInfo || { first_name: null, last_name: null, avatar_url: null };
       
       // Format the new comment
       const formattedComment = {
