@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -169,10 +170,31 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
         updated_at: new Date().toISOString(),
       };
 
+      // Use RPC function instead of direct update to bypass RLS policies
       const { error } = await supabase
-        .from('users')
-        .update(updateData)
-        .eq('id', user.id);
+        .rpc('update_user_bio', {
+          p_user_id: user.id,
+          p_first_name: values.first_name || '',
+          p_last_name: values.last_name || '',
+          p_course: values.course || '',
+          p_semester: values.semester || '',
+          p_bio: values.bio || '',
+          p_email: values.email || user.email,
+          p_website: values.website || '',
+          p_linkedin: values.linkedin || '',
+          p_twitter: values.twitter || '',
+          p_github: values.github || '',
+          p_instagram: values.instagram || '',
+          p_is_last_name_public: privacySettings.is_last_name_public,
+          p_is_avatar_public: privacySettings.is_avatar_public,
+          p_is_bio_public: privacySettings.is_bio_public,
+          p_is_email_public: privacySettings.is_email_public,
+          p_is_website_public: privacySettings.is_website_public,
+          p_is_linkedin_public: privacySettings.is_linkedin_public,
+          p_is_twitter_public: privacySettings.is_twitter_public,
+          p_is_github_public: privacySettings.is_github_public,
+          p_is_instagram_public: privacySettings.is_instagram_public
+        });
 
       if (error) throw error;
 

@@ -21,27 +21,12 @@ export function PrivacyToggleField({
 }: PrivacyToggleFieldProps) {
   return (
     <div className={`flex items-center ${className}`}>
-      <div className="flex items-center ml-auto">
-        <Switch
-          checked={isPublic}
-          onCheckedChange={onChange}
-          disabled={disabled}
-          className="mr-2 data-[state=checked]:bg-green-500"
-        />
-        <span className="flex items-center text-xs text-muted-foreground">
-          {isPublic ? (
-            <>
-              <Eye className="h-3 w-3 mr-1" />
-              Public
-            </>
-          ) : (
-            <>
-              <EyeOff className="h-3 w-3 mr-1" />
-              Private
-            </>
-          )}
-        </span>
-      </div>
+      <Switch
+        checked={isPublic}
+        onCheckedChange={onChange}
+        disabled={disabled}
+        className="mr-2 data-[state=checked]:bg-green-500"
+      />
     </div>
   );
 }
