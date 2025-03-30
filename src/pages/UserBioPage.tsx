@@ -42,7 +42,7 @@ const UserBioPage = () => {
     }
   });
 
-  // Query user's projects directly using a simpler approach to avoid RLS issues
+  // Query user's projects using project_details view like the Index page
   const { data: userProjects, isLoading: projectsLoading } = useQuery({
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
@@ -51,19 +51,10 @@ const UserBioPage = () => {
       console.log('Fetching projects for user ID:', userId);
       
       try {
-        // Directly execute a simple query for projects by creator_id
+        // Use project_details view instead of projects table directly
         const { data, error } = await supabase
-          .from('projects')
-          .select(`
-            id, 
-            title, 
-            description, 
-            cover_image_url, 
-            created_at, 
-            updated_at, 
-            is_private, 
-            creator_id
-          `)
+          .from('project_details')
+          .select('*')
           .eq('creator_id', userId)
           .eq('is_private', false) // Only fetch public projects to avoid permission issues
           .order('updated_at', { ascending: false });
@@ -73,16 +64,8 @@ const UserBioPage = () => {
           return []; // Return empty array instead of throwing to prevent query retries
         }
         
-        // Since we aren't using project_details view, manually add creator_name
-        const projectsWithCreatorName = data?.map(project => ({
-          ...project,
-          creator_name: user?.first_name && user?.last_name 
-            ? `${user.first_name} ${user.last_name}`.trim() 
-            : user?.first_name || 'Unknown'
-        }));
-        
-        console.log('User projects fetched successfully:', projectsWithCreatorName?.length || 0, 'projects');
-        return projectsWithCreatorName as Project[];
+        console.log('User projects fetched successfully:', data?.length || 0, 'projects');
+        return data as Project[];
       } catch (err) {
         console.error('Failed to fetch projects:', err);
         return []; // Return empty array instead of throwing to prevent query retries
