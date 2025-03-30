@@ -58,6 +58,12 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
     }
     
     try {
+      console.log('Adding comment:', {
+        mediaId: selectedMedia.id,
+        userId: user.id,
+        content
+      });
+      
       const newComment = {
         media_item_id: selectedMedia.id,
         user_id: user.id,
@@ -77,7 +83,16 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         `)
         .single();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error('No data returned from comment insertion');
+      }
+      
+      console.log('Comment added successfully:', data);
       
       // Format the new comment
       const formattedComment = {
@@ -93,9 +108,9 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       setComments(prev => [formattedComment, ...prev]);
       toast.success('Comment added successfully');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error adding comment:', error);
-      toast.error('Failed to add comment');
+      toast.error(`Failed to add comment: ${error.message || 'Unknown error'}`);
     }
   };
 

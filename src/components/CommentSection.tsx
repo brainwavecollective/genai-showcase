@@ -7,8 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { MessageSquare } from 'lucide-react';
-import { Comment, getUserFullName } from '@/types';
-import { useToast } from "@/hooks/use-toast";
+import { Comment } from '@/types';
+import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
 
 interface CommentSectionProps {
@@ -21,19 +21,28 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
   const { isAuthenticated, user } = useAuth();
   const [newComment, setNewComment] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!newComment.trim()) return;
+    if (!newComment.trim()) {
+      toast.error('Comment cannot be empty');
+      return;
+    }
     
-    setIsSubmitting(true);
-    
-    // Pass the content string to the parent component
-    onAddComment(newComment);
-    setNewComment('');
-    setIsSubmitting(false);
+    try {
+      setIsSubmitting(true);
+      
+      // Pass the content string to the parent component
+      await onAddComment(newComment);
+      
+      // Only clear input if submission was successful
+      setNewComment('');
+    } catch (error) {
+      console.error('Error in comment submission:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Format date
