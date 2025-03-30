@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { User, UserStatus } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,7 +80,7 @@ export function useUsers() {
       
       // Copy over all fields except status (handle it separately)
       Object.entries(params.userData).forEach(([key, value]) => {
-        if (key !== 'status') {
+        if (key !== 'status' && key !== 'name') { // Exclude 'name' as we'll derive it
           validUserData[key] = value;
         }
       });
@@ -93,13 +92,6 @@ export function useUsers() {
         } else {
           console.warn(`Ignoring invalid status: ${params.userData.status}`);
         }
-      }
-      
-      // Make sure name is consistent with first_name and last_name
-      if (validUserData.first_name || validUserData.last_name) {
-        const firstName = validUserData.first_name || '';
-        const lastName = validUserData.last_name || '';
-        validUserData.name = `${firstName} ${lastName}`.trim();
       }
       
       console.log('Sending update with validated data:', validUserData);
@@ -140,6 +132,11 @@ export function useUsers() {
     const user = users.find(u => u.id === userId);
     return user?.status === 'denied';
   };
+  
+  // Helper function to get full name from first and last name
+  const getFullName = (user: User): string => {
+    return `${user.first_name || ''} ${user.last_name || ''}`.trim();
+  };
 
   return {
     users,
@@ -149,6 +146,7 @@ export function useUsers() {
       updateUserStatus.mutate({ userId, status }),
     updateUserInfo: (userId: string, userData: Partial<User>) =>
       updateUserInfo.mutate({ userId, userData }),
-    isUserDenied
+    isUserDenied,
+    getFullName
   };
 }

@@ -15,6 +15,10 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
     if (!dateString) return 'Not available';
     return format(new Date(dateString), 'PPP');
   };
+  
+  const getFullName = () => {
+    return `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Not set';
+  };
 
   return (
     <div className="grid gap-4 py-4">
@@ -33,9 +37,7 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
       <div className="grid grid-cols-4 items-center gap-4">
         <Label className="text-right font-semibold">Name</Label>
         <div className="col-span-3">
-          {user.first_name && user.last_name
-            ? `${user.first_name} ${user.last_name}`
-            : user.name || 'Not set'}
+          {getFullName()}
         </div>
       </div>
       

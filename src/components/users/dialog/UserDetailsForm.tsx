@@ -13,29 +13,10 @@ interface UserDetailsFormProps {
 }
 
 const UserDetailsForm = ({ user, onSave, onCancel }: UserDetailsFormProps) => {
-  // Helper function to split full name into first and last name
-  const getNameParts = (fullName: string) => {
-    const parts = fullName.split(' ');
-    if (parts.length === 1) return { firstName: parts[0], lastName: '' };
-    const lastName = parts.pop() || '';
-    const firstName = parts.join(' ');
-    return { firstName, lastName };
-  };
-
   const [editedUser, setEditedUser] = useState<Partial<User>>(() => {
-    // If first_name and last_name are empty but name exists, split the name
-    let firstName = user.first_name || '';
-    let lastName = user.last_name || '';
-    
-    if ((!firstName || !lastName) && user.name) {
-      const nameParts = getNameParts(user.name);
-      firstName = firstName || nameParts.firstName;
-      lastName = lastName || nameParts.lastName;
-    }
-    
     return {
-      first_name: firstName,
-      last_name: lastName,
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
       email: user.email || '',
       course: user.course || '',
       semester: user.semester || '',
@@ -45,18 +26,9 @@ const UserDetailsForm = ({ user, onSave, onCancel }: UserDetailsFormProps) => {
   
   // Re-initialize form when user changes
   useEffect(() => {
-    let firstName = user.first_name || '';
-    let lastName = user.last_name || '';
-    
-    if ((!firstName || !lastName) && user.name) {
-      const nameParts = getNameParts(user.name);
-      firstName = firstName || nameParts.firstName;
-      lastName = lastName || nameParts.lastName;
-    }
-    
     setEditedUser({
-      first_name: firstName,
-      last_name: lastName,
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
       email: user.email || '',
       course: user.course || '',
       semester: user.semester || '',
@@ -70,14 +42,8 @@ const UserDetailsForm = ({ user, onSave, onCancel }: UserDetailsFormProps) => {
   };
   
   const handleSubmit = () => {
-    // Calculate the full name from first and last name for consistency
-    const userData = {
-      ...editedUser,
-      name: `${editedUser.first_name} ${editedUser.last_name}`.trim()
-    };
-    
-    console.log('Saving user data:', userData);
-    onSave(userData);
+    console.log('Saving user data:', editedUser);
+    onSave(editedUser);
   };
 
   return (

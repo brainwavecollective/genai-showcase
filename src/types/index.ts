@@ -1,13 +1,13 @@
+
 export type UserRole = 'admin' | 'creator' | 'visitor' | 'member'; // Added 'member' to match the options
 export type UserStatus = 'pending_review' | 'approved' | 'denied' | 'active' | 'suspended'; // Added 'active' and 'suspended' to match the UI options
 
 export interface User {
   id: string;
   email: string;
-  name: string;
+  first_name: string;
+  last_name: string;
   role: UserRole;
-  first_name?: string;
-  last_name?: string;
   course?: string;
   semester?: string;
   notes?: string;
