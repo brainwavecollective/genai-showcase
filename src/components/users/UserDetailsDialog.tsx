@@ -86,7 +86,8 @@ const UserDetailsDialog = ({ user, open, onOpenChange, onStatusChange }: UserDet
             Close
           </Button>
           
-          {(user.status === 'pending_review' || !user.status) && (
+          {/* Show approval button for pending or denied users */}
+          {(user.status === 'pending_review' || user.status === 'denied' || !user.status) && (
             <div className="flex gap-2">
               <AlertDialog>
                 <AlertDialogTrigger asChild>
@@ -117,35 +118,70 @@ const UserDetailsDialog = ({ user, open, onOpenChange, onStatusChange }: UserDet
                 </AlertDialogContent>
               </AlertDialog>
               
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="text-red-600 hover:text-red-700">
-                    <XCircle className="h-4 w-4 mr-1" />
-                    Deny
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Deny User</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to deny {user.email}?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={() => {
-                        onStatusChange(user.id, 'denied');
-                        onOpenChange(false);
-                      }}
-                      className="bg-red-600 hover:bg-red-700"
-                    >
+              {/* Only show deny button if not already denied */}
+              {user.status !== 'denied' && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="outline" className="text-red-600 hover:text-red-700">
+                      <XCircle className="h-4 w-4 mr-1" />
                       Deny
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Deny User</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to deny {user.email}?
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction
+                        onClick={() => {
+                          onStatusChange(user.id, 'denied');
+                          onOpenChange(false);
+                        }}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
+                        Deny
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
             </div>
+          )}
+          
+          {/* Show deny button for approved users */}
+          {user.status === 'approved' && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" className="text-red-600 hover:text-red-700">
+                  <XCircle className="h-4 w-4 mr-1" />
+                  Deny
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Deny User</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to deny {user.email}? This will hide their content from the site.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
+                      onStatusChange(user.id, 'denied');
+                      onOpenChange(false);
+                    }}
+                    className="bg-red-600 hover:bg-red-700"
+                  >
+                    Deny
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           )}
         </DialogFooter>
       </DialogContent>

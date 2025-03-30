@@ -6,9 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { CheckCircle, XCircle, Search, Info } from 'lucide-react';
+import { CheckCircle, XCircle, Search, Info, RefreshCcw } from 'lucide-react';
 import UserStatusBadge from './UserStatusBadge';
 import UserDetailsDialog from './UserDetailsDialog';
+import { StatusDropdown } from './StatusDropdown';
 
 interface UserListProps {
   users: User[];
@@ -96,7 +97,11 @@ const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
                   </TableCell>
                   <TableCell>{user.course || 'Not set'}</TableCell>
                   <TableCell>
-                    <UserStatusBadge status={user.status || 'pending_review'} />
+                    <StatusDropdown 
+                      userId={user.id}
+                      currentStatus={user.status || 'pending_review'}
+                      updateUserStatus={({ userId, status }) => onStatusChange(userId, status)}
+                    />
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex items-center justify-end gap-2">
@@ -163,6 +168,62 @@ const UserList = ({ users, isLoading, onStatusChange }: UserListProps) => {
                             </AlertDialogContent>
                           </AlertDialog>
                         </>
+                      )}
+                      
+                      {user.status === 'denied' && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-green-600 hover:text-green-700">
+                              <RefreshCcw className="h-4 w-4 mr-1" />
+                              Approve
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Approve Denied User</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to approve {user.email}? This will make their content visible again.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onStatusChange(user.id, 'approved')}
+                                className="bg-green-600 hover:bg-green-700"
+                              >
+                                Approve
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      )}
+                      
+                      {user.status === 'approved' && (
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" size="sm" className="text-red-600 hover:text-red-700">
+                              <XCircle className="h-4 w-4 mr-1" />
+                              Deny
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Deny Approved User</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Are you sure you want to deny {user.email}? This will hide their content from the site.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onStatusChange(user.id, 'denied')}
+                                className="bg-red-600 hover:bg-red-700"
+                              >
+                                Deny
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       )}
                     </div>
                   </TableCell>

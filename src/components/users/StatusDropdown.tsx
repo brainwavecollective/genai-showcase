@@ -10,6 +10,8 @@ interface StatusDropdownProps {
 
 const statusOptions = [
   { value: 'pending_review', label: 'Pending Review' },
+  { value: 'approved', label: 'Approved' },
+  { value: 'denied', label: 'Denied' },
   { value: 'active', label: 'Active' },
   { value: 'suspended', label: 'Suspended' },
 ];
