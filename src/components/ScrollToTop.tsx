@@ -6,15 +6,14 @@ export function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Force scroll to top with a slight delay to ensure it takes precedence
-    // over any other scroll behavior
+    // Force scroll to top immediately with no animation
+    // This has higher priority than any other scroll behavior
+    window.scrollTo(0, 0);
+    
+    // As a backup, also scroll after a slight delay
     const timer = setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'auto'
-      });
-    }, 0);
+      window.scrollTo(0, 0);
+    }, 50);
     
     return () => clearTimeout(timer);
   }, [pathname]);
