@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { User } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -38,18 +39,17 @@ export const BioSection = ({ user }: BioSectionProps) => {
     setIsLoading(true);
     
     try {
-      // Use Supabase's `from('users')` function to update the user's bio and social links
+      // Use the new update_user_bio RPC function instead of direct update
       const { error } = await supabase
-        .from('users')
-        .update({
-          bio: bioData.bio,
-          website: bioData.website,
-          linkedin: bioData.linkedin,
-          twitter: bioData.twitter,
-          github: bioData.github,
-          instagram: bioData.instagram,
-        })
-        .eq('id', user.id);
+        .rpc('update_user_bio', {
+          p_user_id: user.id,
+          p_bio: bioData.bio,
+          p_website: bioData.website,
+          p_linkedin: bioData.linkedin,
+          p_twitter: bioData.twitter,
+          p_github: bioData.github,
+          p_instagram: bioData.instagram
+        });
         
       if (error) throw error;
       
