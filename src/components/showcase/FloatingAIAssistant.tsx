@@ -39,7 +39,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
             exit={{ opacity: 0, y: 20, scale: 0.8 }}
             className="mb-2"
           >
-            <Card className="p-4 shadow-lg w-[400px] md:w-[460px] lg:w-[500px]">
+            <Card className="p-4 shadow-lg w-96 md:w-[420px] lg:w-[460px]">
               <div className="flex justify-between items-center mb-3">
                 <h4 className="font-semibold">Project AI Assistant</h4>
                 <Button 
@@ -53,7 +53,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
               </div>
               
               {/* Chat Messages */}
-              <ScrollArea className="h-80 mb-3 pr-2">
+              <ScrollArea className="h-72 mb-3 pr-2">
                 <div className="space-y-2">
                   {messages.length === 0 ? (
                     <p className="text-sm text-muted-foreground p-2">
