@@ -49,7 +49,10 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
         <SheetContent side="bottom" className="h-[85vh] p-0">
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center py-3 px-4 border-b">
-              <h4 className="font-semibold">Project AI Assistant</h4>
+              <div>
+                <h4 className="font-semibold">{project?.title || "Project"}</h4>
+                <p className="text-xs text-muted-foreground">AI Assistant</p>
+              </div>
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -97,8 +100,8 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
   // Desktop version with slide-out panel and resize functionality
   return (
     <>
-      {/* Fixed position wrapper that just contains the panel and button */}
-      <div className="fixed inset-y-0 right-0 z-40 pointer-events-none">
+      {/* Fixed position wrapper that stops at header height */}
+      <div className="fixed top-24 bottom-0 right-0 z-40 pointer-events-none">
         {/* The actual panel container that slides */}
         <div 
           className={cn(
@@ -117,16 +120,19 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
               maxSize={40}
               className="h-full bg-background border-l shadow-xl flex flex-col"
             >
-              <div className="flex justify-between items-center p-4 border-b bg-background">
-                <h4 className="font-semibold">Project AI Assistant</h4>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0" 
-                  onClick={() => setIsOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+              <div className="flex flex-col p-4 border-b bg-background">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-semibold">{project?.title || "Project"}</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0" 
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">AI Assistant</p>
               </div>
               
               <ScrollArea className="flex-1 px-4 bg-background">
