@@ -34,9 +34,6 @@ export function ProjectHeader({
     );
   };
 
-  // Helper to determine if the profile is clickable
-  const hasProfileLink = creator?.id !== undefined && creator?.id !== null;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -84,17 +81,24 @@ export function ProjectHeader({
       )}
       
       <div className="flex items-center justify-center space-x-3 mb-6">
-        {hasProfileLink ? (
-          <Link to={`/user/${creator.id}`} className="flex items-center space-x-3">
+        {/* Creator info with simplified approach */}
+        {project.creator_id ? (
+          <Link 
+            to={`/user/${project.creator_id}`} 
+            className="flex items-center space-x-3 hover:underline"
+          >
             <Avatar>
-              {creator?.avatar_url && <AvatarImage src={creator.avatar_url} />}
-              <AvatarFallback>
-                <User className="h-4 w-4" />
-              </AvatarFallback>
+              {creator?.avatar_url ? (
+                <AvatarImage src={creator.avatar_url} alt={creator?.name || 'Creator'} />
+              ) : (
+                <AvatarFallback>
+                  <User className="h-4 w-4" />
+                </AvatarFallback>
+              )}
             </Avatar>
             <div>
-              <p className="text-sm font-medium hover:underline">
-                {creator?.name || project.creator_name}
+              <p className="text-sm font-medium">
+                {creator?.name || project.creator_name || 'Creator'}
               </p>
               <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
             </div>
@@ -107,7 +111,7 @@ export function ProjectHeader({
               </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
+              <p className="text-sm font-medium">{creator?.name || project.creator_name || 'Creator'}</p>
               <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
             </div>
           </div>
