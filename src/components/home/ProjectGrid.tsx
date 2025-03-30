@@ -1,14 +1,22 @@
-import { Project } from '@/types';
-import ProjectCard from './ProjectCard';
-import { Skeleton } from "@/components/ui/skeleton"
+
+import { Project, Tag } from '@/types';
+import { Skeleton } from "@/components/ui/skeleton";
 import { useUsers } from '@/hooks/useUsers';
 import { filterContentByUserStatus } from '@/utils/contentFilters';
+import { ProjectCard } from '@/components/ProjectCard';
 
-const ProjectGrid = ({ projects = [], isLoading = false }) => {
+interface ProjectGridProps {
+  projects?: Project[];
+  isLoading?: boolean;
+  visibleProjects?: Project[];
+  tags?: Tag[];
+}
+
+const ProjectGrid = ({ projects = [], isLoading = false, visibleProjects, tags }: ProjectGridProps) => {
   const { isUserDenied } = useUsers();
   
-  // Filter out projects from denied users
-  const filteredProjects = filterContentByUserStatus(projects, isUserDenied);
+  // Use visibleProjects if provided, otherwise filter projects
+  const projectsToDisplay = visibleProjects ?? filterContentByUserStatus(projects, isUserDenied);
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -17,10 +25,10 @@ const ProjectGrid = ({ projects = [], isLoading = false }) => {
         [...Array(8)].map((_, i) => (
           <Skeleton key={i} className="w-full aspect-video rounded-md" />
         ))
-      ) : filteredProjects.length > 0 ? (
+      ) : projectsToDisplay.length > 0 ? (
         // Display project cards if there are projects
-        filteredProjects.map((project) => (
-          <ProjectCard key={project.id} project={project} />
+        projectsToDisplay.map((project) => (
+          <ProjectCard key={project.id} project={project} tags={tags} />
         ))
       ) : (
         // Display a message if there are no projects

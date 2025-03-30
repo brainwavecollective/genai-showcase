@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/context/AuthContext';
 import { Layout } from '@/components/Layout';
 import { Button } from '@/components/ui/button';
-import { ProjectGrid } from '@/components/home/ProjectGrid';
+import ProjectGrid from '@/components/home/ProjectGrid';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { Project, Tag } from '@/types';

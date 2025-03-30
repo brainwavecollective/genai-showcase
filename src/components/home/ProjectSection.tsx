@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Project, Tag } from '@/types';
 import { SearchAndFilterBar } from './SearchAndFilterBar';
-import { ProjectGrid } from './ProjectGrid';
+import ProjectGrid from './ProjectGrid';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ProjectSectionProps {
