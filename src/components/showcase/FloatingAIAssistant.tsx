@@ -14,7 +14,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
   
   return (
-    <div className="fixed bottom-[50%] right-4 z-50">
+    <div className="fixed bottom-[40%] right-4 z-50">
       <AnimatePresence>
         {isOpen && (
           <motion.div
@@ -47,7 +47,9 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
       <motion.div
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-2"
       >
+        <span className="text-primary font-medium text-sm bg-background/80 backdrop-blur-sm py-1 px-3 rounded-full shadow">AI Project Chat</span>
         <Button 
           size="lg"
           onClick={() => setIsOpen(!isOpen)}

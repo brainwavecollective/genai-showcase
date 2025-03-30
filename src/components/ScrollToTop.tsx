@@ -24,8 +24,9 @@ export function ScrollToTop() {
     const handleScroll = () => {
       if (pathname === '/') {
         // For home page, scroll to a position just above the "Student Showcase Platform" badge
+        // Adjusted to scroll less far down
         window.scrollTo({
-          top: 220,
+          top: 100, // Reduced from 220 to 100 for less dramatic scrolling
           left: 0,
           behavior: 'instant' // Use instant to avoid animation conflicts
         });
