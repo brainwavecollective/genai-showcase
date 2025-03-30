@@ -41,20 +41,32 @@ export function ProfileSidebar({
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
   };
   
+  // Use first_name and last_name, avoiding the legacy name field entirely
+  const getDisplayName = () => {
+    if (!displayUser) return 'User';
+    
+    if (displayUser.first_name) {
+      // If first_name exists, use it (with last_name if visible)
+      return `${displayUser.first_name} ${isFieldVisible('last_name') && displayUser.last_name ? displayUser.last_name : ''}`.trim();
+    }
+    
+    // Fallback to email username if no name data
+    return displayUser.email?.split('@')[0] || 'User';
+  };
+  
   return (
     <Card>
       <CardHeader className="relative">
         <div className="flex flex-col items-center">
           <Avatar className="h-24 w-24 mb-4">
             {isFieldVisible('avatar') && displayUser?.avatar_url && (
-              <AvatarImage src={displayUser.avatar_url} alt={getUserFullName(displayUser)} />
+              <AvatarImage src={displayUser.avatar_url} alt={getDisplayName()} />
             )}
             <AvatarFallback className="text-xl">{getInitials()}</AvatarFallback>
           </Avatar>
           
           <CardTitle className="text-center">
-            {displayUser?.first_name || 'User'}{' '}
-            {isFieldVisible('last_name') && displayUser?.last_name}
+            {getDisplayName()}
           </CardTitle>
           
           <CardDescription className="text-center">

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,6 +45,13 @@ const UserProfilePage = () => {
       }
       
       console.log('User details fetched successfully:', data);
+      
+      // Handle legacy profiles that might have name but not first_name/last_name
+      if (data && data.name && (!data.first_name && !data.last_name)) {
+        // Move legacy name field into first_name for display
+        data.first_name = data.name;
+      }
+      
       return data as unknown as User;
     },
     enabled: !!user?.id && isAuthenticated,

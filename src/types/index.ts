@@ -6,7 +6,6 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  name?: string; // Make name optional for backward compatibility
   role: UserRole;
   course?: string;
   semester?: string;
@@ -100,10 +99,6 @@ export interface ProjectTag {
 
 // Utility function to get a user's full name
 export function getUserFullName(user: User): string {
-  if (user.name) {
-    return user.name;
-  }
-  
   if (user.first_name || user.last_name) {
     return `${user.first_name || ''} ${user.last_name || ''}`.trim();
   }
