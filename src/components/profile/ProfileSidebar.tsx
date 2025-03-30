@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import UserStatusBadge from '@/components/users/UserStatusBadge';
-import { Pencil, UserCircle, School, CalendarDays } from 'lucide-react';
+import { Pencil, UserCircle, School, CalendarDays, Globe } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { EditProfileDialog } from './EditProfileDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -22,6 +22,7 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editMode, setEditMode] = useState<'private' | 'public'>('private');
 
   const getInitials = () => {
     if (displayUser) {
@@ -31,7 +32,8 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
   };
 
-  const handleEditProfile = () => {
+  const handleEditProfile = (mode: 'private' | 'public') => {
+    setEditMode(mode);
     setIsEditDialogOpen(true);
   };
 
@@ -84,10 +86,19 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
           <Button 
             variant="outline" 
             className="w-full"
-            onClick={handleEditProfile}
+            onClick={() => handleEditProfile('private')}
           >
             <Pencil className="h-4 w-4 mr-2" />
-            Edit Profile
+            Edit Private Profile
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => handleEditProfile('public')}
+          >
+            <Globe className="h-4 w-4 mr-2" />
+            Edit Public Bio
           </Button>
           
           {isAdmin && (
@@ -112,7 +123,8 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
       
       <EditProfileDialog 
         user={user} 
-        isOpen={isEditDialogOpen} 
+        isOpen={isEditDialogOpen}
+        mode={editMode}
         onClose={() => setIsEditDialogOpen(false)} 
       />
     </>

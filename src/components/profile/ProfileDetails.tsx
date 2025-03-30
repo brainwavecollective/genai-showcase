@@ -1,11 +1,7 @@
 
 import { User, getUserFullName } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import UserStatusBadge from '@/components/users/UserStatusBadge';
 
 interface ProfileDetailsProps {
   displayUser: User | null;
@@ -13,87 +9,51 @@ interface ProfileDetailsProps {
 }
 
 export const ProfileDetails = ({ displayUser, user }: ProfileDetailsProps) => {
+  if (!displayUser) return null;
+  
   return (
-    <Card className="md:col-span-2">
+    <Card>
       <CardHeader>
         <CardTitle>Private Profile Details</CardTitle>
-        <CardDescription>
-          Your personal information and settings
-        </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="personal">Personal Info</TabsTrigger>
-            <TabsTrigger value="account">Account Settings</TabsTrigger>
-          </TabsList>
+      <CardContent className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-medium text-sm text-muted-foreground mb-1">Full Name</h3>
+            <p>{getUserFullName(displayUser)}</p>
+          </div>
           
-          <TabsContent value="personal" className="space-y-4 pt-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>First Name</Label>
-                <div className="p-2 rounded-md bg-muted/40">
-                  {displayUser?.first_name || 'Not set'}
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Last Name</Label>
-                <div className="p-2 rounded-md bg-muted/40">
-                  {displayUser?.last_name || 'Not set'}
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Email</Label>
-              <div className="p-2 rounded-md bg-muted/40">
-                {user?.email}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Course</Label>
-              <div className="p-2 rounded-md bg-muted/40">
-                {displayUser?.course || 'Not set'}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label>Semester</Label>
-              <div className="p-2 rounded-md bg-muted/40">
-                {displayUser?.semester || 'Not set'}
-              </div>
-            </div>
-          </TabsContent>
+          <div>
+            <h3 className="font-medium text-sm text-muted-foreground mb-1">Email</h3>
+            <p>{displayUser.email}</p>
+          </div>
           
-          <TabsContent value="account" className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label>Account Status</Label>
-              <div className="p-2 rounded-md bg-muted/40 flex items-center">
-                <UserStatusBadge status={displayUser?.status || 'pending_review'} />
-              </div>
+          <div>
+            <h3 className="font-medium text-sm text-muted-foreground mb-1">Role</h3>
+            <Badge variant="outline" className="capitalize">{displayUser.role || 'visitor'}</Badge>
+          </div>
+          
+          <div>
+            <h3 className="font-medium text-sm text-muted-foreground mb-1">Status</h3>
+            <Badge variant={displayUser.status === 'approved' ? 'success' : 'secondary'} className="capitalize">
+              {displayUser.status || 'pending'}
+            </Badge>
+          </div>
+          
+          {displayUser.course && (
+            <div>
+              <h3 className="font-medium text-sm text-muted-foreground mb-1">Course</h3>
+              <p>{displayUser.course}</p>
             </div>
-            
-            <div className="space-y-2">
-              <Label>Role</Label>
-              <div className="p-2 rounded-md bg-muted/40">
-                <Badge variant="outline" className="capitalize">
-                  {displayUser?.role || 'visitor'}
-                </Badge>
-              </div>
+          )}
+          
+          {displayUser.semester && (
+            <div>
+              <h3 className="font-medium text-sm text-muted-foreground mb-1">Semester</h3>
+              <p>{displayUser.semester}</p>
             </div>
-            
-            <Separator />
-            
-            <div className="space-y-2">
-              <Label>Account Created</Label>
-              <div className="p-2 rounded-md bg-muted/40">
-                {displayUser?.created_at ? new Date(displayUser.created_at).toLocaleDateString() : 'Unknown'}
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
