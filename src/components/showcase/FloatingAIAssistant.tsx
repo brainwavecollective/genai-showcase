@@ -103,7 +103,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
         <div 
           className={cn(
             "h-full pointer-events-auto transition-all duration-300 ease-in-out",
-            isOpen ? "translate-x-0" : "translate-x-full"
+            isOpen ? "translate-x-0 z-[100]" : "translate-x-full"
           )}
           style={{ width: isOpen ? `${panelSize}vw` : 0 }}
         >
