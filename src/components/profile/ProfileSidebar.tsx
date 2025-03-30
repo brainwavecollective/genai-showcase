@@ -41,13 +41,16 @@ export function ProfileSidebar({
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
   };
   
-  // Use first_name and last_name, avoiding the legacy name field entirely
+  // Use first_name and last_name, applying privacy rules
   const getDisplayName = () => {
     if (!displayUser) return 'User';
     
-    if (displayUser.first_name) {
-      // If first_name exists, use it (with last_name if visible)
-      return `${displayUser.first_name} ${isFieldVisible('last_name') && displayUser.last_name ? displayUser.last_name : ''}`.trim();
+    // Use getUserFullName to get the properly formatted name
+    const fullName = getUserFullName(displayUser);
+    
+    // Only show full name if it's not the default email username
+    if (fullName !== displayUser.email?.split('@')[0]) {
+      return fullName;
     }
     
     // Fallback to email username if no name data

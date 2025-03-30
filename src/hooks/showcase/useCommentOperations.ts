@@ -28,13 +28,20 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       if (commentsError) throw commentsError;
       
       // Format comments to match the Comment type
-      const formattedComments = commentsData.map((comment: any) => ({
-        ...comment,
-        user_name: comment.users?.first_name ? 
-          `${comment.users.first_name} ${comment.users.last_name || ''}`.trim() : 
-          'Unknown User',
-        user_avatar: comment.users?.avatar_url || null
-      }));
+      const formattedComments = commentsData.map((comment: any) => {
+        // Create a user-like object from the joined data to use getUserFullName
+        const userObj = {
+          first_name: comment.users?.first_name || '',
+          last_name: comment.users?.last_name || '',
+          email: 'unknown@example.com' // Fallback email (won't be shown)
+        };
+        
+        return {
+          ...comment,
+          user_name: comment.users?.first_name ? getUserFullName(userObj) : 'Unknown User',
+          user_avatar: comment.users?.avatar_url || null
+        };
+      });
       
       setComments(formattedComments);
     } catch (error) {
@@ -76,8 +83,11 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       const formattedComment = {
         ...data,
         user_name: data.users?.first_name ? 
-          `${data.users.first_name} ${data.users.last_name || ''}`.trim() : 
-          user ? getUserFullName(user) : 'Unknown User',
+          getUserFullName({
+            first_name: data.users.first_name,
+            last_name: data.users.last_name || '',
+            email: ''
+          }) : getUserFullName(user),
         user_avatar: data.users?.avatar_url || null
       };
       
