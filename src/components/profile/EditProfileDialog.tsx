@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -144,33 +143,8 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
     setIsLoading(true);
     
     try {
-      // Create an object with all the values we want to update
-      const updateData = {
-        first_name: values.first_name || '',
-        last_name: values.last_name || '',
-        course: values.course || '',
-        semester: values.semester || '',
-        bio: values.bio || '',
-        email: values.email || user.email,
-        website: values.website || '',
-        linkedin: values.linkedin || '',
-        twitter: values.twitter || '',
-        github: values.github || '',
-        instagram: values.instagram || '',
-        // Add privacy settings
-        is_last_name_public: privacySettings.is_last_name_public,
-        is_avatar_public: privacySettings.is_avatar_public,
-        is_bio_public: privacySettings.is_bio_public,
-        is_email_public: privacySettings.is_email_public,
-        is_website_public: privacySettings.is_website_public,
-        is_linkedin_public: privacySettings.is_linkedin_public,
-        is_twitter_public: privacySettings.is_twitter_public,
-        is_github_public: privacySettings.is_github_public,
-        is_instagram_public: privacySettings.is_instagram_public,
-        updated_at: new Date().toISOString(),
-      };
-
-      // Use RPC function instead of direct update to bypass RLS policies
+      // Use RPC function to update user profile
+      // The DB function only accepts the parameters it was defined with
       const { error } = await supabase
         .rpc('update_user_bio', {
           p_user_id: user.id,
