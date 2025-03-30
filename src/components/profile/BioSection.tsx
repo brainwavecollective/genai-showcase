@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { User } from '@/types';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -85,6 +84,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
           {isEditing ? 'Cancel' : 'Edit'}
         </Button>
       </CardHeader>
+      
       <CardContent className="space-y-4">
         {isEditing ? (
           <>
