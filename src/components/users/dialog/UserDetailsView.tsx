@@ -1,5 +1,5 @@
 
-import { User } from '@/types';
+import { User, getUserFullName } from '@/types';
 import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';
 import { format } from 'date-fns';
@@ -17,7 +17,7 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
   };
   
   const getFullName = () => {
-    return `${user.first_name || ''} ${user.last_name || ''}`.trim() || 'Not set';
+    return getUserFullName(user);
   };
 
   return (

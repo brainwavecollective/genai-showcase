@@ -13,6 +13,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { useEffect, useState } from 'react';
+import { getUserFullName } from '@/types';
 
 export function UserMenu() {
   const { isAuthenticated, user, logout, isAdmin, isInitializing } = useAuth();
@@ -49,8 +50,9 @@ export function UserMenu() {
   }, [isAuthenticated, user, isAdmin, isInitializing]);
 
   const getInitials = () => {
-    if (localUser?.name) {
-      return localUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    if (localUser) {
+      const fullName = getUserFullName(localUser);
+      return fullName.split(' ').map(n => n[0]).join('').toUpperCase();
     }
     return localUser?.email?.charAt(0).toUpperCase() || 'U';
   };
@@ -89,16 +91,17 @@ export function UserMenu() {
 
   // Show the user menu if authenticated
   if (localIsAuthenticated && localUser) {
-    console.log('Rendering authenticated user menu for', localUser.name || localUser.email, 'isAdmin:', localIsAdmin);
+    const displayName = getUserFullName(localUser);
+    console.log('Rendering authenticated user menu for', displayName, 'isAdmin:', localIsAdmin);
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="flex items-center gap-1">
             <Avatar className="h-6 w-6">
-              <AvatarImage src={localUser?.avatar_url} alt={localUser?.name || 'User'} />
+              <AvatarImage src={localUser?.avatar_url} alt={displayName} />
               <AvatarFallback>{getInitials()}</AvatarFallback>
             </Avatar>
-            <span className="hidden md:inline ml-2">{localUser?.name || localUser?.email}</span>
+            <span className="hidden md:inline ml-2">{displayName || localUser?.email}</span>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">

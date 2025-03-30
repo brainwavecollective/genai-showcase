@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, Plus } from 'lucide-react';
-import { MediaItem } from '@/types';
+import { MediaItem, getUserFullName } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from '@/context/AuthContext';
 
@@ -53,7 +53,7 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
         media_type: mediaType,
         media_url: finalMediaUrl,
         creator_id: user?.id || '',
-        creator_name: user?.name,
+        creator_name: user ? getUserFullName(user) : undefined,
         creator_avatar: user?.avatar_url,
         created_at: new Date().toISOString(),
       };

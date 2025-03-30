@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { User } from '@/types';
+import { User, getUserFullName } from '@/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
@@ -30,7 +30,6 @@ import { Loader2 } from 'lucide-react';
 const profileFormSchema = z.object({
   first_name: z.string().optional(),
   last_name: z.string().optional(),
-  name: z.string().min(1, 'Display name is required'),
   course: z.string().optional(),
   semester: z.string().optional(),
 });
@@ -53,7 +52,6 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
     defaultValues: {
       first_name: user?.first_name || '',
       last_name: user?.last_name || '',
-      name: user?.name || '',
       course: user?.course || '',
       semester: user?.semester || '',
     },
@@ -70,7 +68,6 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
         .update({
           first_name: values.first_name,
           last_name: values.last_name,
-          name: values.name,
           course: values.course,
           semester: values.semester,
           updated_at: new Date().toISOString(),
@@ -112,20 +109,6 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Display Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Display Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}

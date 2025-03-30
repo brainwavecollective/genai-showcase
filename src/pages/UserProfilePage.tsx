@@ -2,9 +2,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { User } from '@/types';
+import { User, getUserFullName } from '@/types';
 import { GetUserByIdResponse } from '@/types/supabase-functions';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
@@ -34,8 +32,9 @@ const UserProfilePage = () => {
 
   // Helper function for initials
   const getInitials = () => {
-    if (user?.name) {
-      return user.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    if (user) {
+      const fullName = getUserFullName(user);
+      return fullName.split(' ').map(n => n[0]).join('').toUpperCase();
     }
     return user?.email?.charAt(0).toUpperCase() || 'U';
   };

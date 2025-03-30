@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { User } from '@/types';
+import { User, getUserFullName } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -24,11 +24,9 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   const getInitials = () => {
-    if (displayUser?.first_name && displayUser?.last_name) {
-      return `${displayUser.first_name[0]}${displayUser.last_name[0]}`.toUpperCase();
-    } 
-    if (displayUser?.name) {
-      return displayUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+    if (displayUser) {
+      const fullName = getUserFullName(displayUser);
+      return fullName.split(' ').map(n => n[0]).join('').toUpperCase();
     }
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
   };
@@ -43,11 +41,11 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <Avatar className="h-24 w-24">
-              <AvatarImage src={displayUser?.avatar_url || ''} alt={displayUser?.name || 'User'} />
+              <AvatarImage src={displayUser?.avatar_url || ''} alt={displayUser ? getUserFullName(displayUser) : 'User'} />
               <AvatarFallback className="text-xl">{getInitials()}</AvatarFallback>
             </Avatar>
           </div>
-          <CardTitle>{displayUser?.name || user?.email?.split('@')[0] || 'User'}</CardTitle>
+          <CardTitle>{displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}</CardTitle>
           <CardDescription>{user?.email}</CardDescription>
           {displayUser?.status && (
             <div className="mt-2 flex justify-center">

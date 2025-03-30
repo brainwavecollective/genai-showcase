@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/context/AuthContext';
 import { MessageSquare } from 'lucide-react';
-import { Comment } from '@/types';
+import { Comment, getUserFullName } from '@/types';
 import { useToast } from "@/hooks/use-toast";
 
 interface CommentSectionProps {
@@ -38,7 +38,7 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
         user_id: user?.id || '1',
         content: newComment,
         created_at: new Date().toISOString(),
-        user_name: user?.name || 'Anonymous',
+        user_name: user ? getUserFullName(user) : 'Anonymous',
         user_avatar: user?.avatar_url,
       };
       

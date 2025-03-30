@@ -1,5 +1,5 @@
 
-import { User, UserStatus } from '@/types';
+import { User, UserStatus, getUserFullName } from '@/types';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { StatusDropdown } from './StatusDropdown';
 import UserActions from './UserActions';
@@ -28,9 +28,7 @@ const UsersTable = ({ users, onDetailsClick, onStatusChange }: UsersTableProps) 
             <TableRow key={user.id}>
               <TableCell>{user.email}</TableCell>
               <TableCell>
-                {user.first_name && user.last_name
-                  ? `${user.first_name} ${user.last_name}`
-                  : user.name || 'Not set'}
+                {getUserFullName(user)}
               </TableCell>
               <TableCell>{user.course || 'Not set'}</TableCell>
               <TableCell>

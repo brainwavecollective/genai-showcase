@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { User, UserRole, UserStatus } from '@/types';
+import { User, UserRole, UserStatus, getUserFullName } from '@/types';
 import { GetUserByIdResponse } from '@/types/supabase-functions';
 
 export function useSessionHandler() {
@@ -20,7 +20,8 @@ export function useSessionHandler() {
     return {
       id: sessionUser.id,
       email: email,
-      name: email.split('@')[0] || 'User',
+      first_name: '',
+      last_name: '',
       role: 'visitor' as UserRole,
       status: 'pending_review' as UserStatus,
       created_at: new Date().toISOString(),
