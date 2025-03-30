@@ -30,6 +30,7 @@ const UserDetailsDialog = ({
   };
   
   const handleSave = (editedUser: Partial<User>) => {
+    console.log('UserDetailsDialog - handleSave called with:', editedUser);
     if (onUserUpdate) {
       onUserUpdate(user.id, editedUser);
     }
@@ -82,9 +83,29 @@ const UserDetailsDialog = ({
           {isEditing ? (
             <Button
               onClick={() => {
-                const formElement = document.querySelector('form');
-                if (formElement) {
-                  formElement.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                // Get the form element from UserDetailsForm
+                const form = document.querySelector('form');
+                if (form) {
+                  // Get the current form data
+                  const formData = new FormData(form);
+                  const userData: Partial<User> = {};
+                  
+                  // Convert form data to user data object
+                  formData.forEach((value, key) => {
+                    if (typeof value === 'string') {
+                      (userData as any)[key] = value;
+                    }
+                  });
+                  
+                  // Pass the collected data to handleSave
+                  handleSave({
+                    first_name: userData.first_name || '',
+                    last_name: userData.last_name || '',
+                    email: userData.email || '',
+                    course: userData.course || '',
+                    semester: userData.semester || '',
+                    notes: userData.notes || ''
+                  });
                 }
               }}
               className="flex items-center gap-1"
