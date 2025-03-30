@@ -1,6 +1,6 @@
 
 import { useState, ChangeEvent, FormEvent } from 'react';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { z } from 'zod';
@@ -12,6 +12,7 @@ interface UseUserFormProps {
 
 export const useUserForm = ({ onSuccess }: UseUserFormProps) => {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState<UserFormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -35,6 +36,9 @@ export const useUserForm = ({ onSuccess }: UseUserFormProps) => {
       return data;
     },
     onSuccess: () => {
+      // Invalidate the users query to trigger a refetch
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      
       toast({
         title: "User Added",
         description: "The user has been added successfully",
