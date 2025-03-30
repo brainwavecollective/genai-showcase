@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, getUserFullName } from "@/types";
 import { Bot } from "lucide-react";
+import { useEffect, useState } from "react";
 
 type ChatMessageProps = {
   content: string;
@@ -13,6 +14,23 @@ type ChatMessageProps = {
 
 export function ChatMessage({ content, isUser, user, isLoading = false }: ChatMessageProps) {
   const displayName = user ? getUserFullName(user) : "You";
+  const [formattedContent, setFormattedContent] = useState<string>(content);
+
+  // Format the content with proper paragraph breaks and lists
+  useEffect(() => {
+    if (!isUser && !isLoading && content) {
+      // Format project listings and numbered lists
+      let formatted = content
+        // Add space after numbered list items (1. Item -> 1. Item)
+        .replace(/(\d+\.)\s*(\w)/g, "$1 $2")
+        // Convert "-" bullet points to proper list items
+        .replace(/\n\s*-\s+/g, "\n• ");
+
+      setFormattedContent(formatted);
+    } else {
+      setFormattedContent(content);
+    }
+  }, [content, isUser, isLoading]);
   
   return (
     <div
@@ -39,9 +57,28 @@ export function ChatMessage({ content, isUser, user, isLoading = false }: ChatMe
         <div className="font-medium">
           {isUser ? displayName : "Project Assistant"}
         </div>
-        <div className={cn("text-sm", isLoading && "animate-pulse")}>
-          {isLoading ? "Thinking..." : content}
-        </div>
+        {isLoading ? (
+          <div className="text-sm animate-pulse">Thinking...</div>
+        ) : (
+          <div className="text-sm whitespace-pre-line">
+            {formattedContent.split('\n').map((paragraph, index) => {
+              // Check if this is a list item
+              const isListItem = paragraph.trim().startsWith('•') || /^\d+\./.test(paragraph.trim());
+              
+              return (
+                <p 
+                  key={index} 
+                  className={cn(
+                    "mb-2", 
+                    isListItem && "pl-2"
+                  )}
+                >
+                  {paragraph}
+                </p>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );
