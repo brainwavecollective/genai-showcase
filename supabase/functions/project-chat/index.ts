@@ -129,12 +129,14 @@ serve(async (req) => {
       throw new Error(`Error fetching public projects: ${projectsError.message}`);
     }
     
+    // Log detailed information about projects to help with debugging
     console.log(`Successfully fetched ${publicProjects?.length || 0} public projects`);
+    console.log('Projects info:', publicProjects?.map(p => ({ id: p.id, title: p.title, tags: p.tag_names })));
     
-    // Format public projects for the system prompt
+    // Format public projects for the system prompt - ensuring ONLY real project data is used
     const projectsInfo = publicProjects?.map(project => {
       return `
-        Project: ${project.title}
+        Project: ${project.title || 'Untitled Project'}
         Description: ${project.description || 'No description provided'}
         Tags: ${project.tag_names?.join(', ') || 'No tags'}
         Creator: ${project.creator_name || 'Unknown'}
@@ -183,6 +185,10 @@ serve(async (req) => {
       Keep your responses concise, informative, and student-friendly.
       Base your responses ONLY on the information provided about the actual projects in the database. 
       If you don't have enough information, suggest what might be relevant or state that you don't have that specific information.
+      
+      IMPORTANT: Never mention or refer to fictional projects like "Interactive Solar System", "Virtual Reality Gallery", 
+      or "Mobile Weather App" unless these projects explicitly exist in the database information provided above.
+      Only discuss the actual projects that are listed in the database information.
     `;
 
     console.log('System prompt created with project information');
