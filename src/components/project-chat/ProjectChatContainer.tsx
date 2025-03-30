@@ -1,12 +1,11 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/components/ui/use-toast';
 import { useAuth } from '@/context/AuthContext';
-import { Project } from '@/types';
 import { MessageList } from './MessageList';
 import { ChatInput } from '@/components/chat/ChatInput';
-import { ProjectList } from './ProjectList';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -35,17 +34,9 @@ export function ProjectChatContainer() {
     },
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [showProjects, setShowProjects] = useState(false);
   const [limitReached, setLimitReached] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
-  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
-
-  // Fetch projects on initial load
-  useEffect(() => {
-    fetchProjects();
-  }, []);
 
   // Helper to sleep for ms milliseconds
   const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -85,21 +76,11 @@ export function ProjectChatContainer() {
     setIsLoading(true);
 
     try {
-      // Create context about available projects
-      let projectContext = "";
-      
-      if (projects.length > 0) {
-        projectContext = "Available projects: \n" + 
-          projects.map(p => 
-            `- ${p.title}: ${p.description?.substring(0, 100) || 'No description'} (Tags: ${p.tag_names?.join(', ') || 'None'})`
-          ).join('\n');
-      }
-
       // Send to Anthropic API via edge function
       const response = await supabase.functions.invoke("project-chat", {
         body: { 
           message: content, 
-          projectContext 
+          projectContext: "General chat assistant for ATLAS Institute Generative AI Showcase" 
         },
       });
 
@@ -117,18 +98,6 @@ export function ProjectChatContainer() {
       // Check if we've hit the daily limit
       if (response.data.response.includes("number of available free chats for today has been exhausted")) {
         setLimitReached(true);
-      }
-
-      // Check if we need to fetch/show projects
-      if (
-        (content.toLowerCase().includes("show") && content.toLowerCase().includes("project")) ||
-        (content.toLowerCase().includes("list") && content.toLowerCase().includes("project")) ||
-        content.toLowerCase().includes("what projects") ||
-        (messages.length === 1 && !projects.length)
-      ) {
-        if (!showProjects) {
-          setShowProjects(true);
-        }
       }
 
       // Replace loading message with AI response
@@ -206,54 +175,6 @@ export function ProjectChatContainer() {
     }
   };
 
-  const fetchProjects = async () => {
-    setIsLoadingProjects(true);
-    try {
-      const { data, error } = await supabase
-        .from("project_details")
-        .select("*")
-        .eq("is_private", false)
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      
-      // Verify projects exist by querying each one
-      if (data && data.length > 0) {
-        const validatedProjects = [];
-        
-        for (const project of data) {
-          if (project && project.id) {
-            // Check if project exists by querying it directly
-            const { data: projectData, error: projectError } = await supabase
-              .from("projects")
-              .select("id")
-              .eq("id", project.id)
-              .single();
-              
-            if (!projectError && projectData) {
-              validatedProjects.push(project);
-            } else {
-              console.log(`Skipping invalid project with ID: ${project.id}`);
-            }
-          }
-        }
-        
-        setProjects(validatedProjects as unknown as Project[]);
-      } else {
-        setProjects([]);
-      }
-    } catch (error) {
-      console.error("Error fetching projects:", error);
-      toast({
-        title: "Error",
-        description: "Failed to load projects",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoadingProjects(false);
-    }
-  };
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -300,16 +221,6 @@ export function ProjectChatContainer() {
         />
         <ChatInput onSend={sendMessage} isLoading={isLoading} disabled={limitReached} />
       </div>
-
-      {showProjects && (
-        <ProjectList 
-          projects={projects}
-          showProjects={showProjects}
-          setShowProjects={setShowProjects}
-          navigate={navigate}
-          isLoading={isLoadingProjects}
-        />
-      )}
     </motion.div>
   );
 }
@@ -356,3 +267,4 @@ function QuickPromptCard({ sendMessage, disabled = false }: { sendMessage: (mess
     </Card>
   );
 }
+
