@@ -1,16 +1,17 @@
 
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { UserPlus, Loader2 } from 'lucide-react';
+import { UserPlus, Loader2, X } from 'lucide-react';
 import UserBasicInfoFields from './UserBasicInfoFields';
 import UserEducationFields from './UserEducationFields';
 import { useUserForm } from './hooks/useUserForm';
 
 interface AddUserFormProps {
   onSuccess: () => void;
+  onCancel: () => void;
 }
 
-const AddUserForm = ({ onSuccess }: AddUserFormProps) => {
+const AddUserForm = ({ onSuccess, onCancel }: AddUserFormProps) => {
   const { 
     formData, 
     errors, 
@@ -42,23 +43,35 @@ const AddUserForm = ({ onSuccess }: AddUserFormProps) => {
         />
       </div>
       
-      <Button 
-        type="submit" 
-        className="w-full md:w-auto"
-        disabled={isSubmitting}
-      >
-        {isSubmitting ? (
-          <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Adding User...
-          </>
-        ) : (
-          <>
-            <UserPlus className="mr-2 h-4 w-4" />
-            Add User
-          </>
-        )}
-      </Button>
+      <div className="flex items-center gap-4">
+        <Button 
+          type="submit" 
+          className="w-full md:w-auto"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Adding User...
+            </>
+          ) : (
+            <>
+              <UserPlus className="mr-2 h-4 w-4" />
+              Add User
+            </>
+          )}
+        </Button>
+        
+        <Button 
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          className="w-full md:w-auto"
+        >
+          <X className="mr-2 h-4 w-4" />
+          Cancel
+        </Button>
+      </div>
     </motion.form>
   );
 };

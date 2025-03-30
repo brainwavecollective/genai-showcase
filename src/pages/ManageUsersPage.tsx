@@ -90,7 +90,10 @@ export function ManageUsersPage() {
         {showAddUserForm ? (
           <div className="bg-card p-6 rounded-lg border">
             <h2 className="text-2xl font-semibold mb-6">Add New User</h2>
-            <AddUserForm onSuccess={handleAddUserSuccess} />
+            <AddUserForm 
+              onSuccess={handleAddUserSuccess} 
+              onCancel={handleCancelAddUser}
+            />
           </div>
         ) : (
           <UserList 
