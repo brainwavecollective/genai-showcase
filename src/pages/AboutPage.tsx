@@ -1,12 +1,12 @@
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+
 import { motion } from 'framer-motion';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
-import { FluidCursor } from '@/components/ui/fluid-cursor'; // Import the FluidCursor component
+import { FluidCursor } from '@/components/ui/fluid-cursor';
+import { Layout } from '@/components/Layout';
 
 const AboutPage = () => {
   return (
-    <div className="min-h-screen flex flex-col relative">
+    <Layout>
       {/* Add FluidCursor as a background element */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <FluidCursor 
@@ -21,9 +21,7 @@ const AboutPage = () => {
         />
       </div>
       
-      <Header />
-      
-      <main className="flex-1 pt-24 pb-16 relative z-10">
+      <div className="pt-24 pb-16 relative z-10">
         <div className="container max-w-4xl mx-auto px-4 md:px-8">
           <motion.div 
             initial={{ opacity: 0, y: 20 }} 
@@ -31,7 +29,7 @@ const AboutPage = () => {
             transition={{ duration: 0.5 }}
             className="bg-background/80 backdrop-blur-sm p-6 rounded-lg shadow-lg"
           >
-            <h1 className="text-4xl md:text-5xl font-display font-bold mb-8 border-b-2 border-cu-gold pb-2">
+            <h1 className="text-4xl md:text-5xl font-display font-bold mb-8 border-b-2 border-cu-gold pb-2 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">
               About the Showcase
             </h1>
             
@@ -50,7 +48,7 @@ const AboutPage = () => {
             </div>
             
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4">Project Origin</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">Project Origin</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
                 Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
@@ -63,7 +61,7 @@ const AboutPage = () => {
             </section>
             
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4">Educational Context</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">Educational Context</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 As part of Professor Schwartz's Generative AI curriculum, this project provided students with 
                 hands-on experience in:
@@ -78,7 +76,7 @@ const AboutPage = () => {
             </section>
             
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4">Student Work Usage Policy</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">Student Work Usage Policy</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 All student projects featured on this platform remain the intellectual property of their respective 
                 creators. Students are wholly responsible for the content they upload to this showcase platform. 
@@ -102,7 +100,7 @@ const AboutPage = () => {
             </section>
             
             <section className="mb-10">
-              <h2 className="text-2xl font-semibold mb-4">Contact Information</h2>
+              <h2 className="text-2xl font-semibold mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">Contact Information</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 For questions regarding this platform, please contact:
               </p>
@@ -124,10 +122,8 @@ const AboutPage = () => {
             </p>
           </motion.div>
         </div>
-      </main>
-      
-      <Footer />
-    </div>
+      </div>
+    </Layout>
   );
 };
 
