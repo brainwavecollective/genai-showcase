@@ -37,7 +37,7 @@ const UserBioPage = () => {
     }
   });
 
-  // Query user's projects - modified to fix the not showing projects issue
+  // Query user's projects - fixing infinite recursion issue by using a direct query
   const { data: userProjects, isLoading: projectsLoading } = useQuery({
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
@@ -45,10 +45,19 @@ const UserBioPage = () => {
       
       console.log('Fetching projects for user ID:', userId);
       
-      // Modified query to properly fetch all projects for this creator
+      // Using public.projects table without joining to users to avoid RLS recursion
       const { data, error } = await supabase
-        .from('projects') // Use projects table directly instead of project_details view
-        .select('*')
+        .from('projects')
+        .select(`
+          id, 
+          title, 
+          description, 
+          cover_image_url, 
+          created_at, 
+          updated_at, 
+          is_private, 
+          creator_id
+        `)
         .eq('creator_id', userId)
         .order('updated_at', { ascending: false });
       
@@ -57,10 +66,19 @@ const UserBioPage = () => {
         throw error;
       }
       
-      console.log('User projects fetched:', data);
-      return data as Project[];
+      // Since we aren't using project_details view, we need to manually add creator_name
+      // But we already have the user's info from the previous query
+      const projectsWithCreatorName = data?.map(project => ({
+        ...project,
+        creator_name: user?.first_name && user?.last_name 
+          ? `${user.first_name} ${user.last_name}`.trim() 
+          : user?.first_name || 'Unknown'
+      }));
+      
+      console.log('User projects fetched:', projectsWithCreatorName);
+      return projectsWithCreatorName as Project[];
     },
-    enabled: !!userId
+    enabled: !!userId && !!user // Only run this query when we have both userId and user data
   });
 
   return (
