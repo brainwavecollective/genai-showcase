@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -21,7 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { PrivacyToggleField } from '@/components/project/PrivacyToggleField';
-import { TagSelector } from '@/components/TagSelector';
+import { TagSelector } from '@/components/project/TagSelector';
 import { Tag } from '@/types';
 
 const formSchema = z.object({
