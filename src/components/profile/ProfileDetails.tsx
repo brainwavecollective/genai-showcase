@@ -35,7 +35,10 @@ export const ProfileDetails = ({ displayUser, user }: ProfileDetailsProps) => {
           
           <div>
             <h3 className="font-medium text-sm text-muted-foreground mb-1">Status</h3>
-            <Badge variant={displayUser.status === 'approved' ? 'success' : 'secondary'} className="capitalize">
+            <Badge 
+              variant={displayUser.status === 'approved' ? 'secondary' : 'outline'} 
+              className={`capitalize ${displayUser.status === 'approved' ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}`}
+            >
               {displayUser.status || 'pending'}
             </Badge>
           </div>
