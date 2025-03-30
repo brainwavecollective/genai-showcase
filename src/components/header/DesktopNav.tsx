@@ -26,7 +26,7 @@ export function DesktopNav() {
       </NavLink>
       <a href="https://brainwavecollective.ai" target="_blank" rel="noopener noreferrer">
         <Button variant="ghost" className="text-base gap-2 group">
-          <Brain className="h-4 w-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:via-purple-500 group-hover:to-pink-500" />
+          <Brain className="h-4 w-4 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:via-purple-500 group-hover:to-pink-500 text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500">
             BWC
           </span>
