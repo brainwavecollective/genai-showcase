@@ -1,9 +1,8 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { User, getUserFullName } from '@/types';
-import { GetUserByIdResponse } from '@/types/supabase-functions';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -19,18 +18,8 @@ const UserProfilePage = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [redirectTriggered, setRedirectTriggered] = useState(false);
   
-  // Redirect if not logged in
-  if (!isAuthenticated) {
-    toast({
-      title: "Access Denied",
-      description: "You must be logged in to view your profile",
-      variant: "destructive",
-    });
-    navigate('/');
-    return null;
-  }
-
   // Helper function for initials
   const getInitials = () => {
     if (user) {
@@ -40,13 +29,12 @@ const UserProfilePage = () => {
     return user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
-  // Fetch full user details using the RPC function to avoid RLS recursion
+  // Always define the query, but only enable it conditionally
   const { data: userDetails, isLoading, error } = useQuery({
     queryKey: ['user', user?.id],
     queryFn: async () => {
       console.log('Fetching user details for ID:', user?.id);
       
-      // Fix: Remove type parameters from rpc call
       const { data, error } = await supabase
         .rpc('get_user_by_id', { user_id: user?.id });
 
@@ -58,9 +46,27 @@ const UserProfilePage = () => {
       console.log('User details fetched successfully:', data);
       return data as unknown as User;
     },
-    enabled: !!user?.id,
+    enabled: !!user?.id && isAuthenticated,
     retry: 1, // Limit retries since we want to show error quickly
   });
+
+  // Use useEffect for navigation instead of conditional rendering
+  useEffect(() => {
+    if (!isAuthenticated && !redirectTriggered) {
+      setRedirectTriggered(true);
+      toast({
+        title: "Access Denied",
+        description: "You must be logged in to view your profile",
+        variant: "destructive",
+      });
+      navigate('/');
+    }
+  }, [isAuthenticated, navigate, toast, redirectTriggered]);
+
+  // If redirect has been triggered, don't render the rest of the component
+  if (!isAuthenticated && redirectTriggered) {
+    return null;
+  }
 
   // Use data from auth context as fallback
   const displayUser = userDetails || user;
