@@ -34,6 +34,9 @@ export function ProjectHeader({
     );
   };
 
+  // Helper to determine if the profile is clickable
+  const hasProfileLink = creator?.id !== undefined && creator?.id !== null;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -81,7 +84,7 @@ export function ProjectHeader({
       )}
       
       <div className="flex items-center justify-center space-x-3 mb-6">
-        {creator?.id ? (
+        {hasProfileLink ? (
           <Link to={`/user/${creator.id}`} className="flex items-center space-x-3">
             <Avatar>
               {creator?.avatar_url && <AvatarImage src={creator.avatar_url} />}

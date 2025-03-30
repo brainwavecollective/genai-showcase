@@ -23,6 +23,10 @@ export function useProjectData(projectId: string | undefined) {
           .single();
 
         if (error) throw error;
+        
+        // Log the project data to debug
+        console.log("Project data from useProjectData:", data);
+        
         setProject(data as unknown as Project);
       } catch (error) {
         console.error("Error fetching project:", error);

@@ -51,6 +51,7 @@ export function useProjectData(projectId: string | undefined) {
         }
         
         setProject(projectData);
+        console.log("Project data in useProjectData:", projectData);
         
         // Fetch tags for this project
         if (projectData.tag_ids?.length) {
@@ -70,6 +71,7 @@ export function useProjectData(projectId: string | undefined) {
             .eq('id', projectData.creator_id)
             .single();
           
+          console.log("Creator data in useProjectData:", creatorData);
           setCreator(creatorData);
         }
         
