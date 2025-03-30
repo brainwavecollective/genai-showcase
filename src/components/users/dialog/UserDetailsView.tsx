@@ -40,7 +40,7 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
         <Label className="text-right font-semibold">Name</Label>
         <div className="col-span-3 flex items-center gap-2">
           {getFullName()}
-          <Button variant="ghost" size="icon" asChild className="h-6 w-6">
+          <Button variant="ghost" size="icon" asChild className="h-6 w-6" title="View bio page">
             <Link to={`/user/${user.id}`}>
               <ExternalLink className="h-4 w-4" />
             </Link>

@@ -22,7 +22,13 @@ BEGIN
       'status', u.status,
       'avatar_url', u.avatar_url,
       'created_at', u.created_at,
-      'updated_at', u.updated_at
+      'updated_at', u.updated_at,
+      'bio', u.bio,
+      'website', u.website,
+      'linkedin', u.linkedin,
+      'twitter', u.twitter,
+      'github', u.github,
+      'instagram', u.instagram
     ) INTO user_data
   FROM
     public.users u

@@ -39,6 +39,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
     setIsLoading(true);
     
     try {
+      // Use Supabase's `from('users')` function to update the user's bio and social links
       const { error } = await supabase
         .from('users')
         .update({
