@@ -28,6 +28,20 @@ export const BioSection = ({ user }: BioSectionProps) => {
     instagram: user?.instagram || '',
   });
 
+  // Update local state when user prop changes
+  useState(() => {
+    if (user) {
+      setBioData({
+        bio: user.bio || '',
+        website: user.website || '',
+        linkedin: user.linkedin || '',
+        twitter: user.twitter || '',
+        github: user.github || '',
+        instagram: user.instagram || '',
+      });
+    }
+  }, [user]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setBioData(prev => ({ ...prev, [name]: value }));
@@ -40,7 +54,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
     
     try {
       // Use the new update_user_bio RPC function instead of direct update
-      const { error } = await supabase
+      const { data, error } = await supabase
         .rpc('update_user_bio', {
           p_user_id: user.id,
           p_bio: bioData.bio,
@@ -52,6 +66,20 @@ export const BioSection = ({ user }: BioSectionProps) => {
         });
         
       if (error) throw error;
+      
+      // Update local state with the returned user data
+      if (data && data.length > 0) {
+        const updatedUser = data[0];
+        // Update user info directly in this component
+        setBioData({
+          bio: updatedUser.bio || '',
+          website: updatedUser.website || '',
+          linkedin: updatedUser.linkedin || '',
+          twitter: updatedUser.twitter || '',
+          github: updatedUser.github || '',
+          instagram: updatedUser.instagram || '',
+        });
+      }
       
       toast({
         title: "Profile updated",
@@ -162,17 +190,17 @@ export const BioSection = ({ user }: BioSectionProps) => {
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-2">Bio</h3>
               <p className="text-sm">
-                {user?.bio || "No bio provided yet."}
+                {bioData.bio || "No bio provided yet."}
               </p>
             </div>
             
-            {(user?.website || user?.linkedin || user?.twitter || user?.github || user?.instagram) && (
+            {(bioData.website || bioData.linkedin || bioData.twitter || bioData.github || bioData.instagram) && (
               <div>
                 <h3 className="text-sm font-medium text-muted-foreground mb-2">Connect</h3>
                 <div className="flex flex-wrap gap-2">
-                  {user?.website && (
+                  {bioData.website && (
                     <a 
-                      href={user.website} 
+                      href={bioData.website} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"
@@ -181,9 +209,9 @@ export const BioSection = ({ user }: BioSectionProps) => {
                     </a>
                   )}
                   
-                  {user?.linkedin && (
+                  {bioData.linkedin && (
                     <a 
-                      href={user.linkedin} 
+                      href={bioData.linkedin} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"
@@ -192,9 +220,9 @@ export const BioSection = ({ user }: BioSectionProps) => {
                     </a>
                   )}
                   
-                  {user?.twitter && (
+                  {bioData.twitter && (
                     <a 
-                      href={user.twitter} 
+                      href={bioData.twitter} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"
@@ -203,9 +231,9 @@ export const BioSection = ({ user }: BioSectionProps) => {
                     </a>
                   )}
                   
-                  {user?.github && (
+                  {bioData.github && (
                     <a 
-                      href={user.github} 
+                      href={bioData.github} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"
@@ -214,9 +242,9 @@ export const BioSection = ({ user }: BioSectionProps) => {
                     </a>
                   )}
                   
-                  {user?.instagram && (
+                  {bioData.instagram && (
                     <a 
-                      href={user.instagram} 
+                      href={bioData.instagram} 
                       target="_blank" 
                       rel="noopener noreferrer"
                       className="text-sm text-primary hover:underline"
