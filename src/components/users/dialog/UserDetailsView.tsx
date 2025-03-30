@@ -4,9 +4,10 @@ import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { UserCircle, School, CalendarDays, ExternalLink, Mail, GraduationCap, Hash, FileText } from 'lucide-react';
+import { UserCircle, School, CalendarDays, ExternalLink, Mail, GraduationCap, Hash, FileText, Globe, Linkedin, Twitter, Github, Instagram } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 
 interface UserDetailsViewProps {
   user: User;
@@ -21,6 +22,9 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
   const getFullName = () => {
     return getUserFullName(user);
   };
+
+  // Check if user has any social profiles
+  const hasSocialProfiles = user.website || user.linkedin || user.twitter || user.github || user.instagram;
 
   return (
     <div className="grid gap-6 py-4">
@@ -68,6 +72,97 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
           </div>
         )}
       </div>
+      
+      {hasSocialProfiles && (
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-muted-foreground">Social Profiles</h3>
+          
+          {user.website && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right font-semibold">Website</Label>
+              <div className="col-span-3 flex items-center">
+                <Globe className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  {user.website}
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {user.linkedin && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right font-semibold">LinkedIn</Label>
+              <div className="col-span-3 flex items-center">
+                <Linkedin className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  LinkedIn Profile
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {user.twitter && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right font-semibold">Twitter</Label>
+              <div className="col-span-3 flex items-center">
+                <Twitter className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.twitter} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Twitter Profile
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {user.github && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right font-semibold">GitHub</Label>
+              <div className="col-span-3 flex items-center">
+                <Github className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  GitHub Profile
+                </a>
+              </div>
+            </div>
+          )}
+          
+          {user.instagram && (
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label className="text-right font-semibold">Instagram</Label>
+              <div className="col-span-3 flex items-center">
+                <Instagram className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:underline"
+                >
+                  Instagram Profile
+                </a>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
       
       <div className="space-y-4">
         <h3 className="text-sm font-medium text-muted-foreground">Education</h3>

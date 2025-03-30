@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,6 +10,7 @@ import { Layout } from '@/components/Layout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 import { ProfileDetails } from '@/components/profile/ProfileDetails';
+import { BioSection } from '@/components/profile/BioSection';
 import { ProfileError } from '@/components/profile/ProfileError';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
 import { Button } from '@/components/ui/button';
@@ -182,6 +182,11 @@ const UserProfilePage = () => {
               <ProfileDetails 
                 displayUser={displayUser} 
                 user={user}
+                isFieldVisible={isFieldVisible}
+              />
+              
+              <BioSection 
+                user={displayUser}
                 isFieldVisible={isFieldVisible}
               />
             </div>

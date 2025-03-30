@@ -65,15 +65,6 @@ export function ProfileDetails({ displayUser, user, isFieldVisible }: ProfileDet
                     <div className="font-medium">{displayUser.email}</div>
                   </div>
                 )}
-                
-                {(isOwnProfile || displayUser.bio) && isFieldVisible('bio') && (
-                  <div className="flex items-start mt-2">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground pt-0.5">Bio:</div>
-                    <div className="font-medium whitespace-pre-wrap text-pretty">
-                      {displayUser.bio || 'No bio added yet'}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
             
@@ -102,81 +93,6 @@ export function ProfileDetails({ displayUser, user, isFieldVisible }: ProfileDet
           </div>
 
           <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-semibold mb-2">Social Profiles</h3>
-              <div className="grid gap-2">
-                {isFieldVisible('website') && displayUser.website && (
-                  <div className="flex items-start">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground">Website:</div>
-                    <a 
-                      href={displayUser.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      {displayUser.website}
-                    </a>
-                  </div>
-                )}
-                
-                {isFieldVisible('linkedin') && displayUser.linkedin && (
-                  <div className="flex items-start">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground">LinkedIn:</div>
-                    <a 
-                      href={displayUser.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      LinkedIn Profile
-                    </a>
-                  </div>
-                )}
-                
-                {isFieldVisible('twitter') && displayUser.twitter && (
-                  <div className="flex items-start">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground">Twitter:</div>
-                    <a 
-                      href={displayUser.twitter} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      Twitter Profile
-                    </a>
-                  </div>
-                )}
-                
-                {isFieldVisible('github') && displayUser.github && (
-                  <div className="flex items-start">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground">GitHub:</div>
-                    <a 
-                      href={displayUser.github} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      GitHub Profile
-                    </a>
-                  </div>
-                )}
-                
-                {isFieldVisible('instagram') && displayUser.instagram && (
-                  <div className="flex items-start">
-                    <div className="w-28 flex-shrink-0 text-sm text-muted-foreground">Instagram:</div>
-                    <a 
-                      href={displayUser.instagram} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="font-medium text-primary hover:underline"
-                    >
-                      Instagram Profile
-                    </a>
-                  </div>
-                )}
-              </div>
-            </div>
-            
             <div>
               <h3 className="text-lg font-semibold mb-2">Account Information</h3>
               <div className="grid gap-2">
