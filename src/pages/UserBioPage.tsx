@@ -119,7 +119,7 @@ const UserBioPage = () => {
                   ))}
                 </div>
               ) : userProjects && userProjects.length > 0 ? (
-                <ProjectGrid projects={userProjects} />
+                <ProjectGrid projects={userProjects} visibleProjects={userProjects} />
               ) : (
                 <div className="text-center py-10 bg-muted/50 rounded-lg">
                   <p className="text-muted-foreground">No public projects available</p>
