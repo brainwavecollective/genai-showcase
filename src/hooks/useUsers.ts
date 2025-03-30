@@ -71,7 +71,7 @@ export function useUsers() {
     },
   });
 
-  // New mutation for updating user information
+  // Mutation for updating user information
   const updateUserInfo = useMutation({
     mutationFn: async (params: { userId: string; userData: Partial<User> }) => {
       console.log(`Updating user ${params.userId} information`, params.userData);
@@ -94,6 +94,8 @@ export function useUsers() {
           console.warn(`Ignoring invalid status: ${params.userData.status}`);
         }
       }
+      
+      console.log('Sending update with validated data:', validUserData);
       
       const { data, error } = await supabase
         .from('users')

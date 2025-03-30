@@ -43,11 +43,12 @@ const UserDetailsDialog = ({
       setEditedUser({
         first_name: user.first_name || '',
         last_name: user.last_name || '',
-        email: user.email,
+        email: user.email || '',
         course: user.course || '',
         semester: user.semester || '',
         notes: user.notes || ''
       });
+      console.log('Initializing edit form with user data:', user);
     }
     setIsEditing(!isEditing);
   };
@@ -59,6 +60,8 @@ const UserDetailsDialog = ({
   
   const handleSave = () => {
     if (onUserUpdate) {
+      // Log the data being saved for debugging
+      console.log('Saving user data:', editedUser);
       onUserUpdate(user.id, editedUser);
     }
     setIsEditing(false);
