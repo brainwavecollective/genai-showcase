@@ -9,7 +9,7 @@ import { File, Image, LinkIcon, Video, FileText } from 'lucide-react';
 interface MediaContentProps {
   selectedMedia: MediaItem | null;
   comments: Comment[];
-  onAddComment: (comment: Comment) => void;
+  onAddComment: (content: string) => void; // Changed to match CommentSection props
 }
 
 export function MediaContent({ selectedMedia, comments, onAddComment }: MediaContentProps) {

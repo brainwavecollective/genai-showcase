@@ -23,7 +23,7 @@ export interface MediaItem {
   project_id: string;
   title: string;
   description?: string;
-  media_type: 'image' | 'video' | 'link' | 'document' | 'text';
+  media_type: 'image' | 'video' | 'link' | 'document' | 'text' | string; // Added generic string to handle db values
   media_url: string;
   thumbnail_url?: string;
   creator_id: string;

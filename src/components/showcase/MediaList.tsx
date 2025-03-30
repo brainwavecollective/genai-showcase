@@ -40,7 +40,8 @@ export function MediaList({
           .order('created_at', { ascending: false });
           
         if (error) throw error;
-        setMediaItems(data || []);
+        // Explicitly cast data as MediaItem[] to handle the media_type field
+        setMediaItems(data as unknown as MediaItem[]);
       } catch (error) {
         console.error('Error fetching media items:', error);
       } finally {
@@ -87,7 +88,7 @@ export function MediaList({
         {showUpload ? (
           <MediaUpload 
             projectId={projectId} 
-            onComplete={handleMediaUploaded} 
+            onMediaAdded={handleMediaUploaded} 
           />
         ) : (
           <Tabs defaultValue="all">

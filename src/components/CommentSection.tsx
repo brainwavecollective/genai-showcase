@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 interface CommentSectionProps {
   comments: Comment[];
   mediaItemId: string;
-  onAddComment: (comment: Comment) => void;
+  onAddComment: (content: string) => void; // Changed from (comment: Comment) => void to match the function implementation
 }
 
 export function CommentSection({ comments, mediaItemId, onAddComment }: CommentSectionProps) {
@@ -29,28 +28,10 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
     
     setIsSubmitting(true);
     
-    // In a real app, this would be an API call
-    setTimeout(() => {
-      // Create new comment with mock data
-      const comment: Comment = {
-        id: `comment-${Date.now()}`,
-        media_item_id: mediaItemId,
-        user_id: user?.id || '1',
-        content: newComment,
-        created_at: new Date().toISOString(),
-        user_name: user ? getUserFullName(user) : 'Anonymous',
-        user_avatar: user?.avatar_url,
-      };
-      
-      onAddComment(comment);
-      setNewComment('');
-      setIsSubmitting(false);
-      
-      toast({
-        title: "Comment Added",
-        description: "Your comment has been posted successfully.",
-      });
-    }, 500);
+    // Pass the content string to the parent component
+    onAddComment(newComment);
+    setNewComment('');
+    setIsSubmitting(false);
   };
 
   // Format date

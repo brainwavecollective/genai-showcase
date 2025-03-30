@@ -87,7 +87,7 @@ const ShowcasePage = () => {
         
         if (mediaItems && mediaItems.length > 0) {
           // Set the first media item as selected by default
-          setSelectedMedia(mediaItems[0]);
+          setSelectedMedia(mediaItems[0] as unknown as MediaItem);
           
           // Fetch comments for the first media item
           fetchComments(mediaItems[0].id);
@@ -157,7 +157,7 @@ const ShowcasePage = () => {
     fetchComments(media.id);
   };
   
-  // Handle adding new comment
+  // Handle adding new comment - Updated to match component expectations
   const handleAddComment = async (content: string) => {
     if (!selectedMedia || !isAuthenticated || !user) {
       toast.error('You must be logged in to comment');
@@ -213,7 +213,7 @@ const ShowcasePage = () => {
           if (data && data.length > 0) {
             // Set the newly added media as selected
             const newMedia = data.find(item => item.id === media.id) || data[0];
-            setSelectedMedia(newMedia);
+            setSelectedMedia(newMedia as unknown as MediaItem);
             fetchComments(newMedia.id);
           }
         });

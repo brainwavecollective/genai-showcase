@@ -13,7 +13,7 @@ import { useAuth } from '@/context/AuthContext';
 
 interface MediaUploadProps {
   projectId: string;
-  onMediaAdded: (media: MediaItem) => void;
+  onMediaAdded: (media: MediaItem) => void; // Changed from onComplete to match how it's called
 }
 
 export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
