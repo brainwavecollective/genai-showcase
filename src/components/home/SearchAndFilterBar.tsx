@@ -1,4 +1,3 @@
-
 import { Search, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -66,7 +65,7 @@ export function SearchAndFilterBar({
   return (
     <div className="mb-8 space-y-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h2 className="text-3xl font-bold">Featured Projects</h2>
+        <h2 className="text-3xl font-bold">Project Gallery</h2>
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input

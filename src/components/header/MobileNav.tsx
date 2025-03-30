@@ -81,8 +81,10 @@ export function MobileNav() {
                   className="flex items-center gap-3 px-4 py-3 text-base hover:bg-muted rounded-md transition-colors"
                   onClick={handleLinkClick}
                 >
-                  <Brain size={20} />
-                  Brain Wave Collective
+                  <Brain className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500" size={20} />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 font-medium">
+                    Brain Wave Collective
+                  </span>
                 </a>
               </li>
             </ul>

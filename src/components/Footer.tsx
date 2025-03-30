@@ -10,7 +10,7 @@ export function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <Link to="/" className="text-xl font-display font-bold tracking-tight hover:opacity-90 transition-opacity">
-              Showcase
+              GenAI Project Gallery
             </Link>
             <p className="mt-2 text-sm text-muted-foreground">
               A showcase for student work from the ATLAS Institute's Generative AI course at CU Boulder.
@@ -29,6 +29,21 @@ export function Footer() {
                 <Link to="/about" className="text-muted-foreground hover:text-foreground transition-colors">
                   About
                 </Link>
+              </li>
+              <li>
+                <Link to="/chat" className="text-muted-foreground hover:text-foreground transition-colors">
+                  Chat
+                </Link>
+              </li>
+              <li>
+                <a 
+                  href="https://brainwavecollective.ai" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:opacity-90 transition-opacity"
+                >
+                  Brain Wave Collective
+                </a>
               </li>
             </ul>
           </div>
