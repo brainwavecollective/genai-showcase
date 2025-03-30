@@ -41,6 +41,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
           <Button 
             size="icon"
             className="fixed bottom-20 right-4 z-50 rounded-full h-14 w-14 shadow-lg flex items-center justify-center bg-primary hover:bg-primary/90"
+            variant="default"
           >
             <Bot className="h-6 w-6" />
           </Button>
@@ -96,21 +97,96 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
   // Desktop version with slide-out panel and resize functionality
   return (
     <>
+      {/* Invisible panel wrapper to prevent the panel from blocking clicks when closed */}
+      <div 
+        className={cn(
+          "fixed inset-y-0 right-0 z-40 pointer-events-none",
+          isOpen ? "w-auto" : "w-0"
+        )}
+      >
+        {/* The sliding chat panel with resize functionality */}
+        <div 
+          className={cn(
+            "h-full pointer-events-auto transition-all duration-300 ease-in-out transform",
+            isOpen ? "translate-x-0" : "translate-x-full"
+          )}
+        >
+          <ResizablePanelGroup direction="horizontal" onLayout={(sizes) => setPanelSize(sizes[0])}>
+            <ResizablePanel 
+              defaultSize={25} 
+              minSize={20} 
+              maxSize={40}
+              className="h-full"
+            >
+              <div className="h-full bg-card border-l shadow-xl flex flex-col">
+                <div className="flex justify-between items-center p-4 border-b">
+                  <h4 className="font-semibold">Project AI Assistant</h4>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="h-8 w-8 p-0" 
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+                
+                <ScrollArea className="flex-1 px-4">
+                  <div className="space-y-2 py-4">
+                    {messages.length === 0 ? (
+                      <p className="text-sm text-muted-foreground p-2">
+                        Ask me anything about this project! I can explain the technologies, features, or implementation details.
+                      </p>
+                    ) : (
+                      messages.map((message) => (
+                        <div 
+                          key={message.id} 
+                          className={`text-sm p-3 rounded-lg ${message.isUser ? 'bg-muted ml-4' : 'bg-primary/10 mr-4'}`}
+                        >
+                          <p className="font-medium text-xs mb-1">{message.isUser ? 'You' : 'AI'}</p>
+                          <p>{message.content}</p>
+                        </div>
+                      ))
+                    )}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+                
+                <div className="border-t p-3">
+                  <ChatInput 
+                    onSend={sendMessage} 
+                    isLoading={isLoading} 
+                    disabled={limitReached} 
+                  />
+                </div>
+              </div>
+            </ResizablePanel>
+            
+            {/* Add a visible resize handle */}
+            <ResizableHandle withHandle className="bg-muted hover:bg-muted-foreground/20">
+              <div className="h-8 w-2 flex items-center justify-center">
+                <GripVertical className="h-4 w-4 text-muted-foreground" />
+              </div>
+            </ResizableHandle>
+          </ResizablePanelGroup>
+        </div>
+      </div>
+
       {/* Toggle button - fixed to the right edge of the screen when closed */}
       <Button
         variant="default" 
         size="sm"
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "fixed right-0 top-1/2 -translate-y-1/2 z-50",
+          "fixed top-1/2 -translate-y-1/2 z-50",
           "h-auto px-2 py-6 rounded-l-md rounded-r-none border border-border shadow-md",
           "flex items-center gap-2",
-          isOpen ? "translate-x-0 bg-secondary hover:bg-secondary/80" : "bg-primary hover:bg-primary/90"
+          isOpen ? "right-[calc(var(--panel-size)*1vw)] bg-secondary hover:bg-secondary/80" : "right-0 bg-primary hover:bg-primary/90"
         )}
         style={{
-          transform: isOpen ? 'translateY(-50%)' : 'translateY(-50%)',
+          '--panel-size': panelSize,
           transition: 'all 0.3s ease'
-        }}
+        } as React.CSSProperties}
       >
         {isOpen ? (
           <ChevronRight className="h-4 w-4" />
@@ -121,72 +197,6 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
           </>
         )}
       </Button>
-      
-      {/* The sliding chat panel with resize functionality */}
-      <div 
-        className={cn(
-          "fixed inset-y-0 right-0 z-40 transition-all duration-300 ease-in-out",
-          isOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <ResizablePanelGroup direction="horizontal" onLayout={(sizes) => setPanelSize(sizes[0])}>
-          <ResizablePanel 
-            defaultSize={25} 
-            minSize={20} 
-            maxSize={40}
-          >
-            <div className="h-full bg-card border-l shadow-xl flex flex-col">
-              <div className="flex justify-between items-center p-4 border-b">
-                <h4 className="font-semibold">Project AI Assistant</h4>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0" 
-                  onClick={() => setIsOpen(false)}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              <ScrollArea className="flex-1 px-4">
-                <div className="space-y-2 py-4">
-                  {messages.length === 0 ? (
-                    <p className="text-sm text-muted-foreground p-2">
-                      Ask me anything about this project! I can explain the technologies, features, or implementation details.
-                    </p>
-                  ) : (
-                    messages.map((message) => (
-                      <div 
-                        key={message.id} 
-                        className={`text-sm p-3 rounded-lg ${message.isUser ? 'bg-muted ml-4' : 'bg-primary/10 mr-4'}`}
-                      >
-                        <p className="font-medium text-xs mb-1">{message.isUser ? 'You' : 'AI'}</p>
-                        <p>{message.content}</p>
-                      </div>
-                    ))
-                  )}
-                  <div ref={messagesEndRef} />
-                </div>
-              </ScrollArea>
-              
-              <div className="border-t p-3">
-                <ChatInput 
-                  onSend={sendMessage} 
-                  isLoading={isLoading} 
-                  disabled={limitReached} 
-                />
-              </div>
-            </div>
-          </ResizablePanel>
-          
-          {/* Add a visible resize handle */}
-          <ResizableHandle withHandle className="bg-muted hover:bg-muted-foreground/20">
-            <div className="h-8 w-2 flex items-center justify-center">
-              <GripVertical className="h-4 w-4 text-muted-foreground" />
-            </div>
-          </ResizableHandle>
-        </ResizablePanelGroup>
-      </div>
     </>
   );
 }
