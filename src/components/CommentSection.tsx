@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -56,6 +55,13 @@ export function CommentSection({ comments, mediaItemId, onAddComment, isLoading 
     });
   };
 
+  // Prevent form submission on Enter key
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -69,6 +75,7 @@ export function CommentSection({ comments, mediaItemId, onAddComment, isLoading 
           <Textarea
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="Add a comment..."
             className="min-h-[100px]"
             disabled={isLoading}

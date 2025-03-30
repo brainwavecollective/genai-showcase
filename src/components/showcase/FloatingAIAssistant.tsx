@@ -25,6 +25,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [panelSize, setPanelSize] = useState(25); // Initial panel size percentage
+  const panelRef = useRef<HTMLDivElement>(null);
   
   // Scroll to bottom when new messages are added
   useEffect(() => {
@@ -32,6 +33,22 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages, isOpen]);
+  
+  // Handle click outside to close the panel
+  useEffect(() => {
+    if (!isOpen) return;
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
   
   // Use different UI components for mobile vs desktop
   if (isMobile) {
@@ -104,6 +121,7 @@ export function FloatingAIAssistant({ projectId }: FloatingAIAssistantProps) {
       <div className="fixed top-24 bottom-0 right-0 z-40 pointer-events-none">
         {/* The actual panel container that slides */}
         <div 
+          ref={panelRef}
           className={cn(
             "h-full pointer-events-auto transition-all duration-300 ease-in-out",
             isOpen ? "translate-x-0" : "translate-x-full"
