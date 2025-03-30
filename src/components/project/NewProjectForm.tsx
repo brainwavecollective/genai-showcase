@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -201,9 +200,8 @@ export function NewProjectForm() {
                   <FormLabel>Tags</FormLabel>
                   <FormControl>
                     <TagSelector
-                      availableTags={availableTags}
-                      selectedTagIds={field.value || []}
-                      onChange={field.onChange}
+                      selectedTags={field.value || []}
+                      onTagsChange={field.onChange}
                     />
                   </FormControl>
                   <FormDescription>
