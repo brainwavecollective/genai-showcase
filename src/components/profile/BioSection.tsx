@@ -81,7 +81,7 @@ export const BioSection = ({ user }: BioSectionProps) => {
           disabled={isLoading}
         >
           {isEditing ? 'Cancel' : <Edit className="h-4 w-4 mr-2" />}
-          {isEditing ? 'Cancel' : 'Edit'}
+          {isEditing ? '' : 'Edit'}
         </Button>
       </CardHeader>
       
