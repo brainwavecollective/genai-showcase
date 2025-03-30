@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -46,13 +47,16 @@ const UserProfilePage = () => {
       
       console.log('User details fetched successfully:', data);
       
-      // Handle legacy profiles that might have name but not first_name/last_name
-      if (data && data.name && (!data.first_name && !data.last_name)) {
+      // Convert the jsonb response to a User object
+      const userData = data as Record<string, any>;
+      
+      // Handle legacy profiles that might have name field but not first_name/last_name
+      if (userData && userData.name && (!userData.first_name && !userData.last_name)) {
         // Move legacy name field into first_name for display
-        data.first_name = data.name;
+        userData.first_name = userData.name;
       }
       
-      return data as unknown as User;
+      return userData as User;
     },
     enabled: !!user?.id && isAuthenticated,
     retry: 1, // Limit retries since we want to show error quickly

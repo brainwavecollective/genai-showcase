@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Comment, MediaItem } from '@/types';
+import { Comment, MediaItem, getUserFullName } from '@/types';
 import { toast } from 'sonner';
 
 export function useCommentOperations(selectedMedia: MediaItem | null) {
@@ -17,7 +17,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         .select(`
           *,
           users:user_id (
-            name,
+            first_name,
+            last_name,
             avatar_url
           )
         `)
@@ -29,7 +30,9 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       // Format comments to match the Comment type
       const formattedComments = commentsData.map((comment: any) => ({
         ...comment,
-        user_name: comment.users?.name || 'Unknown User',
+        user_name: comment.users?.first_name ? 
+          `${comment.users.first_name} ${comment.users.last_name || ''}`.trim() : 
+          'Unknown User',
         user_avatar: comment.users?.avatar_url || null
       }));
       
@@ -60,7 +63,8 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         .select(`
           *,
           users:user_id (
-            name,
+            first_name,
+            last_name,
             avatar_url
           )
         `)
@@ -68,10 +72,12 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       if (error) throw error;
       
-      // Format the new comment
+      // Format the new comment using getUserFullName utility
       const formattedComment = {
         ...data,
-        user_name: data.users?.name || user.name || 'Unknown User',
+        user_name: data.users?.first_name ? 
+          `${data.users.first_name} ${data.users.last_name || ''}`.trim() : 
+          user ? getUserFullName(user) : 'Unknown User',
         user_avatar: data.users?.avatar_url || null
       };
       
