@@ -7,13 +7,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Upload, Plus } from 'lucide-react';
-import { MediaItem, getUserFullName } from '@/types';
-import { useToast } from "@/hooks/use-toast";
+import { MediaItem } from '@/types';
+import { toast } from "sonner";
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MediaUploadProps {
   projectId: string;
-  onMediaAdded: (media: MediaItem) => void; // Changed from onComplete to match how it's called
+  onMediaAdded: (media: MediaItem) => void;
 }
 
 export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
@@ -24,7 +25,6 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
   const [mediaUrl, setMediaUrl] = useState('');
   const [mediaContent, setMediaContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const resetForm = () => {
@@ -35,27 +35,57 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
     setMediaContent('');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user) {
+      toast.error("You must be logged in to add media");
+      return;
+    }
+    
     setIsSubmitting(true);
     
-    // Create media item
-    const finalMediaUrl = mediaType === 'text' ? mediaContent : mediaUrl;
-    
-    // In a real app, this would be an API call
-    setTimeout(() => {
-      // Create new media item with mock ID and creator data
+    try {
+      // Create media item in the database
+      const finalMediaUrl = mediaType === 'text' ? mediaContent : mediaUrl;
+      
+      const { data, error } = await supabase
+        .from('media_items')
+        .insert({
+          project_id: projectId,
+          title,
+          description,
+          media_type: mediaType,
+          media_url: finalMediaUrl,
+          creator_id: user.id
+        })
+        .select('*')
+        .single();
+      
+      if (error) {
+        throw error;
+      }
+      
+      if (!data) {
+        throw new Error('No data returned from insert operation');
+      }
+      
+      // Get creator info for the full media item object
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('first_name, last_name, avatar_url')
+        .eq('id', user.id)
+        .single();
+      
+      if (userError) {
+        console.error('Error fetching user data:', userError);
+      }
+      
+      // Create the media item with creator info
       const newMedia: MediaItem = {
-        id: `new-${Date.now()}`,
-        project_id: projectId,
-        title,
-        description,
-        media_type: mediaType,
-        media_url: finalMediaUrl,
-        creator_id: user?.id || '',
-        creator_name: user ? getUserFullName(user) : undefined,
-        creator_avatar: user?.avatar_url,
-        created_at: new Date().toISOString(),
+        ...data,
+        creator_name: userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() : '',
+        creator_avatar: userData?.avatar_url || null
       };
       
       onMediaAdded(newMedia);
@@ -64,11 +94,12 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       setIsOpen(false);
       resetForm();
       
-      toast({
-        title: "Media Added",
-        description: "Your new media item has been added successfully.",
-      });
-    }, 1000);
+      toast.success("Media added successfully");
+    } catch (error: any) {
+      console.error('Error adding media:', error);
+      toast.error(`Failed to add media: ${error.message || 'Unknown error'}`);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -140,7 +171,7 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
                   required
                 />
                 <p className="text-xs text-muted-foreground">
-                  For demo purposes, enter any valid URL
+                  Enter the URL for your media content
                 </p>
               </div>
             ) : (

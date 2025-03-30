@@ -1,61 +1,37 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { MediaItem } from '@/types';
 import { Card, CardContent } from '@/components/ui/card';
 import { MediaUpload } from '@/components/MediaUpload';
-import { supabase } from '@/integrations/supabase/client';
 import { MediaListHeader } from './media-list/MediaListHeader';
 import { MediaListTabs } from './media-list/MediaListTabs';
 
 interface MediaListProps {
-  mediaItems?: MediaItem[];
+  mediaItems: MediaItem[];
   selectedMedia: MediaItem | null;
   onMediaSelect: (media: MediaItem) => void;
   canEdit: boolean;
   projectId: string;
   onMediaAdded: (media: MediaItem) => void;
+  isLoading?: boolean;
 }
 
 export function MediaList({ 
+  mediaItems,
   selectedMedia, 
   onMediaSelect, 
   canEdit, 
   projectId, 
-  onMediaAdded 
+  onMediaAdded,
+  isLoading = false
 }: MediaListProps) {
-  const [isLoading, setIsLoading] = useState(true);
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [showUpload, setShowUpload] = useState(false);
-
-  useEffect(() => {
-    const fetchMediaItems = async () => {
-      try {
-        setIsLoading(true);
-        const { data, error } = await supabase
-          .from('media_items')
-          .select('*')
-          .eq('project_id', projectId)
-          .order('created_at', { ascending: false });
-          
-        if (error) throw error;
-        // Explicitly cast data as MediaItem[] to handle the media_type field
-        setMediaItems(data as unknown as MediaItem[]);
-      } catch (error) {
-        console.error('Error fetching media items:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchMediaItems();
-  }, [projectId]);
 
   const handleMediaSelect = (media: MediaItem) => {
     onMediaSelect(media);
   };
 
   const handleMediaUploaded = (newMedia: MediaItem) => {
-    setMediaItems(prev => [newMedia, ...prev]);
     onMediaAdded(newMedia);
     setShowUpload(false);
   };

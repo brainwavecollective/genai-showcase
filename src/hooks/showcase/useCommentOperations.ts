@@ -46,7 +46,7 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       if (commentsError) throw commentsError;
       
-      // Fetch user info for each comment using our new security definer function
+      // Fetch user info for each comment using our security definer function
       const formattedComments = await Promise.all(
         commentsData.map(async (comment) => {
           // Use the security definer function to get user info

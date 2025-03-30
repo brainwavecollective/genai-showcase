@@ -14,7 +14,7 @@ export function useShowcaseData(projectId: string | undefined) {
     project, 
     projectTags, 
     creator, 
-    isLoading, 
+    isLoading: projectLoading, 
     error, 
     canEdit, 
     setCanEdit,
@@ -22,7 +22,9 @@ export function useShowcaseData(projectId: string | undefined) {
   } = useProjectData(projectId);
   
   const { 
+    mediaItems,
     selectedMedia, 
+    isLoading: mediaLoading,
     handleMediaSelect, 
     handleAddMedia 
   } = useMediaOperations(projectId);
@@ -57,11 +59,14 @@ export function useShowcaseData(projectId: string | undefined) {
     }
   };
 
+  const isLoading = projectLoading || mediaLoading;
+
   return {
     project,
     projectTags,
     creator,
     selectedMedia,
+    mediaItems,
     comments,
     isLoading,
     error,

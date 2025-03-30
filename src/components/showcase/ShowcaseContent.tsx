@@ -1,5 +1,5 @@
 
-import { Project, MediaItem, Comment, Tag } from '@/types';
+import { Project, MediaItem, Comment } from '@/types';
 import { MediaList } from './MediaList';
 import { MediaContent } from './MediaContent';
 
@@ -11,6 +11,8 @@ interface ShowcaseContentProps {
   onMediaSelect: (media: MediaItem) => void;
   onAddComment: (content: string) => void;
   onMediaAdded: (media: MediaItem) => void;
+  mediaItems: MediaItem[];
+  isLoading?: boolean;
 }
 
 export function ShowcaseContent({
@@ -20,19 +22,22 @@ export function ShowcaseContent({
   canEdit,
   onMediaSelect,
   onAddComment,
-  onMediaAdded
+  onMediaAdded,
+  mediaItems,
+  isLoading = false
 }: ShowcaseContentProps) {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Sidebar with media items list */}
       <div className="lg:col-span-1 order-2 lg:order-1">
         <MediaList 
-          mediaItems={project.mediaItems || []}
+          mediaItems={mediaItems}
           selectedMedia={selectedMedia}
           onMediaSelect={onMediaSelect}
           canEdit={canEdit}
           projectId={project.id}
           onMediaAdded={onMediaAdded}
+          isLoading={isLoading}
         />
       </div>
       

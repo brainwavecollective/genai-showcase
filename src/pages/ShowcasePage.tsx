@@ -20,6 +20,7 @@ const ShowcasePage = () => {
     projectTags,
     creator,
     selectedMedia,
+    mediaItems,
     comments,
     isLoading,
     error,
@@ -73,11 +74,13 @@ const ShowcasePage = () => {
           <ShowcaseContent
             project={project}
             selectedMedia={selectedMedia}
+            mediaItems={mediaItems}
             comments={comments}
             canEdit={canEdit}
             onMediaSelect={handleMediaSelect}
             onAddComment={handleAddComment}
             onMediaAdded={handleAddMedia}
+            isLoading={isLoading}
           />
           
           {/* Last updated date at the bottom */}
