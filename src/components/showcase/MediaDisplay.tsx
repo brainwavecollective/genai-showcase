@@ -1,12 +1,25 @@
 
 import { MediaItem } from '@/types';
 import { File, Image, LinkIcon, Video, FileText } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface MediaDisplayProps {
   media: MediaItem;
+  error?: string | null;
 }
 
-export function MediaDisplay({ media }: MediaDisplayProps) {
+export function MediaDisplay({ media, error }: MediaDisplayProps) {
+  // If there's an error, display it
+  if (error) {
+    return (
+      <Alert variant="destructive" className="my-4">
+        <AlertDescription>
+          Error loading media: {error}
+        </AlertDescription>
+      </Alert>
+    );
+  }
+
   switch (media.media_type) {
     case 'image':
       return (
@@ -15,6 +28,10 @@ export function MediaDisplay({ media }: MediaDisplayProps) {
             src={media.media_url} 
             alt={media.title} 
             className="max-w-full max-h-[500px] object-contain"
+            onError={(e) => {
+              e.currentTarget.src = '/placeholder.svg';
+              e.currentTarget.classList.add('p-8');
+            }}
           />
         </div>
       );
