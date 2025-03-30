@@ -13,6 +13,7 @@ import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 import { ProfileDetails } from '@/components/profile/ProfileDetails';
 import { ProfileError } from '@/components/profile/ProfileError';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
+import { BioSection } from '@/components/profile/BioSection';
 
 const UserProfilePage = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -109,7 +110,10 @@ const UserProfilePage = () => {
               isAdmin={isAdmin} 
               onLogout={logout} 
             />
-            <ProfileDetails displayUser={displayUser} user={user} />
+            <div className="md:col-span-2 space-y-6">
+              <ProfileDetails displayUser={displayUser} user={user} />
+              <BioSection user={displayUser} />
+            </div>
           </div>
         </motion.div>
       </main>

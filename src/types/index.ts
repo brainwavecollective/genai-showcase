@@ -1,4 +1,3 @@
-
 export type UserRole = 'admin' | 'creator' | 'visitor' | 'member'; // Added 'member' to match the options
 export type UserStatus = 'pending_review' | 'approved' | 'denied' | 'active' | 'suspended'; // Added 'active' and 'suspended' to match the UI options
 
@@ -16,6 +15,13 @@ export interface User {
   avatar_url?: string;
   created_at?: string;
   updated_at?: string;
+  // Add new bio and social fields
+  bio?: string;
+  website?: string;
+  linkedin?: string;
+  twitter?: string;
+  github?: string;
+  instagram?: string;
 }
 
 export interface MediaItem {

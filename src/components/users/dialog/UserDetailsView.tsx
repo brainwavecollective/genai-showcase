@@ -4,7 +4,9 @@ import { Label } from '@/components/ui/label';
 import UserStatusBadge from '../UserStatusBadge';
 import { format } from 'date-fns';
 import { Badge } from '@/components/ui/badge';
-import { UserCircle, School, CalendarDays } from 'lucide-react';
+import { UserCircle, School, CalendarDays, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 interface UserDetailsViewProps {
   user: User;
@@ -36,8 +38,13 @@ const UserDetailsView = ({ user }: UserDetailsViewProps) => {
       
       <div className="grid grid-cols-4 items-center gap-4">
         <Label className="text-right font-semibold">Name</Label>
-        <div className="col-span-3">
+        <div className="col-span-3 flex items-center gap-2">
           {getFullName()}
+          <Button variant="ghost" size="icon" asChild className="h-6 w-6">
+            <Link to={`/user/${user.id}`}>
+              <ExternalLink className="h-4 w-4" />
+            </Link>
+          </Button>
         </div>
       </div>
       

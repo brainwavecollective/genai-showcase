@@ -10,6 +10,7 @@ import ShowcasePage from "./pages/ShowcasePage";
 import NotFound from "./pages/NotFound";
 import ManageUsersPage from "./pages/ManageUsersPage";
 import UserProfilePage from "./pages/UserProfilePage";
+import UserBioPage from "./pages/UserBioPage";
 import AboutPage from "./pages/AboutPage";
 import TermsPage from "./pages/TermsPage";
 import ChatPage from "./pages/ChatPage";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/manage-users" element={<ManageUsersPage />} />
               <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/user/:userId" element={<UserBioPage />} />
               <Route path="/about" element={<AboutPage />} />
               <Route path="/terms" element={<TermsPage />} />
               {/* Redirect /login to home page since there's no actual login page route */}
