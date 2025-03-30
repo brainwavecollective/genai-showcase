@@ -118,7 +118,7 @@ serve(async (req) => {
 
     console.log('Received request for project chat:', { message, projectContext });
 
-    // Fetch public projects for context - ALWAYS do this regardless of whether projectContext is provided
+    // Fetch public projects with improved logging
     const { data: publicProjects, error: projectsError } = await supabase
       .from('project_details')
       .select('*')
@@ -126,7 +126,10 @@ serve(async (req) => {
     
     if (projectsError) {
       console.error('Error fetching public projects:', projectsError);
+      throw new Error(`Error fetching public projects: ${projectsError.message}`);
     }
+    
+    console.log(`Successfully fetched ${publicProjects?.length || 0} public projects`);
     
     // Format public projects for the system prompt
     const projectsInfo = publicProjects?.map(project => {
@@ -138,8 +141,6 @@ serve(async (req) => {
         Created: ${project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
       `;
     }).join('\n') || 'No public projects available';
-    
-    console.log(`Found ${publicProjects?.length || 0} public projects for context`);
     
     // About page information for context
     const aboutPageInfo = `
@@ -180,7 +181,8 @@ serve(async (req) => {
       If asked about unrelated topics, politely redirect the conversation to the showcase platform.
       
       Keep your responses concise, informative, and student-friendly.
-      Base your responses on the information provided. If you don't have enough information, suggest what might be relevant.
+      Base your responses ONLY on the information provided about the actual projects in the database. 
+      If you don't have enough information, suggest what might be relevant or state that you don't have that specific information.
     `;
 
     console.log('System prompt created with project information');
