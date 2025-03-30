@@ -1,63 +1,105 @@
 
 import { User, getUserFullName } from '@/types';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CalendarDays, Clock, Graduation, School, Hash } from 'lucide-react';
+import { format } from 'date-fns';
 
 interface ProfileDetailsProps {
   displayUser: User | null;
   user: User | null;
+  isFieldVisible: (field: string) => boolean;
 }
 
-export const ProfileDetails = ({ displayUser, user }: ProfileDetailsProps) => {
+export function ProfileDetails({ displayUser, user, isFieldVisible }: ProfileDetailsProps) {
+  const isOwnProfile = user?.id === displayUser?.id;
+  
   if (!displayUser) return null;
   
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'n/a';
+    return format(new Date(dateString), 'MMMM dd, yyyy');
+  };
+  
+  // Display only first name if last name is private
+  const displayName = () => {
+    if (!displayUser) return 'User';
+    
+    const firstName = displayUser.first_name || '';
+    const lastName = isFieldVisible('last_name') ? displayUser.last_name || '' : '';
+    
+    return (firstName + (lastName ? ' ' + lastName : '')).trim() || displayUser.email?.split('@')[0] || 'User';
+  };
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Private Profile Details</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h3 className="font-medium text-sm text-muted-foreground mb-1">Full Name</h3>
-            <p>{getUserFullName(displayUser)}</p>
-          </div>
-          
-          <div>
-            <h3 className="font-medium text-sm text-muted-foreground mb-1">Email</h3>
-            <p>{displayUser.email}</p>
-          </div>
-          
-          <div>
-            <h3 className="font-medium text-sm text-muted-foreground mb-1">Role</h3>
-            <Badge variant="outline" className="capitalize">{displayUser.role || 'visitor'}</Badge>
-          </div>
-          
-          <div>
-            <h3 className="font-medium text-sm text-muted-foreground mb-1">Status</h3>
+        <CardTitle className="flex items-center justify-between">
+          <span>Profile Details</span>
+          {displayUser.role && (
             <Badge 
-              variant={displayUser.status === 'approved' ? 'secondary' : 'outline'} 
-              className={`capitalize ${displayUser.status === 'approved' ? 'bg-green-100 text-green-800 hover:bg-green-200' : ''}`}
+              variant="secondary"
+              className={displayUser.role === 'admin' ? 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200' : ''}
             >
-              {displayUser.status || 'pending'}
+              {displayUser.role}
             </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">Full Name</p>
+            <p className="font-medium">{displayName()}</p>
           </div>
           
-          {displayUser.course && (
-            <div>
-              <h3 className="font-medium text-sm text-muted-foreground mb-1">Course</h3>
-              <p>{displayUser.course}</p>
+          {isFieldVisible('email') && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground">Email</p>
+              <p className="font-medium">{displayUser.email}</p>
             </div>
           )}
           
-          {displayUser.semester && (
-            <div>
-              <h3 className="font-medium text-sm text-muted-foreground mb-1">Semester</h3>
-              <p>{displayUser.semester}</p>
+          {(isOwnProfile || displayUser.course) && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground flex items-center">
+                <School className="h-4 w-4 mr-1" /> Course
+              </p>
+              <p className="font-medium">{displayUser.course || 'Not set'}</p>
             </div>
           )}
+          
+          {(isOwnProfile || displayUser.semester) && (
+            <div className="space-y-1">
+              <p className="text-sm text-muted-foreground flex items-center">
+                <Graduation className="h-4 w-4 mr-1" /> Semester
+              </p>
+              <p className="font-medium">{displayUser.semester || 'Not set'}</p>
+            </div>
+          )}
+          
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground flex items-center">
+              <CalendarDays className="h-4 w-4 mr-1" /> Joined
+            </p>
+            <p className="font-medium">{formatDate(displayUser.created_at)}</p>
+          </div>
+          
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground flex items-center">
+              <Clock className="h-4 w-4 mr-1" /> Last Updated
+            </p>
+            <p className="font-medium">{formatDate(displayUser.updated_at)}</p>
+          </div>
+          
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground flex items-center">
+              <Hash className="h-4 w-4 mr-1" /> ID
+            </p>
+            <p className="font-medium text-xs text-muted-foreground truncate">{displayUser.id}</p>
+          </div>
         </div>
       </CardContent>
     </Card>
   );
-};
+}

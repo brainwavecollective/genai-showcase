@@ -26,7 +26,10 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Separator } from '@/components/ui/separator';
 import { Loader2 } from 'lucide-react';
+import { PrivacyToggleField } from '@/components/project/PrivacyToggleField';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const privateProfileFormSchema = z.object({
   first_name: z.string().optional(),
@@ -48,6 +51,18 @@ const publicBioFormSchema = z.object({
 type PrivateProfileFormValues = z.infer<typeof privateProfileFormSchema>;
 type PublicBioFormValues = z.infer<typeof publicBioFormSchema>;
 
+interface PrivacySettings {
+  is_last_name_public: boolean;
+  is_avatar_public: boolean;
+  is_bio_public: boolean;
+  is_email_public: boolean;
+  is_website_public: boolean;
+  is_linkedin_public: boolean;
+  is_twitter_public: boolean;
+  is_github_public: boolean;
+  is_instagram_public: boolean;
+}
+
 interface EditProfileDialogProps {
   user: User | null;
   isOpen: boolean;
@@ -55,10 +70,24 @@ interface EditProfileDialogProps {
   onClose: () => void;
 }
 
-export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDialogProps) {
+export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('profile');
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Default privacy settings (can be updated from user data when available)
+  const [privacySettings, setPrivacySettings] = useState<PrivacySettings>({
+    is_last_name_public: false,
+    is_avatar_public: true,
+    is_bio_public: true,
+    is_email_public: false,
+    is_website_public: true,
+    is_linkedin_public: true,
+    is_twitter_public: true,
+    is_github_public: true,
+    is_instagram_public: true,
+  });
 
   const privateForm = useForm<PrivateProfileFormValues>({
     resolver: zodResolver(privateProfileFormSchema),
@@ -83,6 +112,13 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
     },
   });
 
+  const handlePrivacyToggle = (field: keyof PrivacySettings) => (isPublic: boolean) => {
+    setPrivacySettings(prev => ({
+      ...prev,
+      [field]: isPublic,
+    }));
+  };
+
   async function onSubmitPrivate(values: PrivateProfileFormValues) {
     if (!user?.id) return;
     
@@ -97,6 +133,9 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
           course: values.course,
           semester: values.semester,
           updated_at: new Date().toISOString(),
+          // Add privacy settings
+          is_last_name_public: privacySettings.is_last_name_public,
+          is_avatar_public: privacySettings.is_avatar_public,
         })
         .eq('id', user.id);
 
@@ -107,7 +146,7 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
       
       toast({
         title: "Profile updated",
-        description: "Your private profile has been updated successfully.",
+        description: "Your profile and privacy settings have been updated successfully.",
       });
       
       onClose();
@@ -129,16 +168,29 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
     setIsLoading(true);
     
     try {
-      const { error } = await supabase.rpc('update_user_bio', {
-        p_user_id: user.id,
-        p_bio: values.bio || '',
-        p_email: values.email || user.email,
-        p_website: values.website || '',
-        p_linkedin: values.linkedin || '',
-        p_twitter: values.twitter || '',
-        p_github: values.github || '',
-        p_instagram: values.instagram || '',
-      });
+      // Create an object with all the values we want to update
+      const updateData = {
+        bio: values.bio || '',
+        email: values.email || user.email,
+        website: values.website || '',
+        linkedin: values.linkedin || '',
+        twitter: values.twitter || '',
+        github: values.github || '',
+        instagram: values.instagram || '',
+        // Add privacy settings
+        is_bio_public: privacySettings.is_bio_public,
+        is_email_public: privacySettings.is_email_public,
+        is_website_public: privacySettings.is_website_public,
+        is_linkedin_public: privacySettings.is_linkedin_public,
+        is_twitter_public: privacySettings.is_twitter_public,
+        is_github_public: privacySettings.is_github_public,
+        is_instagram_public: privacySettings.is_instagram_public,
+      };
+
+      const { error } = await supabase
+        .from('users')
+        .update(updateData)
+        .eq('id', user.id);
 
       if (error) throw error;
 
@@ -147,7 +199,7 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
       
       toast({
         title: "Bio updated",
-        description: "Your public bio has been updated successfully.",
+        description: "Your public bio and privacy settings have been updated successfully.",
       });
       
       onClose();
@@ -165,26 +217,29 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{mode === 'private' ? 'Edit Private Profile' : 'Edit Public Bio'}</DialogTitle>
+          <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
-            {mode === 'private' 
-              ? 'Update your private profile information below.'
-              : 'Update your public bio and social links.'}
+            Update your profile information and privacy settings below.
           </DialogDescription>
         </DialogHeader>
         
-        {mode === 'private' ? (
-          <Form {...privateForm}>
-            <form onSubmit={privateForm.handleSubmit(onSubmitPrivate)} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="links">Bio & Links</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="profile" className="space-y-4 py-4">
+            <Form {...privateForm}>
+              <form onSubmit={privateForm.handleSubmit(onSubmitPrivate)} className="space-y-4">
                 <FormField
                   control={privateForm.control}
                   name="first_name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>First Name</FormLabel>
+                      <FormLabel>First Name <span className="text-xs text-muted-foreground">(Always public)</span></FormLabel>
                       <FormControl>
                         <Input placeholder="First Name" {...field} />
                       </FormControl>
@@ -193,177 +248,257 @@ export function EditProfileDialog({ user, isOpen, mode, onClose }: EditProfileDi
                   )}
                 />
                 
+                <div className="grid gap-4 items-start">
+                  <FormField
+                    control={privateForm.control}
+                    name="last_name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Last Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Last Name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <PrivacyToggleField
+                    label="Last Name Visibility"
+                    isPublic={privacySettings.is_last_name_public}
+                    onChange={handlePrivacyToggle('is_last_name_public')}
+                  />
+                </div>
+                
+                <PrivacyToggleField
+                  label="Profile Photo Visibility"
+                  isPublic={privacySettings.is_avatar_public}
+                  onChange={handlePrivacyToggle('is_avatar_public')}
+                />
+                
+                <Separator className="my-4" />
+                
                 <FormField
                   control={privateForm.control}
-                  name="last_name"
+                  name="course"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Last Name</FormLabel>
+                      <FormLabel>Course <span className="text-xs text-muted-foreground">(Private info)</span></FormLabel>
                       <FormControl>
-                        <Input placeholder="Last Name" {...field} />
+                        <Input placeholder="Your Course" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              </div>
-              
-              <FormField
-                control={privateForm.control}
-                name="course"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Course</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Your Course" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={privateForm.control}
-                name="semester"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Semester</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Current Semester" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        ) : (
-          <Form {...publicForm}>
-            <form onSubmit={publicForm.handleSubmit(onSubmitPublic)} className="space-y-4">
-              <FormField
-                control={publicForm.control}
-                name="bio"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Bio</FormLabel>
-                    <FormControl>
-                      <Textarea 
-                        placeholder="Tell us about yourself" 
-                        className="resize-y min-h-[100px]"
-                        {...field} 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Public Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="your@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="website"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Website</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://yourwebsite.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="linkedin"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>LinkedIn</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://linkedin.com/in/yourusername" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="twitter"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Twitter</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://twitter.com/yourusername" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="github"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GitHub</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://github.com/yourusername" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={publicForm.control}
-                name="instagram"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Instagram</FormLabel>
-                    <FormControl>
-                      <Input placeholder="https://instagram.com/yourusername" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
-                  Cancel
-                </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                  Save Changes
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        )}
+                
+                <FormField
+                  control={privateForm.control}
+                  name="semester"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Semester <span className="text-xs text-muted-foreground">(Private info)</span></FormLabel>
+                      <FormControl>
+                        <Input placeholder="Current Semester" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </TabsContent>
+          
+          <TabsContent value="links" className="space-y-4 py-4">
+            <Form {...publicForm}>
+              <form onSubmit={publicForm.handleSubmit(onSubmitPublic)} className="space-y-4">
+                <div className="grid gap-4 items-start">
+                  <FormField
+                    control={publicForm.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bio</FormLabel>
+                        <FormControl>
+                          <Textarea 
+                            placeholder="Tell us about yourself" 
+                            className="resize-y min-h-[100px]"
+                            {...field} 
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <PrivacyToggleField
+                    label="Bio Visibility"
+                    isPublic={privacySettings.is_bio_public}
+                    onChange={handlePrivacyToggle('is_bio_public')}
+                  />
+                </div>
+                
+                <Separator className="my-4" />
+                
+                <div className="space-y-4">
+                  <h3 className="text-sm font-medium">Contact & Social Links</h3>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="your@email.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="Email Visibility"
+                      isPublic={privacySettings.is_email_public}
+                      onChange={handlePrivacyToggle('is_email_public')}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="website"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Website</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://yourwebsite.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="Website Visibility"
+                      isPublic={privacySettings.is_website_public}
+                      onChange={handlePrivacyToggle('is_website_public')}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="linkedin"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>LinkedIn</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://linkedin.com/in/yourusername" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="LinkedIn Visibility"
+                      isPublic={privacySettings.is_linkedin_public}
+                      onChange={handlePrivacyToggle('is_linkedin_public')}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="twitter"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Twitter</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://twitter.com/yourusername" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="Twitter Visibility"
+                      isPublic={privacySettings.is_twitter_public}
+                      onChange={handlePrivacyToggle('is_twitter_public')}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="github"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GitHub</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://github.com/yourusername" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="GitHub Visibility"
+                      isPublic={privacySettings.is_github_public}
+                      onChange={handlePrivacyToggle('is_github_public')}
+                    />
+                  </div>
+                  
+                  <div className="grid gap-4 items-start">
+                    <FormField
+                      control={publicForm.control}
+                      name="instagram"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Instagram</FormLabel>
+                          <FormControl>
+                            <Input placeholder="https://instagram.com/yourusername" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <PrivacyToggleField
+                      label="Instagram Visibility"
+                      isPublic={privacySettings.is_instagram_public}
+                      onChange={handlePrivacyToggle('is_instagram_public')}
+                    />
+                  </div>
+                </div>
+                
+                <DialogFooter>
+                  <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isLoading}>
+                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    Save Changes
+                  </Button>
+                </DialogFooter>
+              </form>
+            </Form>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   );

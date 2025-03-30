@@ -1,147 +1,123 @@
 
-import { useState } from 'react';
 import { User, getUserFullName } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import UserStatusBadge from '@/components/users/UserStatusBadge';
-import { Pencil, UserCircle, School, CalendarDays, Globe } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
-import { EditProfileDialog } from './EditProfileDialog';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { LogOut, User as UserIcon, UserCog } from 'lucide-react';
+import { useState } from 'react';
+import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
 
 interface ProfileSidebarProps {
   user: User | null;
   displayUser: User | null;
   isAdmin: boolean;
   onLogout: () => void;
+  isFieldVisible: (field: string) => boolean;
 }
 
-export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: ProfileSidebarProps) => {
-  const navigate = useNavigate();
-  const isMobile = useIsMobile();
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+export function ProfileSidebar({ user, displayUser, isAdmin, onLogout, isFieldVisible }: ProfileSidebarProps) {
   const [editMode, setEditMode] = useState<'private' | 'public'>('private');
-
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  const isOwnProfile = user?.id === displayUser?.id;
+  const canEdit = isOwnProfile || isAdmin;
+  
   const getInitials = () => {
     if (displayUser) {
-      const fullName = getUserFullName(displayUser);
-      return fullName.split(' ').map(n => n[0]).join('').toUpperCase();
+      const firstName = displayUser.first_name || '';
+      // Only include last name initial if it's public or viewing own profile
+      const lastName = isFieldVisible('last_name') && displayUser.last_name 
+        ? displayUser.last_name 
+        : '';
+      
+      if (firstName || lastName) {
+        return (firstName.charAt(0) + (lastName ? lastName.charAt(0) : '')).toUpperCase();
+      }
     }
     return displayUser?.email?.charAt(0).toUpperCase() || 'U';
   };
-
-  const handleEditProfile = (mode: 'private' | 'public') => {
-    setEditMode(mode);
-    setIsEditDialogOpen(true);
+  
+  const handleEditPrivate = () => {
+    setEditMode('private');
+    setIsDialogOpen(true);
   };
-
-  const isViewingSelf = user?.id === displayUser?.id;
-
+  
+  const handleEditPublic = () => {
+    setEditMode('public');
+    setIsDialogOpen(true);
+  };
+  
   return (
-    <>
-      <Card className="md:col-span-1">
-        <CardHeader className="text-center">
-          <div className="flex justify-center mb-4">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={displayUser?.avatar_url || ''} alt={displayUser ? getUserFullName(displayUser) : 'User'} />
-              <AvatarFallback className="text-xl">{getInitials()}</AvatarFallback>
-            </Avatar>
-          </div>
-          
-          {isViewingSelf ? (
-            <CardTitle>{displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}</CardTitle>
-          ) : (
-            <CardTitle>
-              <Link 
-                to={displayUser ? `/user/${displayUser.id}` : '#'} 
-                className="hover:underline"
-              >
-                {displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}
-              </Link>
-            </CardTitle>
-          )}
-          
-          <CardDescription>{user?.email}</CardDescription>
-          {displayUser?.status && (
-            <div className="mt-2 flex justify-center">
-              <UserStatusBadge status={displayUser.status} />
-            </div>
-          )}
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center">
-              <UserCircle className="h-4 w-4 mr-2 text-muted-foreground" />
-              <span className="font-medium">Role:</span>
-              <Badge variant="outline" className="ml-2 capitalize">
-                {displayUser?.role || 'visitor'}
-              </Badge>
-            </div>
-            
-            {displayUser?.course && (
-              <div className="flex items-center">
-                <School className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="font-medium">Course:</span>
-                <span className="ml-2">{displayUser.course}</span>
-              </div>
+    <Card>
+      <CardHeader className="relative">
+        <div className="flex flex-col items-center">
+          <Avatar className="h-24 w-24 mb-4">
+            {isFieldVisible('avatar') && displayUser?.avatar_url && (
+              <AvatarImage src={displayUser.avatar_url} alt={getUserFullName(displayUser)} />
             )}
-            
-            {displayUser?.semester && (
-              <div className="flex items-center">
-                <CalendarDays className="h-4 w-4 mr-2 text-muted-foreground" />
-                <span className="font-medium">Semester:</span>
-                <span className="ml-2">{displayUser.semester}</span>
-              </div>
-            )}
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => handleEditProfile('private')}
-          >
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit Private Profile
-          </Button>
+            <AvatarFallback className="text-xl">{getInitials()}</AvatarFallback>
+          </Avatar>
           
-          <Button 
-            variant="outline" 
-            className="w-full"
-            onClick={() => handleEditProfile('public')}
-          >
-            <Globe className="h-4 w-4 mr-2" />
-            Edit Public Bio
-          </Button>
+          <CardTitle className="text-center">
+            {displayUser?.first_name || 'User'}{' '}
+            {isFieldVisible('last_name') && displayUser?.last_name}
+          </CardTitle>
           
-          {isAdmin && (
-            <Button 
-              variant="outline"
-              className="w-full" 
-              onClick={() => navigate('/manage-users')}
-            >
-              Manage Users
-            </Button>
-          )}
-          
-          <Button 
-            variant="outline" 
-            className="w-full text-destructive hover:text-destructive"
-            onClick={onLogout}
-          >
-            Logout
-          </Button>
-        </CardFooter>
-      </Card>
+          <CardDescription className="text-center">
+            {displayUser?.email}
+          </CardDescription>
+        </div>
+      </CardHeader>
       
-      <EditProfileDialog 
-        user={user} 
-        isOpen={isEditDialogOpen}
-        mode={editMode}
-        onClose={() => setIsEditDialogOpen(false)} 
-      />
-    </>
+      <CardContent className="space-y-4">
+        {canEdit && (
+          <div className="flex flex-col space-y-2">
+            <Button 
+              variant="outline" 
+              className="w-full justify-start" 
+              onClick={handleEditPrivate}
+            >
+              <UserCog className="mr-2 h-4 w-4" />
+              Edit Private Profile
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full justify-start" 
+              onClick={handleEditPublic}
+            >
+              <UserIcon className="mr-2 h-4 w-4" />
+              Edit Public Bio
+            </Button>
+            
+            {isOwnProfile && (
+              <Button 
+                variant="outline" 
+                className="w-full justify-start text-destructive" 
+                onClick={onLogout}
+              >
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
+              </Button>
+            )}
+          </div>
+        )}
+        
+        {isAdmin && !isOwnProfile && (
+          <p className="text-sm bg-muted p-2 rounded-md">
+            <span className="font-medium">Admin note:</span> You're viewing this profile as an administrator.
+          </p>
+        )}
+      </CardContent>
+      
+      {canEdit && (
+        <EditProfileDialog 
+          user={displayUser} 
+          isOpen={isDialogOpen} 
+          mode={editMode}
+          onClose={() => setIsDialogOpen(false)} 
+        />
+      )}
+    </Card>
   );
-};
+}

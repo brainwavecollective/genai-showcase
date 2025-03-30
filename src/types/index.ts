@@ -1,4 +1,3 @@
-
 export type UserRole = 'admin' | 'creator' | 'visitor' | 'member'; // Added 'member' to match the options
 export type UserStatus = 'pending_review' | 'approved' | 'denied' | 'active' | 'suspended'; // Added 'active' and 'suspended' to match the UI options
 
@@ -23,6 +22,16 @@ export interface User {
   twitter?: string;
   github?: string;
   instagram?: string;
+  // Privacy settings
+  is_last_name_public?: boolean;
+  is_avatar_public?: boolean;
+  is_bio_public?: boolean;
+  is_email_public?: boolean;
+  is_website_public?: boolean;
+  is_linkedin_public?: boolean;
+  is_twitter_public?: boolean;
+  is_github_public?: boolean;
+  is_instagram_public?: boolean;
 }
 
 export interface MediaItem {

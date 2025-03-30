@@ -1,309 +1,122 @@
 
-import { useState, useEffect } from 'react';
 import { User } from '@/types';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
-import { supabase } from '@/integrations/supabase/client';
-import { Loader2, Save, Edit } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ExternalLink, FileText, Link2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface BioSectionProps {
   user: User | null;
+  isFieldVisible: (field: string) => boolean;
 }
 
-export const BioSection = ({ user }: BioSectionProps) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { toast } = useToast();
+export function BioSection({ user, isFieldVisible }: BioSectionProps) {
+  if (!user) return null;
   
-  const [bioData, setBioData] = useState({
-    bio: user?.bio || '',
-    email: user?.email || '',
-    website: user?.website || '',
-    linkedin: user?.linkedin || '',
-    twitter: user?.twitter || '',
-    github: user?.github || '',
-    instagram: user?.instagram || '',
-  });
-
-  // Update local state when user prop changes - fixed to useEffect instead of useState
-  useEffect(() => {
-    if (user) {
-      setBioData({
-        bio: user.bio || '',
-        email: user.email || '',
-        website: user.website || '',
-        linkedin: user.linkedin || '',
-        twitter: user.twitter || '',
-        github: user.github || '',
-        instagram: user.instagram || '',
-      });
-    }
-  }, [user]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setBioData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleSave = async () => {
-    if (!user?.id) return;
-    
-    setIsLoading(true);
-    
-    try {
-      // Use the update_user_bio RPC function with the added email parameter
-      const { data, error } = await supabase
-        .rpc('update_user_bio', {
-          p_user_id: user.id,
-          p_bio: bioData.bio,
-          p_email: bioData.email,
-          p_website: bioData.website,
-          p_linkedin: bioData.linkedin,
-          p_twitter: bioData.twitter,
-          p_github: bioData.github,
-          p_instagram: bioData.instagram
-        });
-        
-      if (error) throw error;
-      
-      // Update local state with the returned user data
-      if (data && data.length > 0) {
-        const updatedUser = data[0];
-        // Update user info directly in this component
-        setBioData({
-          bio: updatedUser.bio || '',
-          email: updatedUser.email || '',
-          website: updatedUser.website || '',
-          linkedin: updatedUser.linkedin || '',
-          twitter: updatedUser.twitter || '',
-          github: updatedUser.github || '',
-          instagram: updatedUser.instagram || '',
-        });
-      }
-      
-      toast({
-        title: "Profile updated",
-        description: "Your bio and social links have been updated successfully.",
-      });
-      
-      setIsEditing(false);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to update profile",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  const hasBio = !!user.bio;
+  const hasLinks = (
+    (isFieldVisible('website') && !!user.website) ||
+    (isFieldVisible('linkedin') && !!user.linkedin) ||
+    (isFieldVisible('twitter') && !!user.twitter) ||
+    (isFieldVisible('github') && !!user.github) ||
+    (isFieldVisible('instagram') && !!user.instagram)
+  );
+  
+  if (!hasBio && !hasLinks) return null;
+  
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Bio & Social Links</CardTitle>
-          <p className="text-sm text-muted-foreground mt-1">Your public info</p>
-        </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={() => setIsEditing(!isEditing)}
-          disabled={isLoading}
-        >
-          {isEditing ? 'Cancel' : <Edit className="h-4 w-4 mr-2" />}
-          {isEditing ? '' : 'Edit'}
-        </Button>
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <FileText className="h-5 w-5 mr-2" />
+          Bio
+        </CardTitle>
       </CardHeader>
-      
-      <CardContent className="space-y-4">
-        {isEditing ? (
-          <>
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea 
-                id="bio" 
-                name="bio"
-                value={bioData.bio} 
-                onChange={handleChange}
-                placeholder="Tell others about yourself..."
-                rows={5}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input 
-                id="email" 
-                name="email"
-                value={bioData.email} 
-                onChange={handleChange}
-                placeholder="your@email.com" 
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="website">Website</Label>
-              <Input 
-                id="website" 
-                name="website"
-                value={bioData.website} 
-                onChange={handleChange}
-                placeholder="https://yourwebsite.com" 
-              />
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="linkedin">LinkedIn</Label>
-                <Input 
-                  id="linkedin" 
-                  name="linkedin"
-                  value={bioData.linkedin} 
-                  onChange={handleChange}
-                  placeholder="https://linkedin.com/in/yourusername" 
-                />
+      <CardContent className="space-y-6">
+        {hasBio && (
+          <div className="space-y-2">
+            <p className="whitespace-pre-wrap text-pretty">{user.bio}</p>
+          </div>
+        )}
+        
+        {hasLinks && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isFieldVisible('website') && user.website && (
+              <div className="flex items-center">
+                <Link2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.website} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center"
+                >
+                  Website
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="twitter">Twitter</Label>
-                <Input 
-                  id="twitter" 
-                  name="twitter"
-                  value={bioData.twitter} 
-                  onChange={handleChange}
-                  placeholder="https://twitter.com/yourusername" 
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="github">GitHub</Label>
-                <Input 
-                  id="github" 
-                  name="github"
-                  value={bioData.github} 
-                  onChange={handleChange}
-                  placeholder="https://github.com/yourusername" 
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="instagram">Instagram</Label>
-                <Input 
-                  id="instagram" 
-                  name="instagram"
-                  value={bioData.instagram} 
-                  onChange={handleChange}
-                  placeholder="https://instagram.com/yourusername" 
-                />
-              </div>
-            </div>
-          </>
-        ) : (
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Bio</h3>
-              <p className="text-sm">
-                {bioData.bio || "No bio provided yet."}
-              </p>
-            </div>
+            )}
             
-            <div>
-              <h3 className="text-sm font-medium text-muted-foreground mb-2">Email</h3>
-              <p className="text-sm">
-                {bioData.email || "No email provided."}
-              </p>
-            </div>
+            {isFieldVisible('linkedin') && user.linkedin && (
+              <div className="flex items-center">
+                <Link2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.linkedin} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center"
+                >
+                  LinkedIn
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
+              </div>
+            )}
             
-            {(bioData.website || bioData.linkedin || bioData.twitter || bioData.github || bioData.instagram) && (
-              <div>
-                <h3 className="text-sm font-medium text-muted-foreground mb-2">Connect</h3>
-                <div className="flex flex-wrap gap-2">
-                  {bioData.website && (
-                    <a 
-                      href={bioData.website} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Website
-                    </a>
-                  )}
-                  
-                  {bioData.linkedin && (
-                    <a 
-                      href={bioData.linkedin} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      LinkedIn
-                    </a>
-                  )}
-                  
-                  {bioData.twitter && (
-                    <a 
-                      href={bioData.twitter} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Twitter
-                    </a>
-                  )}
-                  
-                  {bioData.github && (
-                    <a 
-                      href={bioData.github} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      GitHub
-                    </a>
-                  )}
-                  
-                  {bioData.instagram && (
-                    <a 
-                      href={bioData.instagram} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="text-sm text-primary hover:underline"
-                    >
-                      Instagram
-                    </a>
-                  )}
-                </div>
+            {isFieldVisible('twitter') && user.twitter && (
+              <div className="flex items-center">
+                <Link2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.twitter} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center"
+                >
+                  Twitter
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
+              </div>
+            )}
+            
+            {isFieldVisible('github') && user.github && (
+              <div className="flex items-center">
+                <Link2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.github} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center"
+                >
+                  GitHub
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
+              </div>
+            )}
+            
+            {isFieldVisible('instagram') && user.instagram && (
+              <div className="flex items-center">
+                <Link2 className="h-4 w-4 mr-2 text-muted-foreground" />
+                <a 
+                  href={user.instagram} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-sm text-primary hover:underline flex items-center"
+                >
+                  Instagram
+                  <ExternalLink className="h-3 w-3 ml-1" />
+                </a>
               </div>
             )}
           </div>
         )}
       </CardContent>
-      {isEditing && (
-        <CardFooter>
-          <Button 
-            onClick={handleSave}
-            disabled={isLoading}
-            className="w-full"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className="mr-2 h-4 w-4" />
-                Save Changes
-              </>
-            )}
-          </Button>
-        </CardFooter>
-      )}
     </Card>
   );
-};
+}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -72,6 +71,36 @@ const UserProfilePage = () => {
   // Use data from auth context as fallback
   const displayUser = userDetails || user;
 
+  // Helper function to check if a field should be visible based on privacy settings
+  const isFieldVisible = (field: string) => {
+    // If viewing own profile, show everything
+    if (user?.id === displayUser?.id) return true;
+    
+    // For other users' profiles, check privacy settings
+    switch (field) {
+      case 'avatar':
+        return displayUser?.is_avatar_public !== false; // Default to true if not set
+      case 'last_name':
+        return displayUser?.is_last_name_public === true;
+      case 'bio':
+        return displayUser?.is_bio_public !== false; // Default to true if not set
+      case 'email':
+        return displayUser?.is_email_public === true;
+      case 'website':
+        return displayUser?.is_website_public !== false; // Default to true if not set
+      case 'linkedin':
+        return displayUser?.is_linkedin_public !== false; // Default to true if not set
+      case 'twitter':
+        return displayUser?.is_twitter_public !== false; // Default to true if not set
+      case 'github':
+        return displayUser?.is_github_public !== false; // Default to true if not set
+      case 'instagram':
+        return displayUser?.is_instagram_public !== false; // Default to true if not set
+      default:
+        return true;
+    }
+  };
+
   if (error) {
     return (
       <Layout>
@@ -108,11 +137,16 @@ const UserProfilePage = () => {
               user={user} 
               displayUser={displayUser} 
               isAdmin={isAdmin} 
-              onLogout={logout} 
+              onLogout={logout}
+              isFieldVisible={isFieldVisible}
             />
             <div className="md:col-span-2 space-y-6">
-              <ProfileDetails displayUser={displayUser} user={user} />
-              <BioSection user={displayUser} />
+              <ProfileDetails 
+                displayUser={displayUser} 
+                user={user}
+                isFieldVisible={isFieldVisible}
+              />
+              {isFieldVisible('bio') && <BioSection user={displayUser} isFieldVisible={isFieldVisible} />}
             </div>
           </div>
         </motion.div>
