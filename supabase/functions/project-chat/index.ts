@@ -148,16 +148,47 @@ serve(async (req) => {
       projectsInfo = 'Currently there are no public projects available in the showcase.';
     }
     
-    // About page information for context
+    // About page information for context - Expanded with more detailed content
     const aboutPageInfo = `
       About the CU Boulder ATLAS Institute Generative AI Showcase:
-      This showcase platform was developed as part of Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
-      both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
-      experience design, and content management.
       
-      Students retain full ownership of their intellectual property, grant display rights for educational 
-      and demonstration purposes, acknowledge responsibility for the content they upload, and have direct control 
-      over their content through individual login accounts, including the ability to edit or remove their work at any time.
+      Project Origin:
+      This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
+      Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
+      both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
+      experience design, and content management. The workshop explored innovative approaches to rapid 
+      prototyping and development, focusing on the integration of aesthetic and functional elements. 
+      This platform was created as a demonstration tool for the workshop to illustrate application 
+      development concepts in practice.
+      
+      Educational Context:
+      As part of Professor Schwartz's Generative AI curriculum, this project provided students with 
+      hands-on experience in:
+      - Collaborative development environments
+      - User interface design for creative portfolios
+      - Integration of generative AI components in web applications
+      - Exploration of iterative design processes using low-code/no-code tools
+      - Background understanding of vibe coding and related experiences
+      
+      Student Work Usage Policy:
+      All student projects featured on this platform remain the intellectual property of their respective 
+      creators. Students are wholly responsible for the content they upload to this showcase platform. 
+      This platform is provided for demonstration purposes of related technologies only, and content is 
+      not reviewed for accuracy or appropriateness.
+      
+      Important note: This showcase platform is independently developed and maintained by 
+      Daniel Ritchie as an external instructor for the workshop. It is not officially affiliated with or 
+      endorsed by the University of Colorado Boulder or the ATLAS Institute.
+      
+      By submitting work to this platform, students:
+      - Retain full ownership of their intellectual property
+      - Grant display rights for educational and demonstration purposes
+      - Acknowledge responsibility for the content they upload
+      - Have direct control over their content through individual login accounts, including the ability to edit or remove their work at any time
+      
+      Contact Information:
+      For questions regarding this platform: Daniel Ritchie (daniel@brainwavecollective.ai)
+      For questions about the Generative AI course at ATLAS Institute: Larissa Schwartz (Larissa.Schwartz@colorado.edu)
     `;
 
     const systemPrompt = `
