@@ -7,7 +7,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription }
 import { Badge } from '@/components/ui/badge';
 import UserStatusBadge from '@/components/users/UserStatusBadge';
 import { Pencil, UserCircle, School, CalendarDays, Globe } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { EditProfileDialog } from './EditProfileDialog';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -37,6 +37,8 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
     setIsEditDialogOpen(true);
   };
 
+  const isViewingSelf = user?.id === displayUser?.id;
+
   return (
     <>
       <Card className="md:col-span-1">
@@ -47,7 +49,20 @@ export const ProfileSidebar = ({ user, displayUser, isAdmin, onLogout }: Profile
               <AvatarFallback className="text-xl">{getInitials()}</AvatarFallback>
             </Avatar>
           </div>
-          <CardTitle>{displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}</CardTitle>
+          
+          {isViewingSelf ? (
+            <CardTitle>{displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}</CardTitle>
+          ) : (
+            <CardTitle>
+              <Link 
+                to={displayUser ? `/user/${displayUser.id}` : '#'} 
+                className="hover:underline"
+              >
+                {displayUser ? getUserFullName(displayUser) : user?.email?.split('@')[0] || 'User'}
+              </Link>
+            </CardTitle>
+          )}
+          
           <CardDescription>{user?.email}</CardDescription>
           {displayUser?.status && (
             <div className="mt-2 flex justify-center">

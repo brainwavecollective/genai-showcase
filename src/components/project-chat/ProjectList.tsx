@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowDown, Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface ProjectListProps {
   projects: Project[];
@@ -48,7 +49,17 @@ export function ProjectList({ projects, showProjects, setShowProjects, navigate,
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">{project.title}</CardTitle>
                 <CardDescription className="text-xs">
-                  By {project.creator_name || "Anonymous"}
+                  By {project.creator_id ? (
+                    <Link 
+                      to={`/user/${project.creator_id}`} 
+                      className="hover:underline" 
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {project.creator_name || "Anonymous"}
+                    </Link>
+                  ) : (
+                    <span>{project.creator_name || "Anonymous"}</span>
+                  )}
                 </CardDescription>
               </CardHeader>
               <CardContent>

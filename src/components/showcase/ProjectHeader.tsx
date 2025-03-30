@@ -7,6 +7,7 @@ import { User, TagIcon } from 'lucide-react';
 import { Project, Tag } from '@/types';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 interface ProjectHeaderProps {
   project: Project;
@@ -87,7 +88,16 @@ export function ProjectHeader({
           </AvatarFallback>
         </Avatar>
         <div>
-          <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
+          {creator?.id ? (
+            <Link 
+              to={`/user/${creator.id}`} 
+              className="text-sm font-medium hover:underline"
+            >
+              {creator?.name || project.creator_name}
+            </Link>
+          ) : (
+            <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
+          )}
           <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
         </div>
         

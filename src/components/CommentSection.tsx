@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -8,11 +9,12 @@ import { useAuth } from '@/context/AuthContext';
 import { MessageSquare } from 'lucide-react';
 import { Comment, getUserFullName } from '@/types';
 import { useToast } from "@/hooks/use-toast";
+import { Link } from 'react-router-dom';
 
 interface CommentSectionProps {
   comments: Comment[];
   mediaItemId: string;
-  onAddComment: (content: string) => void; // Changed from (comment: Comment) => void to match the function implementation
+  onAddComment: (content: string) => void;
 }
 
 export function CommentSection({ comments, mediaItemId, onAddComment }: CommentSectionProps) {
@@ -95,7 +97,16 @@ export function CommentSection({ comments, mediaItemId, onAddComment }: CommentS
                 
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-sm font-medium">{comment.user_name || 'Unknown User'}</h4>
+                    {comment.user_id ? (
+                      <Link 
+                        to={`/user/${comment.user_id}`} 
+                        className="text-sm font-medium hover:underline"
+                      >
+                        {comment.user_name || 'Unknown User'}
+                      </Link>
+                    ) : (
+                      <h4 className="text-sm font-medium">{comment.user_name || 'Unknown User'}</h4>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       {formatDate(comment.created_at || '')}
                     </span>

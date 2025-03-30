@@ -109,7 +109,17 @@ export function ProjectCard({ project, tags }: ProjectCardProps) {
         
         <CardFooter className="pt-0 pb-4 flex justify-between">
           <div className="text-sm text-muted-foreground">
-            By <span className="font-medium">{project.creator_name}</span>
+            By {project.creator_id ? (
+              <Link 
+                to={`/user/${project.creator_id}`} 
+                className="font-medium hover:underline" 
+                onClick={(e) => e.stopPropagation()}
+              >
+                {project.creator_name}
+              </Link>
+            ) : (
+              <span className="font-medium">{project.creator_name}</span>
+            )}
           </div>
           
           <div className="text-xs text-muted-foreground flex items-center">
