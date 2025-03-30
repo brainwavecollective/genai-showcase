@@ -40,7 +40,7 @@ export function ChatContainer({
     <div className="bg-card border rounded-lg shadow-sm overflow-hidden">
       <ScrollArea 
         className="max-h-[500px]" 
-        viewportRef={scrollAreaRef}
+        ref={scrollAreaRef}
       >
         <div className="py-1">
           {messages.map((message) => (
