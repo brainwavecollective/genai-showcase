@@ -20,24 +20,13 @@ export function ScrollToTop() {
       return restoreScrollBehavior;
     }
     
-    // Handle different routes with specific scrolling behavior
+    // Simple scroll to top for all pages
     const handleScroll = () => {
-      if (pathname === '/') {
-        // For home page, scroll to a position just above the "Student Showcase Platform" badge
-        // Adjusted to scroll less far down
-        window.scrollTo({
-          top: 100, // Reduced from 220 to 100 for less dramatic scrolling
-          left: 0,
-          behavior: 'instant' // Use instant to avoid animation conflicts
-        });
-      } else {
-        // For all other pages, scroll to top
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'instant' // Use instant to avoid animation conflicts
-        });
-      }
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'instant' // Use instant to avoid animation conflicts
+      });
     };
     
     // Execute initial scroll
