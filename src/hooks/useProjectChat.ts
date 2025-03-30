@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +18,7 @@ export function useProjectChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Welcome to the Project Assistant! I can help you discover and understand projects in the ATLAS Institute Generative AI Showcase. What would you like to know?",
+      content: "Welcome to the GenAI Gallery Guide! I can help you discover and understand projects in the ATLAS Institute Generative AI Showcase. What would you like to know?",
       isUser: false,
     },
   ]);

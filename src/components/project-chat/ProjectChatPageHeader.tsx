@@ -22,7 +22,7 @@ export function ProjectChatPageHeader({ projectId }: ProjectChatPageHeaderProps)
       </Button>
       <div className="flex items-center gap-2 text-primary">
         <Bot size={20} />
-        <h1 className="text-xl font-semibold">GenAI Professor</h1>
+        <h1 className="text-xl font-semibold">GenAI Gallery Guide</h1>
       </div>
     </div>
   );
