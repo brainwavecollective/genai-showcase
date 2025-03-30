@@ -81,25 +81,34 @@ export function ProjectHeader({
       )}
       
       <div className="flex items-center justify-center space-x-3 mb-6">
-        <Avatar>
-          {creator?.avatar_url && <AvatarImage src={creator.avatar_url} />}
-          <AvatarFallback>
-            <User className="h-4 w-4" />
-          </AvatarFallback>
-        </Avatar>
-        <div>
-          {creator?.id ? (
-            <Link 
-              to={`/user/${creator.id}`} 
-              className="text-sm font-medium hover:underline"
-            >
-              {creator?.name || project.creator_name}
-            </Link>
-          ) : (
-            <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
-          )}
-          <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
-        </div>
+        {creator?.id ? (
+          <Link to={`/user/${creator.id}`} className="flex items-center space-x-3">
+            <Avatar>
+              {creator?.avatar_url && <AvatarImage src={creator.avatar_url} />}
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium hover:underline">
+                {creator?.name || project.creator_name}
+              </p>
+              <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
+            </div>
+          </Link>
+        ) : (
+          <div className="flex items-center space-x-3">
+            <Avatar>
+              <AvatarFallback>
+                <User className="h-4 w-4" />
+              </AvatarFallback>
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium">{creator?.name || project.creator_name}</p>
+              <p className="text-xs text-muted-foreground">{creator?.role || 'Creator'}</p>
+            </div>
+          </div>
+        )}
         
         {canEdit && (
           <PrivacyToggle 
