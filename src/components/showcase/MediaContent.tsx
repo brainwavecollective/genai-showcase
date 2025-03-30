@@ -21,7 +21,7 @@ export function MediaContent({ selectedMedia, comments, onAddComment, mediaItems
   const [media, setMedia] = useState<MediaItem | null>(selectedMedia);
   const [isLoading, setIsLoading] = useState(false);
 
-  // If media is not preloaded, try to fetch it
+  // Update media when selectedMedia changes
   useEffect(() => {
     setMedia(selectedMedia);
     setLoadingError(null);
@@ -29,45 +29,8 @@ export function MediaContent({ selectedMedia, comments, onAddComment, mediaItems
     if (!selectedMedia) return;
     
     // For debugging - log the media item
-    console.log('Selected media:', selectedMedia);
+    console.log('Media content displaying:', selectedMedia);
     
-    // Try to fetch additional media details if needed
-    const loadMediaDetails = async () => {
-      try {
-        setIsLoading(true);
-        // Check if the media_url is accessible
-        if (selectedMedia.media_type === 'image' && selectedMedia.media_url) {
-          // We could also test if the URL is valid here if needed
-          console.log('Media URL:', selectedMedia.media_url);
-        }
-        
-        // Example: If we need to fetch more details about the media item
-        const { data, error } = await supabase
-          .from('media_items')
-          .select('*')
-          .eq('id', selectedMedia.id)
-          .single();
-          
-        if (error) {
-          console.error('Error fetching media details:', error);
-          setLoadingError(`Could not load full media details: ${error.message}`);
-          return;
-        }
-        
-        if (data) {
-          console.log('Fetched media details:', data);
-          setMedia(data as MediaItem);
-        }
-      } catch (error) {
-        console.error('Error processing media:', error);
-        setLoadingError('An unexpected error occurred loading media');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    // Uncomment if we need to fetch additional details
-    // loadMediaDetails();
   }, [selectedMedia]);
   
   if (!selectedMedia && !media) {

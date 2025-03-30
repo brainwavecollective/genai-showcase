@@ -9,13 +9,24 @@ export function useMediaOperations(projectId: string | undefined) {
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
+  // Reset state when project ID changes
+  useEffect(() => {
+    // Clear existing media when project changes
+    setMediaItems([]);
+    setSelectedMedia(null);
+  }, [projectId]);
+  
   // Fetch media items for the project
   useEffect(() => {
-    if (!projectId) return;
+    if (!projectId) {
+      setIsLoading(false);
+      return;
+    }
     
     const fetchMediaItems = async () => {
       try {
         setIsLoading(true);
+        console.log(`Fetching media for project: ${projectId}`);
         
         // First try to use the view which includes creator information
         let { data: mediaItems, error } = await supabase
@@ -57,7 +68,7 @@ export function useMediaOperations(projectId: string | undefined) {
           });
         }
         
-        console.log('Fetched media items:', mediaItems);
+        console.log(`Fetched ${mediaItems?.length || 0} media items for project ${projectId}:`, mediaItems);
         
         if (mediaItems && mediaItems.length > 0) {
           // Cast the data to MediaItem[] and set state
@@ -72,6 +83,8 @@ export function useMediaOperations(projectId: string | undefined) {
       } catch (error) {
         console.error('Error fetching media items:', error);
         toast.error('Failed to load media items');
+        setMediaItems([]);
+        setSelectedMedia(null);
       } finally {
         setIsLoading(false);
       }

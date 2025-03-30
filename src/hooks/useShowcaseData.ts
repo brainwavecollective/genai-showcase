@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { useProjectData } from './showcase/useProjectData';
@@ -47,7 +47,7 @@ export function useShowcaseData(projectId: string | undefined) {
     if (selectedMedia) {
       fetchComments(selectedMedia.id);
     }
-  }, [selectedMedia]);
+  }, [selectedMedia, fetchComments]);
 
   // Wrap the privacy toggle to show toast messages
   const handlePrivacyToggleWithToast = async (isPrivate: boolean) => {
