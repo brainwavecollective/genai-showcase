@@ -6,34 +6,48 @@ export function ScrollToTop() {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    // Only scroll to the very top for non-home pages
-    if (pathname !== '/') {
-      // Immediately scroll to top
-      window.scrollTo(0, 0);
+    // Disable any existing scroll behavior
+    if (document.documentElement.style.scrollBehavior) {
+      const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+      document.documentElement.style.scrollBehavior = 'auto';
       
-      // Try again after DOM has had time to update
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 50);
+      // Function to restore original behavior
+      const restoreScrollBehavior = () => {
+        document.documentElement.style.scrollBehavior = originalScrollBehavior;
+      };
       
-      // And again after potential animations have completed
-      setTimeout(() => {
-        window.scrollTo(0, 0);
-      }, 300);
-    } else {
-      // For home page, scroll to a position just above the "Student Showcase Platform" badge
-      // Use a slight delay to ensure proper execution after render
-      setTimeout(() => {
-        window.scrollTo(0, 220);
-      }, 100);
-      
-      // Try again to ensure it works
-      setTimeout(() => {
-        window.scrollTo(0, 220);
-      }, 300);
+      // Clean up when component unmounts
+      return restoreScrollBehavior;
     }
     
-    return () => {};
+    // Handle different routes with specific scrolling behavior
+    const handleScroll = () => {
+      if (pathname === '/') {
+        // For home page, scroll to a position just above the "Student Showcase Platform" badge
+        window.scrollTo({
+          top: 220,
+          left: 0,
+          behavior: 'instant' // Use instant to avoid animation conflicts
+        });
+      } else {
+        // For all other pages, scroll to top
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'instant' // Use instant to avoid animation conflicts
+        });
+      }
+    };
+    
+    // Execute initial scroll
+    handleScroll();
+    
+    // Also handle scroll after a slight delay to ensure DOM is fully ready
+    const timeoutId = setTimeout(handleScroll, 100);
+    
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [pathname]);
 
   return null;

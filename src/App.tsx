@@ -30,24 +30,22 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <AnimatePresence mode="wait">
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/project/:id" element={<ShowcasePage />} />
-              <Route path="/project/new" element={<NewProjectPage />} />
-              <Route path="/project/:id/chat" element={<ChatPage />} />
-              <Route path="/chat" element={<ProjectChatPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/manage-users" element={<ManageUsersPage />} />
-              <Route path="/profile" element={<UserProfilePage />} />
-              <Route path="/user/:userId" element={<UserBioPage />} />
-              <Route path="/about" element={<AboutPage />} />
-              <Route path="/terms" element={<TermsPage />} />
-              {/* Redirect /login to home page since there's no actual login page route */}
-              <Route path="/login" element={<Navigate to="/" replace />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </AnimatePresence>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/project/:id" element={<ShowcasePage />} />
+            <Route path="/project/new" element={<NewProjectPage />} />
+            <Route path="/project/:id/chat" element={<ChatPage />} />
+            <Route path="/chat" element={<ProjectChatPage />} />
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/manage-users" element={<ManageUsersPage />} />
+            <Route path="/profile" element={<UserProfilePage />} />
+            <Route path="/user/:userId" element={<UserBioPage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            {/* Redirect /login to home page since there's no actual login page route */}
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>
