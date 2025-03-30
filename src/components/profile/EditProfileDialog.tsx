@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -212,14 +211,18 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Personal Information Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Personal Information</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">Personal Information</h3>
+              </div>
               
               <FormField
                 control={form.control}
                 name="first_name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>First Name <span className="text-xs text-muted-foreground">(Always public)</span></FormLabel>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>First Name <span className="text-xs text-muted-foreground">(Always public)</span></FormLabel>
+                    </div>
                     <FormControl>
                       <Input placeholder="First Name" {...field} />
                     </FormControl>
@@ -228,33 +231,33 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
                 )}
               />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="last_name"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="last_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>Last Name</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Last Name" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_last_name_public}
+                        onChange={handlePrivacyToggle('is_last_name_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="Last Name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <div className="flex items-center justify-between">
+                <FormLabel>Profile Photo</FormLabel>
                 <PrivacyToggleField
-                  label="Last Name Visibility"
-                  isPublic={privacySettings.is_last_name_public}
-                  onChange={handlePrivacyToggle('is_last_name_public')}
+                  isPublic={privacySettings.is_avatar_public}
+                  onChange={handlePrivacyToggle('is_avatar_public')}
                 />
               </div>
-              
-              <PrivacyToggleField
-                label="Profile Photo Visibility"
-                isPublic={privacySettings.is_avatar_public}
-                onChange={handlePrivacyToggle('is_avatar_public')}
-              />
             </div>
             
             <Separator />
@@ -296,33 +299,33 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
             
             {/* About/Bio Section */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">About</h3>
-              
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="bio"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bio</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Tell us about yourself" 
-                          className="resize-y min-h-[100px]"
-                          {...field} 
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="Bio Visibility"
-                  isPublic={privacySettings.is_bio_public}
-                  onChange={handlePrivacyToggle('is_bio_public')}
-                />
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold">About</h3>
               </div>
+              
+              <FormField
+                control={form.control}
+                name="bio"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Bio</FormLabel>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_bio_public}
+                        onChange={handlePrivacyToggle('is_bio_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Tell us about yourself" 
+                        className="resize-y min-h-[100px]"
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             
             <Separator />
@@ -331,137 +334,125 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
             <div className="space-y-4">
               <h3 className="text-lg font-semibold">Contact & Social Links</h3>
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>Email</FormLabel>
-                      <FormControl>
-                        <Input placeholder="your@email.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="Email Visibility"
-                  isPublic={privacySettings.is_email_public}
-                  onChange={handlePrivacyToggle('is_email_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_email_public}
+                        onChange={handlePrivacyToggle('is_email_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="your@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="website"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="website"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>Website</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://yourwebsite.com" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="Website Visibility"
-                  isPublic={privacySettings.is_website_public}
-                  onChange={handlePrivacyToggle('is_website_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_website_public}
+                        onChange={handlePrivacyToggle('is_website_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="https://yourwebsite.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="linkedin"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="linkedin"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>LinkedIn</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://linkedin.com/in/yourusername" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="LinkedIn Visibility"
-                  isPublic={privacySettings.is_linkedin_public}
-                  onChange={handlePrivacyToggle('is_linkedin_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_linkedin_public}
+                        onChange={handlePrivacyToggle('is_linkedin_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="https://linkedin.com/in/yourusername" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="twitter"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="twitter"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>Twitter</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://twitter.com/yourusername" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="Twitter Visibility"
-                  isPublic={privacySettings.is_twitter_public}
-                  onChange={handlePrivacyToggle('is_twitter_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_twitter_public}
+                        onChange={handlePrivacyToggle('is_twitter_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="https://twitter.com/yourusername" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="github"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="github"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>GitHub</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://github.com/yourusername" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="GitHub Visibility"
-                  isPublic={privacySettings.is_github_public}
-                  onChange={handlePrivacyToggle('is_github_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_github_public}
+                        onChange={handlePrivacyToggle('is_github_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="https://github.com/yourusername" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               
-              <div className="grid gap-4 items-start">
-                <FormField
-                  control={form.control}
-                  name="instagram"
-                  render={({ field }) => (
-                    <FormItem>
+              <FormField
+                control={form.control}
+                name="instagram"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
                       <FormLabel>Instagram</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://instagram.com/yourusername" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <PrivacyToggleField
-                  label="Instagram Visibility"
-                  isPublic={privacySettings.is_instagram_public}
-                  onChange={handlePrivacyToggle('is_instagram_public')}
-                />
-              </div>
+                      <PrivacyToggleField
+                        isPublic={privacySettings.is_instagram_public}
+                        onChange={handlePrivacyToggle('is_instagram_public')}
+                      />
+                    </div>
+                    <FormControl>
+                      <Input placeholder="https://instagram.com/yourusername" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
             
             <DialogFooter>
