@@ -43,13 +43,7 @@ export function useProjectData(projectId: string | undefined) {
           return;
         }
         
-        // If project is private and user is not authenticated, show error
-        if (projectData.is_private && !isAuthenticated) {
-          setError('This project is private. Please sign in to view it.');
-          setIsLoading(false);
-          return;
-        }
-        
+        // Since all projects are now public, we don't need to check privacy status
         setProject(projectData);
         
         // Fetch tags for this project
@@ -84,7 +78,7 @@ export function useProjectData(projectId: string | undefined) {
     fetchProjectData();
   }, [projectId, isAuthenticated]);
 
-  // Handle privacy toggle
+  // Handle privacy toggle - kept for future use if privacy is re-enabled
   const handlePrivacyToggle = async (isPrivate: boolean) => {
     if (project && canEdit) {
       try {
