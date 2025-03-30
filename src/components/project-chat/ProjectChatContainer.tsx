@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -41,6 +40,7 @@ export function ProjectChatContainer() {
   const [limitReached, setLimitReached] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [retryMessage, setRetryMessage] = useState<string | null>(null);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
 
   // Fetch projects on initial load
   useEffect(() => {
@@ -207,6 +207,7 @@ export function ProjectChatContainer() {
   };
 
   const fetchProjects = async () => {
+    setIsLoadingProjects(true);
     try {
       const { data, error } = await supabase
         .from("project_details")
@@ -215,7 +216,32 @@ export function ProjectChatContainer() {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setProjects(data as unknown as Project[]);
+      
+      // Verify projects exist by querying each one
+      if (data && data.length > 0) {
+        const validatedProjects = [];
+        
+        for (const project of data) {
+          if (project && project.id) {
+            // Check if project exists by querying it directly
+            const { data: projectData, error: projectError } = await supabase
+              .from("projects")
+              .select("id")
+              .eq("id", project.id)
+              .single();
+              
+            if (!projectError && projectData) {
+              validatedProjects.push(project);
+            } else {
+              console.log(`Skipping invalid project with ID: ${project.id}`);
+            }
+          }
+        }
+        
+        setProjects(validatedProjects as unknown as Project[]);
+      } else {
+        setProjects([]);
+      }
     } catch (error) {
       console.error("Error fetching projects:", error);
       toast({
@@ -223,6 +249,8 @@ export function ProjectChatContainer() {
         description: "Failed to load projects",
         variant: "destructive",
       });
+    } finally {
+      setIsLoadingProjects(false);
     }
   };
 
@@ -273,12 +301,13 @@ export function ProjectChatContainer() {
         <ChatInput onSend={sendMessage} isLoading={isLoading} disabled={limitReached} />
       </div>
 
-      {showProjects && projects.length > 0 && (
+      {showProjects && (
         <ProjectList 
           projects={projects}
           showProjects={showProjects}
           setShowProjects={setShowProjects}
           navigate={navigate}
+          isLoading={isLoadingProjects}
         />
       )}
     </motion.div>
