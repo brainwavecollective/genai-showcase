@@ -17,6 +17,8 @@ const ProjectGrid = ({ projects = [], isLoading = false, visibleProjects, tags }
   
   // Use visibleProjects if provided, otherwise filter projects
   const projectsToDisplay = visibleProjects ?? filterContentByUserStatus(projects, isUserDenied);
+  
+  console.log("ProjectGrid rendering with projects:", projectsToDisplay);
 
   return (
     <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">

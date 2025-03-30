@@ -16,15 +16,16 @@ export function useProjectData(projectId: string | undefined) {
     const fetchProject = async () => {
       setIsLoadingProject(true);
       try {
+        console.log("Fetching project with ID:", projectId);
+        
         const { data, error } = await supabase
-          .from("project_details")
+          .from("project_details")  // Using project_details view instead of projects table
           .select("*")
           .eq("id", projectId)
           .single();
 
         if (error) throw error;
         
-        // Log the project data to debug
         console.log("Project data from useProjectData:", data);
         
         setProject(data as unknown as Project);

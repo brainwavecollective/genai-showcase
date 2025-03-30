@@ -33,7 +33,6 @@ const UserBioPage = () => {
         throw new Error('User not found');
       }
       
-      // Fix: Properly cast the data to User type
       return data as unknown as User;
     }
   });
@@ -43,6 +42,8 @@ const UserBioPage = () => {
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
       if (!userId) throw new Error('User ID is required');
+      
+      console.log('Fetching projects for user ID:', userId);
       
       const { data, error } = await supabase
         .from('project_details')
@@ -56,6 +57,7 @@ const UserBioPage = () => {
         throw error;
       }
       
+      console.log('User projects fetched:', data);
       return data as Project[];
     },
     enabled: !!userId
