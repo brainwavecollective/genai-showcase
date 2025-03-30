@@ -55,7 +55,7 @@ export function ChatMessage({ content, isUser, user, isLoading = false }: ChatMe
       )}
       <div className="flex-1 space-y-2">
         <div className="font-medium">
-          {isUser ? displayName : "Project Assistant"}
+          {isUser ? displayName : "GenAI Professor"}
         </div>
         {isLoading ? (
           <div className="text-sm animate-pulse">Thinking...</div>

@@ -27,6 +27,6 @@ export const createProjectContext = (project: any) => {
 // Create welcome message
 export const getWelcomeMessage = (): Message => ({
   id: "welcome",
-  content: "Hello! I'm your project assistant. Ask me anything about this project or the ATLAS Institute Generative AI Showcase.",
+  content: "Hello! I'm your GenAI Professor. Ask me anything about this project or the ATLAS Institute Generative AI Showcase.",
   isUser: false,
 });

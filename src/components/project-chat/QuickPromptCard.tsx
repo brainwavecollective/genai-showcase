@@ -16,7 +16,7 @@ export function QuickPromptCard({ sendMessage, disabled = false }: QuickPromptCa
           Let's chat about showcase projects
         </CardTitle>
         <CardDescription>
-          Get help discovering projects, understanding technologies, or learning about the students.
+          Chat with our GenAI Professor to get help discovering projects, understanding technologies, or learning about the students.
         </CardDescription>
       </CardHeader>
       <CardContent>

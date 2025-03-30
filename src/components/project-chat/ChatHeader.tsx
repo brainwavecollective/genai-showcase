@@ -18,7 +18,7 @@ export function ChatHeader() {
       </Button>
       <div className="flex items-center gap-2 text-primary">
         <Bot size={20} />
-        <h1 className="text-xl font-semibold">Project Assistant</h1>
+        <h1 className="text-xl font-semibold">GenAI Professor</h1>
       </div>
     </div>
   );
