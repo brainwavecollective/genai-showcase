@@ -37,7 +37,7 @@ const UserBioPage = () => {
     }
   });
 
-  // Query user's projects
+  // Query user's projects - modified to fix the not showing projects issue
   const { data: userProjects, isLoading: projectsLoading } = useQuery({
     queryKey: ['publicUserProjects', userId],
     queryFn: async () => {
@@ -45,11 +45,11 @@ const UserBioPage = () => {
       
       console.log('Fetching projects for user ID:', userId);
       
+      // Modified query to properly fetch all projects for this creator
       const { data, error } = await supabase
-        .from('project_details')
+        .from('projects') // Use projects table directly instead of project_details view
         .select('*')
         .eq('creator_id', userId)
-        .eq('is_private', false) // Only fetch public projects for public profile
         .order('updated_at', { ascending: false });
       
       if (error) {

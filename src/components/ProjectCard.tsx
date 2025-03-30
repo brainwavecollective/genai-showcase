@@ -18,6 +18,8 @@ export function ProjectCard({ project, tags = [] }: ProjectCardProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const isPrivate = project.is_private;
   
+  console.log("Rendering ProjectCard for:", project.title, "with ID:", project.id);
+  
   // Format date
   const formattedDate = new Date(project.updated_at || '').toLocaleDateString('en-US', {
     year: 'numeric',
@@ -116,17 +118,7 @@ export function ProjectCard({ project, tags = [] }: ProjectCardProps) {
         
         <CardFooter className="pt-0 pb-4 flex justify-between">
           <div className="text-sm text-muted-foreground">
-            By {project.creator_id ? (
-              <Link 
-                to={`/user/${project.creator_id}`} 
-                className="font-medium hover:underline" 
-                onClick={(e) => e.stopPropagation()}
-              >
-                {project.creator_name}
-              </Link>
-            ) : (
-              <span className="font-medium">{project.creator_name}</span>
-            )}
+            By {project.creator_name || 'Unknown Creator'}
           </div>
           
           <div className="text-xs text-muted-foreground flex items-center">
