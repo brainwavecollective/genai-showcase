@@ -596,6 +596,61 @@ export type Database = {
               website: string | null
             }[]
           }
+        | {
+            Args: {
+              p_user_id: string
+              p_first_name?: string
+              p_last_name?: string
+              p_course?: string
+              p_semester?: string
+              p_bio?: string
+              p_email?: string
+              p_website?: string
+              p_linkedin?: string
+              p_twitter?: string
+              p_github?: string
+              p_instagram?: string
+              p_is_last_name_public?: boolean
+              p_is_avatar_public?: boolean
+              p_is_bio_public?: boolean
+              p_is_email_public?: boolean
+              p_is_website_public?: boolean
+              p_is_linkedin_public?: boolean
+              p_is_twitter_public?: boolean
+              p_is_github_public?: boolean
+              p_is_instagram_public?: boolean
+            }
+            Returns: {
+              avatar_url: string | null
+              bio: string | null
+              course: string | null
+              created_at: string | null
+              email: string
+              first_name: string | null
+              github: string | null
+              id: string
+              instagram: string | null
+              is_avatar_public: boolean | null
+              is_bio_public: boolean | null
+              is_email_public: boolean | null
+              is_github_public: boolean | null
+              is_instagram_public: boolean | null
+              is_last_name_public: boolean | null
+              is_linkedin_public: boolean | null
+              is_twitter_public: boolean | null
+              is_website_public: boolean | null
+              last_name: string | null
+              linkedin: string | null
+              name: string
+              notes: string | null
+              role: string
+              semester: string | null
+              status: Database["public"]["Enums"]["user_status"] | null
+              twitter: string | null
+              updated_at: string | null
+              website: string | null
+            }[]
+          }
       update_user_status: {
         Args: {
           p_user_id: string

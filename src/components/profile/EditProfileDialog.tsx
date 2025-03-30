@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -144,44 +143,33 @@ export function EditProfileDialog({ user, isOpen, onClose }: EditProfileDialogPr
     setIsLoading(true);
     
     try {
-      // First, update the bio and social links which are supported by the update_user_bio function
-      const { error: bioError } = await supabase
+      // Use the enhanced update_user_bio RPC function which now handles all fields including privacy settings
+      const { error } = await supabase
         .rpc('update_user_bio', {
           p_user_id: user.id,
+          p_first_name: values.first_name || '',
+          p_last_name: values.last_name || '',
+          p_course: values.course || '',
+          p_semester: values.semester || '',
           p_bio: values.bio || '',
           p_email: values.email || user.email,
           p_website: values.website || '',
           p_linkedin: values.linkedin || '',
           p_twitter: values.twitter || '',
           p_github: values.github || '',
-          p_instagram: values.instagram || ''
+          p_instagram: values.instagram || '',
+          p_is_last_name_public: privacySettings.is_last_name_public,
+          p_is_avatar_public: privacySettings.is_avatar_public,
+          p_is_bio_public: privacySettings.is_bio_public,
+          p_is_email_public: privacySettings.is_email_public,
+          p_is_website_public: privacySettings.is_website_public,
+          p_is_linkedin_public: privacySettings.is_linkedin_public,
+          p_is_twitter_public: privacySettings.is_twitter_public,
+          p_is_github_public: privacySettings.is_github_public,
+          p_is_instagram_public: privacySettings.is_instagram_public
         });
 
-      if (bioError) throw bioError;
-      
-      // Now update the rest of the user profile fields and privacy settings
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({
-          first_name: values.first_name || '',
-          last_name: values.last_name || '',
-          course: values.course || '',
-          semester: values.semester || '',
-          // Privacy settings
-          is_last_name_public: privacySettings.is_last_name_public,
-          is_avatar_public: privacySettings.is_avatar_public,
-          is_bio_public: privacySettings.is_bio_public,
-          is_email_public: privacySettings.is_email_public,
-          is_website_public: privacySettings.is_website_public,
-          is_linkedin_public: privacySettings.is_linkedin_public,
-          is_twitter_public: privacySettings.is_twitter_public,
-          is_github_public: privacySettings.is_github_public,
-          is_instagram_public: privacySettings.is_instagram_public,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', user.id);
-
-      if (updateError) throw updateError;
+      if (error) throw error;
 
       // Invalidate queries to refresh data
       queryClient.invalidateQueries({ queryKey: ['user', user.id] });
