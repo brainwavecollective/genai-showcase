@@ -95,6 +95,13 @@ export function useUsers() {
         }
       }
       
+      // Make sure name is consistent with first_name and last_name
+      if (validUserData.first_name || validUserData.last_name) {
+        const firstName = validUserData.first_name || '';
+        const lastName = validUserData.last_name || '';
+        validUserData.name = `${firstName} ${lastName}`.trim();
+      }
+      
       console.log('Sending update with validated data:', validUserData);
       
       const { data, error } = await supabase
