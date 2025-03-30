@@ -73,10 +73,13 @@ export function MediaUpload({ projectId, onMediaAdded }: MediaUploadProps) {
       
       // Create the media item with creator info from the join
       const creator = data.creator || {};
+      const firstName = creator.first_name || '';
+      const lastName = creator.last_name || '';
+      
       const newMedia: MediaItem = {
         ...data,
-        creator_name: creator ? `${creator.first_name || ''} ${creator.last_name || ''}`.trim() : '',
-        creator_avatar: creator?.avatar_url || null
+        creator_name: `${firstName} ${lastName}`.trim(),
+        creator_avatar: creator.avatar_url || null
       };
       
       onMediaAdded(newMedia);
