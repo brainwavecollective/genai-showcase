@@ -1,12 +1,16 @@
 
+import { useState, useEffect } from 'react';
 import { MediaItem } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
-import { Image, Video, LinkIcon, File, FileText } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
 import { MediaUpload } from '@/components/MediaUpload';
+import { supabase } from '@/integrations/supabase/client';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface MediaListProps {
-  mediaItems: MediaItem[];
+  mediaItems?: MediaItem[];
   selectedMedia: MediaItem | null;
   onMediaSelect: (media: MediaItem) => void;
   canEdit: boolean;
@@ -15,76 +19,292 @@ interface MediaListProps {
 }
 
 export function MediaList({ 
-  mediaItems, 
   selectedMedia, 
-  onMediaSelect,
-  canEdit,
-  projectId,
-  onMediaAdded
+  onMediaSelect, 
+  canEdit, 
+  projectId, 
+  onMediaAdded 
 }: MediaListProps) {
-  // Media type icon mapping
-  const getMediaTypeIcon = (type: string) => {
-    switch (type) {
-      case 'image': return <Image className="h-4 w-4" />;
-      case 'video': return <Video className="h-4 w-4" />;
-      case 'link': return <LinkIcon className="h-4 w-4" />;
-      case 'document': return <File className="h-4 w-4" />;
-      case 'text': return <FileText className="h-4 w-4" />;
-      default: return <File className="h-4 w-4" />;
-    }
+  const [isLoading, setIsLoading] = useState(true);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [showUpload, setShowUpload] = useState(false);
+
+  useEffect(() => {
+    const fetchMediaItems = async () => {
+      try {
+        setIsLoading(true);
+        const { data, error } = await supabase
+          .from('media_items')
+          .select('*')
+          .eq('project_id', projectId)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+        setMediaItems(data || []);
+      } catch (error) {
+        console.error('Error fetching media items:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchMediaItems();
+  }, [projectId]);
+
+  const handleMediaSelect = (media: MediaItem) => {
+    onMediaSelect(media);
   };
-  
+
+  const handleMediaUploaded = (newMedia: MediaItem) => {
+    setMediaItems(prev => [newMedia, ...prev]);
+    onMediaAdded(newMedia);
+    setShowUpload(false);
+  };
+
   return (
-    <div className="sticky top-24 space-y-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-medium">Media Items</h2>
-        {canEdit && (
+    <Card>
+      <CardHeader>
+        <div className="flex justify-between items-center">
+          <CardTitle className="text-xl">Media</CardTitle>
+          {canEdit && (
+            <Button
+              onClick={() => setShowUpload(!showUpload)}
+              size="sm"
+              variant={showUpload ? "secondary" : "default"}
+            >
+              {showUpload ? "Cancel" : (
+                <>
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Media
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </CardHeader>
+      
+      <CardContent>
+        {showUpload ? (
           <MediaUpload 
             projectId={projectId} 
-            onMediaAdded={onMediaAdded}
+            onComplete={handleMediaUploaded} 
           />
+        ) : (
+          <Tabs defaultValue="all">
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="all" className="flex-1">All</TabsTrigger>
+              <TabsTrigger value="images" className="flex-1">Images</TabsTrigger>
+              <TabsTrigger value="videos" className="flex-1">Videos</TabsTrigger>
+              <TabsTrigger value="others" className="flex-1">Others</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="all">
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton key={i} className="w-full h-16 rounded-lg" />
+                  ))}
+                </div>
+              ) : mediaItems.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No media items found</p>
+                  {canEdit && (
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => setShowUpload(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Media
+                    </Button>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {mediaItems.map((media) => (
+                    <div
+                      key={media.id}
+                      className={`p-2 rounded-lg cursor-pointer border transition-colors ${
+                        selectedMedia?.id === media.id
+                          ? 'border-primary bg-accent'
+                          : 'border-border hover:bg-accent/50'
+                      }`}
+                      onClick={() => handleMediaSelect(media)}
+                    >
+                      <div className="flex items-center gap-3">
+                        {media.thumbnail_url ? (
+                          <div className="w-12 h-12 rounded overflow-hidden bg-muted">
+                            <img 
+                              src={media.thumbnail_url} 
+                              alt={media.title} 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <div className="w-12 h-12 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                            {media.media_type === 'video' ? 'Vid' : 
+                             media.media_type === 'image' ? 'Img' : 
+                             media.media_type === 'document' ? 'Doc' : 'File'}
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{media.title}</h4>
+                          <p className="text-muted-foreground text-xs truncate">
+                            {media.description ? media.description.substring(0, 50) : 'No description'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="images">
+              {isLoading ? (
+                <div className="space-y-2">
+                  {[...Array(2)].map((_, i) => (
+                    <Skeleton key={i} className="w-full h-16 rounded-lg" />
+                  ))}
+                </div>
+              ) : mediaItems.filter(m => m.media_type === 'image').length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No images found</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {mediaItems
+                    .filter(media => media.media_type === 'image')
+                    .map((media) => (
+                      <div
+                        key={media.id}
+                        className={`p-2 rounded-lg cursor-pointer border transition-colors ${
+                          selectedMedia?.id === media.id
+                            ? 'border-primary bg-accent'
+                            : 'border-border hover:bg-accent/50'
+                        }`}
+                        onClick={() => handleMediaSelect(media)}
+                      >
+                        <div className="flex items-center gap-3">
+                          {media.thumbnail_url ? (
+                            <div className="w-12 h-12 rounded overflow-hidden bg-muted">
+                              <img 
+                                src={media.thumbnail_url} 
+                                alt={media.title} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                              Img
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{media.title}</h4>
+                            <p className="text-muted-foreground text-xs truncate">
+                              {media.description ? media.description.substring(0, 50) : 'No description'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="videos">
+              {isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="w-full h-16 rounded-lg" />
+                </div>
+              ) : mediaItems.filter(m => m.media_type === 'video').length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No videos found</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {mediaItems
+                    .filter(media => media.media_type === 'video')
+                    .map((media) => (
+                      <div
+                        key={media.id}
+                        className={`p-2 rounded-lg cursor-pointer border transition-colors ${
+                          selectedMedia?.id === media.id
+                            ? 'border-primary bg-accent'
+                            : 'border-border hover:bg-accent/50'
+                        }`}
+                        onClick={() => handleMediaSelect(media)}
+                      >
+                        <div className="flex items-center gap-3">
+                          {media.thumbnail_url ? (
+                            <div className="w-12 h-12 rounded overflow-hidden bg-muted">
+                              <img 
+                                src={media.thumbnail_url} 
+                                alt={media.title} 
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <div className="w-12 h-12 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                              Vid
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{media.title}</h4>
+                            <p className="text-muted-foreground text-xs truncate">
+                              {media.description ? media.description.substring(0, 50) : 'No description'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </TabsContent>
+            
+            <TabsContent value="others">
+              {isLoading ? (
+                <div className="space-y-2">
+                  <Skeleton className="w-full h-16 rounded-lg" />
+                </div>
+              ) : mediaItems.filter(m => m.media_type !== 'image' && m.media_type !== 'video').length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <p>No other media found</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {mediaItems
+                    .filter(media => media.media_type !== 'image' && media.media_type !== 'video')
+                    .map((media) => (
+                      <div
+                        key={media.id}
+                        className={`p-2 rounded-lg cursor-pointer border transition-colors ${
+                          selectedMedia?.id === media.id
+                            ? 'border-primary bg-accent'
+                            : 'border-border hover:bg-accent/50'
+                        }`}
+                        onClick={() => handleMediaSelect(media)}
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded bg-muted flex items-center justify-center text-muted-foreground">
+                            {media.media_type === 'document' ? 'Doc' : 'File'}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{media.title}</h4>
+                            <p className="text-muted-foreground text-xs truncate">
+                              {media.description ? media.description.substring(0, 50) : 'No description'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
         )}
-      </div>
-      
-      {mediaItems.length === 0 ? (
-        <Card>
-          <CardContent className="p-4 text-center text-muted-foreground">
-            No media items available
-          </CardContent>
-        </Card>
-      ) : (
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="space-y-3"
-          >
-            {mediaItems.map((media) => (
-              <Card
-                key={media.id}
-                className={`cursor-pointer transition-all hover:bg-accent/50 ${
-                  selectedMedia?.id === media.id ? 'ring-2 ring-primary bg-accent/30' : ''
-                }`}
-                onClick={() => onMediaSelect(media)}
-              >
-                <CardContent className="p-3">
-                  <div className="flex items-start gap-2">
-                    <div className="mt-1 text-muted-foreground">
-                      {getMediaTypeIcon(media.media_type)}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-medium leading-tight">{media.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {new Date(media.created_at || '').toLocaleDateString()}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </motion.div>
-        </AnimatePresence>
-      )}
-    </div>
+      </CardContent>
+    </Card>
   );
 }

@@ -9,17 +9,18 @@ import { supabase } from '@/integrations/supabase/client';
 interface ProjectSectionProps {
   projects: Project[];
   tags: Tag[];
+  isLoading?: boolean;
 }
 
-export function ProjectSection({ projects, tags }: ProjectSectionProps) {
+export function ProjectSection({ projects, tags, isLoading = false }: ProjectSectionProps) {
   const { isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTab, setSelectedTab] = useState<'all' | 'public' | 'private'>('all');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [visibleProjects, setVisibleProjects] = useState<Project[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [adminTagIds, setAdminTagIds] = useState<string[]>([]);
-
+  const [isFilteringData, setIsFilteringData] = useState(false);
+  
   // Get admin tag IDs for filtering
   useEffect(() => {
     const fetchAdminTagIds = async () => {
@@ -41,7 +42,7 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
 
   // Filter projects based on authentication state, selected tab, search query, and tags
   useEffect(() => {
-    setIsLoading(true);
+    setIsFilteringData(true);
     
     // Simulate loading
     setTimeout(() => {
@@ -63,7 +64,7 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
       if (searchQuery) {
         const query = searchQuery.toLowerCase();
         filtered = filtered.filter(project =>
-          project.title.toLowerCase().includes(query) ||
+          project.title?.toLowerCase().includes(query) ||
           (project.description && project.description.toLowerCase().includes(query)) ||
           project.creator_name?.toLowerCase().includes(query)
         );
@@ -77,8 +78,8 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
       }
       
       setVisibleProjects(filtered);
-      setIsLoading(false);
-    }, 500);
+      setIsFilteringData(false);
+    }, 300);
   }, [searchQuery, selectedTab, isAuthenticated, selectedTags, projects]);
 
   return (
@@ -95,7 +96,7 @@ export function ProjectSection({ projects, tags }: ProjectSectionProps) {
       />
       
       <ProjectGrid 
-        isLoading={isLoading}
+        isLoading={isLoading || isFilteringData}
         visibleProjects={visibleProjects}
         tags={tags}
       />
