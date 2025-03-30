@@ -447,6 +447,12 @@ export type Database = {
           website: string | null
         }[]
       }
+      get_comment_user_info: {
+        Args: {
+          comment_user_id: string
+        }
+        Returns: Json
+      }
       get_user_by_id: {
         Args: {
           user_id: string

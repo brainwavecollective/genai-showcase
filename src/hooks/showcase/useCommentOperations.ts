@@ -14,34 +14,35 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
     try {
       const { data: commentsData, error: commentsError } = await supabase
         .from('comments')
-        .select(`
-          *,
-          users:user_id (
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .eq('media_item_id', mediaItemId)
         .order('created_at', { ascending: false });
       
       if (commentsError) throw commentsError;
       
-      // Format comments to match the Comment type
-      const formattedComments = commentsData.map((comment: any) => {
-        // Create a user-like object from the joined data with required fields for getUserFullName
-        const userObj = {
-          first_name: comment.users?.first_name || '',
-          last_name: comment.users?.last_name || '',
-          email: 'unknown@example.com' // Fallback email
-        };
-        
-        return {
-          ...comment,
-          user_name: comment.users?.first_name ? getUserFullName(userObj) : 'Unknown User',
-          user_avatar: comment.users?.avatar_url || null
-        };
-      });
+      // Fetch user info for each comment using our new security definer function
+      const formattedComments = await Promise.all(
+        commentsData.map(async (comment) => {
+          // Use the security definer function to get user info
+          const { data: userData, error: userError } = await supabase
+            .rpc('get_comment_user_info', { comment_user_id: comment.user_id });
+          
+          if (userError) {
+            console.error('Error fetching user info:', userError);
+          }
+          
+          // Parse the user data
+          const userInfo = userData || {};
+          
+          return {
+            ...comment,
+            user_name: userInfo.first_name && userInfo.last_name ? 
+              `${userInfo.first_name} ${userInfo.last_name}`.trim() : 
+              'Unknown User',
+            user_avatar: userInfo.avatar_url || null
+          };
+        })
+      );
       
       setComments(formattedComments);
     } catch (error) {
@@ -70,17 +71,11 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
         content
       };
       
+      // First insert the comment
       const { data, error } = await supabase
         .from('comments')
         .insert(newComment)
-        .select(`
-          *,
-          users:user_id (
-            first_name,
-            last_name,
-            avatar_url
-          )
-        `)
+        .select('*')
         .single();
       
       if (error) {
@@ -94,16 +89,23 @@ export function useCommentOperations(selectedMedia: MediaItem | null) {
       
       console.log('Comment added successfully:', data);
       
+      // Now get the user info using our security definer function
+      const { data: userData, error: userError } = await supabase
+        .rpc('get_comment_user_info', { comment_user_id: user.id });
+        
+      if (userError) {
+        console.error('Error fetching user info:', userError);
+      }
+      
+      const userInfo = userData || {};
+      
       // Format the new comment
       const formattedComment = {
         ...data,
-        user_name: data.users?.first_name ? 
-          getUserFullName({
-            first_name: data.users.first_name,
-            last_name: data.users.last_name || '',
-            email: ''
-          }) : getUserFullName(user),
-        user_avatar: data.users?.avatar_url || null
+        user_name: userInfo.first_name && userInfo.last_name ? 
+          `${userInfo.first_name} ${userInfo.last_name}`.trim() : 
+          getUserFullName(user),
+        user_avatar: userInfo.avatar_url || null
       };
       
       setComments(prev => [formattedComment, ...prev]);
