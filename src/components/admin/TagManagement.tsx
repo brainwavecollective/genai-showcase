@@ -141,7 +141,6 @@ export function TagManagement() {
         .from('tags')
         .insert({
           name: newTagName.trim(),
-          description: newTagDescription.trim() || null,
           created_by: user?.id || '',
           description: 'Admin created tag'
         })

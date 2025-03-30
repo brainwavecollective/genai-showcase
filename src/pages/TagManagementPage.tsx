@@ -6,15 +6,15 @@ import { useAuth } from '@/context/AuthContext';
 import { Navigate } from 'react-router-dom';
 
 const TagManagementPage = () => {
-  const { isAdmin, isAuthenticated, isInitialized } = useAuth();
+  const { isAdmin, isAuthenticated, isInitializing } = useAuth();
   
   // Show loading state until auth is initialized
-  if (!isInitialized) {
+  if (isInitializing) {
     return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
   }
   
   // Redirect non-admins
-  if (isInitialized && (!isAuthenticated || !isAdmin)) {
+  if (!isInitializing && (!isAuthenticated || !isAdmin)) {
     return <Navigate to="/" />;
   }
 
