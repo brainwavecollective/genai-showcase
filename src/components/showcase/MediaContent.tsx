@@ -1,11 +1,9 @@
-
-import { Badge } from "@/components/ui/badge";
-import { MediaDisplay } from "./MediaDisplay";
-import { CommentSection } from "@/components/CommentSection";
-import { MediaItem, Comment } from "@/types";
-import { motion } from "framer-motion";
-import { File, Image, LinkIcon, Video, FileText } from 'lucide-react';
 import { useState, useEffect } from "react";
+import { MediaItem, Comment } from "@/types";
+import { EmptyMediaState } from "./media-content/EmptyMediaState";
+import { LoadingState } from "./media-content/LoadingState";
+import { ErrorState } from "./media-content/ErrorState";
+import { MediaContentWrapper } from "./media-content/MediaContentWrapper";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -69,78 +67,27 @@ export function MediaContent({ selectedMedia, comments, onAddComment }: MediaCon
     // Uncomment if we need to fetch additional details
     // loadMediaDetails();
   }, [selectedMedia]);
-
-  // Media type icon mapping
-  const getMediaTypeIcon = (type: string) => {
-    switch (type) {
-      case 'image': return <Image className="h-4 w-4" />;
-      case 'video': return <Video className="h-4 w-4" />;
-      case 'link': return <LinkIcon className="h-4 w-4" />;
-      case 'document': return <File className="h-4 w-4" />;
-      case 'text': return <FileText className="h-4 w-4" />;
-      default: return <File className="h-4 w-4" />;
-    }
-  };
   
   if (!selectedMedia && !media) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">
-        <p className="text-muted-foreground">Select a media item to view its details</p>
-      </div>
-    );
+    return <EmptyMediaState />;
   }
   
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">
-        <p className="text-muted-foreground">Loading media content...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
   
   const displayMedia = media || selectedMedia;
   
   if (!displayMedia) {
-    return (
-      <Alert variant="destructive" className="my-4">
-        <AlertDescription>
-          Error: Media content not found
-        </AlertDescription>
-      </Alert>
-    );
+    return <ErrorState />;
   }
   
   return (
-    <motion.div
-      key={displayMedia.id}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="space-y-8"
-    >
-      <div>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-2xl font-medium">{displayMedia.title}</h2>
-          <Badge variant="outline" className="flex items-center gap-1">
-            {getMediaTypeIcon(displayMedia.media_type)}
-            <span className="capitalize">{displayMedia.media_type}</span>
-          </Badge>
-        </div>
-        
-        {displayMedia.description && (
-          <p className="text-muted-foreground mb-6">{displayMedia.description}</p>
-        )}
-        
-        <div className="mb-8">
-          <MediaDisplay media={displayMedia} error={loadingError} />
-        </div>
-      </div>
-      
-      <CommentSection 
-        comments={comments}
-        mediaItemId={displayMedia.id}
-        onAddComment={onAddComment}
-      />
-    </motion.div>
+    <MediaContentWrapper
+      media={displayMedia}
+      comments={comments}
+      onAddComment={onAddComment}
+      loadingError={loadingError}
+    />
   );
 }
