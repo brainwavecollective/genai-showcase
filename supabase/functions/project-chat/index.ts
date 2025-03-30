@@ -118,24 +118,24 @@ serve(async (req) => {
 
     console.log('Received request for project chat:', { message, projectContext });
 
-    // Fetch all projects - modified to fetch all projects without filtering for privacy 
-    // since all projects are now public
-    const { data: allProjects, error: projectsError } = await supabase
+    // Fetch public projects with improved logging
+    const { data: publicProjects, error: projectsError } = await supabase
       .from('project_details')
-      .select('*');
+      .select('*')
+      .eq('is_private', false);
     
     if (projectsError) {
-      console.error('Error fetching projects:', projectsError);
-      throw new Error(`Error fetching projects: ${projectsError.message}`);
+      console.error('Error fetching public projects:', projectsError);
+      throw new Error(`Error fetching public projects: ${projectsError.message}`);
     }
     
     // Log projects for debugging
-    console.log(`Successfully fetched ${allProjects?.length || 0} projects`);
+    console.log(`Successfully fetched ${publicProjects?.length || 0} public projects`);
     
-    // Format projects for the system prompt - ensuring ONLY real project data is used
+    // Format public projects for the system prompt - ensuring ONLY real project data is used
     let projectsInfo = "";
-    if (allProjects && allProjects.length > 0) {
-      projectsInfo = allProjects.map(project => {
+    if (publicProjects && publicProjects.length > 0) {
+      projectsInfo = publicProjects.map(project => {
         return `
           Project: ${project.title || 'Untitled Project'}
           Description: ${project.description || 'No description provided'}
@@ -145,7 +145,7 @@ serve(async (req) => {
         `;
       }).join('\n');
     } else {
-      projectsInfo = 'Currently there are no projects available in the showcase.';
+      projectsInfo = 'Currently there are no public projects available in the showcase.';
     }
     
     // About page information for context - Expanded with more detailed content
@@ -195,7 +195,7 @@ serve(async (req) => {
       You are a helpful AI assistant specifically for the CU Boulder ATLAS Institute Generative AI Showcase platform.
       ${aboutPageInfo}
       
-      Here is information about the projects in the showcase:
+      Here is information about the public projects in the showcase:
       ${projectsInfo}
       
       ${projectContext && projectContext !== "not provided" ? `Additional information about the current project: ${projectContext}` : ''}
