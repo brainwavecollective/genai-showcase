@@ -8,6 +8,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { Layout } from '@/components/Layout';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { ProfileSidebar } from '@/components/profile/ProfileSidebar';
 import { ProfileDetails } from '@/components/profile/ProfileDetails';
@@ -66,33 +67,27 @@ const UserProfilePage = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
+      <Layout>
         <main className="flex-1 container max-w-7xl mx-auto px-4 pt-24 pb-16">
           <ProfileError error={error as Error} onLogout={logout} />
         </main>
-        <Footer />
-      </div>
+      </Layout>
     );
   }
 
   // If still loading, show a simplified profile with data from auth context
   if (isLoading && !displayUser) {
     return (
-      <div className="min-h-screen flex flex-col">
-        <Header />
+      <Layout>
         <main className="flex-1 container max-w-7xl mx-auto px-4 pt-24 pb-16">
           <ProfileLoading user={user} onLogout={logout} getInitials={getInitials} />
         </main>
-        <Footer />
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-      
+    <Layout>
       <main className="flex-1 container max-w-7xl mx-auto px-4 pt-24 pb-16">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -112,9 +107,7 @@ const UserProfilePage = () => {
           </div>
         </motion.div>
       </main>
-      
-      <Footer />
-    </div>
+    </Layout>
   );
 };
 
