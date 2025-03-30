@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { User, getUserFullName } from '@/types';
+import { User, getUserFullName, Project } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
@@ -14,6 +14,7 @@ import { BioSection } from '@/components/profile/BioSection';
 import { ProfileError } from '@/components/profile/ProfileError';
 import { ProfileLoading } from '@/components/profile/ProfileLoading';
 import { EditProfileDialog } from '@/components/profile/EditProfileDialog';
+import ProjectGrid from '@/components/home/ProjectGrid';
 
 const UserProfilePage = () => {
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -31,7 +32,7 @@ const UserProfilePage = () => {
     return user?.email?.charAt(0).toUpperCase() || 'U';
   };
 
-  // Always define the query, but only enable it conditionally
+  // Query for user details
   const { data: userDetails, isLoading, error } = useQuery({
     queryKey: ['user', user?.id],
     queryFn: async () => {
@@ -60,6 +61,30 @@ const UserProfilePage = () => {
     },
     enabled: !!user?.id && isAuthenticated,
     retry: 1, // Limit retries since we want to show error quickly
+  });
+
+  // Query for user's projects
+  const { data: userProjects, isLoading: projectsLoading } = useQuery({
+    queryKey: ['userProjects', user?.id],
+    queryFn: async () => {
+      console.log('Fetching projects for user ID:', user?.id);
+      
+      const { data, error } = await supabase
+        .from('project_details')
+        .select('*')
+        .eq('creator_id', user?.id)
+        .order('updated_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching user projects:', error);
+        throw error;
+      }
+      
+      console.log('User projects fetched successfully:', data);
+      return data as Project[];
+    },
+    enabled: !!user?.id && isAuthenticated,
+    retry: 1,
   });
 
   // Use useEffect for navigation instead of conditional rendering
@@ -143,7 +168,7 @@ const UserProfilePage = () => {
 
   return (
     <Layout>
-      <main className="flex-1 container max-w-7xl mx-auto px-4 pt-24 pb-16">
+      <main className="flex-1 container max-w-7xl mx-auto px-4 pt-28 pb-16">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -168,6 +193,27 @@ const UserProfilePage = () => {
                 user={displayUser}
                 isFieldVisible={isFieldVisible}
               />
+              
+              {/* User's Projects Section */}
+              {isOwnProfile && (
+                <div className="mt-8">
+                  <h2 className="text-2xl font-semibold mb-4">My Projects</h2>
+                  
+                  {projectsLoading ? (
+                    <div className="text-center py-6">
+                      <p>Loading your projects...</p>
+                    </div>
+                  ) : userProjects && userProjects.length > 0 ? (
+                    <div className="mt-4">
+                      <ProjectGrid projects={userProjects} />
+                    </div>
+                  ) : (
+                    <div className="text-center py-6 bg-muted/50 rounded-lg">
+                      <p className="text-muted-foreground">You haven't created any projects yet</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           
