@@ -150,11 +150,11 @@ serve(async (req) => {
     
     // About page information for context - Expanded with more detailed content
     const aboutPageInfo = `
-      About the CU Boulder ATLAS Institute Generative AI Showcase:
+      About the Generative AI Showcase:
       
       Project Origin:
       This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
-      Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
+      Larissa Schwartz's Generative AI course at CU Boulder's School of Engineering. The platform serves as 
       both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
       experience design, and content management. The workshop explored innovative approaches to rapid 
       prototyping and development, focusing on the integration of aesthetic and functional elements. 
@@ -178,7 +178,7 @@ serve(async (req) => {
       
       Important note: This showcase platform is independently developed and maintained by 
       Daniel Ritchie as an external instructor for the workshop. It is not officially affiliated with or 
-      endorsed by the University of Colorado Boulder or the ATLAS Institute.
+      endorsed by the University of Colorado Boulder or CU's School of Engineering.
       
       By submitting work to this platform, students:
       - Retain full ownership of their intellectual property
@@ -188,11 +188,11 @@ serve(async (req) => {
       
       Contact Information:
       For questions regarding this platform: Daniel Ritchie (daniel@brainwavecollective.ai)
-      For questions about the Generative AI course at ATLAS Institute: Larissa Schwartz (Larissa.Schwartz@colorado.edu)
+      For questions about the Generative AI course at CU: Larissa Schwartz (Larissa.Schwartz@colorado.edu)
     `;
 
     const systemPrompt = `
-      You are a helpful AI assistant specifically for the CU Boulder ATLAS Institute Generative AI Showcase platform.
+      You are a helpful AI assistant specifically for the Generative AI Showcase platform.
       ${aboutPageInfo}
       
       Here is information about the public projects in the showcase:
