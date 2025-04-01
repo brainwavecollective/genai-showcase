@@ -51,7 +51,7 @@ const AboutPage = () => {
               <h2 className="text-2xl font-semibold mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">Project Origin</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 This showcase platform was developed during a Spring 2025 workshop led by Daniel Ritchie as part of 
-                Larissa Schwartz's Generative AI course at the ATLAS Institute, CU Boulder. The platform serves as 
+                Larissa Schwartz's Generative AI course at CU Boulder's School of Engineering. The platform serves as 
                 both a functional showcase and a teaching tool, demonstrating key concepts in web development, user 
                 experience design, and content management. The workshop explored innovative approaches to rapid 
                 prototyping and development, focusing on the integration of aesthetic and functional elements. 
@@ -86,7 +86,7 @@ const AboutPage = () => {
               <p className="font-medium mb-4">
                 <strong>Important note:</strong> This showcase platform is independently developed and maintained by 
                 Daniel Ritchie as an external instructor for the workshop. It is not officially affiliated with or 
-                endorsed by the University of Colorado Boulder or the ATLAS Institute.
+                endorsed by the University of Colorado Boulder or the School of Engineering.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 By submitting work to this platform, students:
@@ -108,7 +108,7 @@ const AboutPage = () => {
                 <li>Daniel Ritchie: <a href="mailto:daniel@brainwavecollective.ai" className="text-cu-gold hover:underline">daniel@brainwavecollective.ai</a></li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                For questions about the Generative AI course at ATLAS Institute, please contact:
+                For questions about the Generative AI course at CU, please contact:
               </p>
               <ul className="list-disc pl-6 mb-4 text-muted-foreground space-y-1">
                 <li>Larissa Schwartz: <a href="mailto:Larissa.Schwartz@colorado.edu" className="text-cu-gold hover:underline">Larissa.Schwartz@colorado.edu</a></li>
