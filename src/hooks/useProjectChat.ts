@@ -18,7 +18,7 @@ export function useProjectChat() {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
-      content: "Welcome to the GenAI Gallery Guide! I can help you discover and understand projects in the ATLAS Institute Generative AI Showcase. What would you like to know?",
+      content: "Welcome to the GenAI Gallery Guide! I can help you discover and understand projects in the Generative AI Showcase. What would you like to know?",
       isUser: false,
     },
   ]);
@@ -69,7 +69,7 @@ export function useProjectChat() {
       const response = await supabase.functions.invoke("project-chat", {
         body: { 
           message: content, 
-          projectContext: "General chat assistant for ATLAS Institute Generative AI Showcase" 
+          projectContext: "General chat assistant for Generative AI Showcase" 
         },
       });
 
