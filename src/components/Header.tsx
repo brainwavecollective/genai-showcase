@@ -51,7 +51,7 @@ export function Header() {
             to="/"
             className="text-xl md:text-2xl font-display font-bold tracking-tight hover:opacity-90 transition-opacity"
           >
-            ATLAS GenAI Showcase
+            GenAI Student Showcase
           </Link>
         </div>
 
