@@ -18,12 +18,12 @@ export function HeroSection() {
           >
             <Badge variant="outline" className="mb-4 border-cu-gold text-cu-gold">Student Showcase Platform</Badge>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold tracking-tight mb-4 text-gradient bg-gradient-to-r from-cu-gold to-cu-bronze">
-              Generative AI Innovation at ATLAS
+              Generative AI Innovation at CU
             </h1>
             <div className="bg-card/50 backdrop-blur-sm border border-border/50 rounded-lg p-4 md:p-6 mb-6">
               <p className="text-lg md:text-xl text-foreground/90 mb-4">
                 Explore the frontier of AI innovation through cutting-edge student projects
-                from CU Boulder's ATLAS Institute. This curated showcase highlights 
+                from CU Boulder's School of Engineering. This curated showcase highlights 
                 exceptional work from Spring 2025's Generative AI course.
               </p>
               <p className="text-muted-foreground">
