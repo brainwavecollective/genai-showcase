@@ -13,7 +13,7 @@ export function Footer() {
               GenAI Project Gallery
             </Link>
             <p className="mt-2 text-sm text-muted-foreground">
-              A showcase for student work from the ATLAS Institute's Generative AI course at CU Boulder.
+              A showcase for student work from the School of Engineering's Generative AI course at CU Boulder.
             </p>
           </div>
           
